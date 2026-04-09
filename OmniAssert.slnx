@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OmniAssert.Build/OmniAssert.Build.csproj" />
+    <Project Path="src/OmniAssert.Core/OmniAssert.Core.csproj" />
+    <Project Path="src/OmniAssert.Generator/OmniAssert.Generator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OmniAssert.Tests/OmniAssert.Tests.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/RewriteSample/RewriteSample.csproj" />
+  </Folder>
+</Solution>
