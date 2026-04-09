@@ -7,7 +7,4 @@
   <Folder Name="/tests/">
     <Project Path="tests/OmniAssert.Tests/OmniAssert.Tests.csproj" />
   </Folder>
-  <Folder Name="/samples/">
-    <Project Path="samples/RewriteSample/RewriteSample.csproj" />
-  </Folder>
 </Solution>
