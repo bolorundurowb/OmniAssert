@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests;

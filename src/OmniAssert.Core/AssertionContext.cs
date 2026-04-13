@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace OmniAssert;
 
 internal sealed class AssertionContext

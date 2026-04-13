@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace OmniAssert;
 
 /// <summary>Structured capture for Power-Assert style diagnostics (populated by the build-time rewriter).</summary>
