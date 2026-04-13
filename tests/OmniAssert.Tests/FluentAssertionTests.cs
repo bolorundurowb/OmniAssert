@@ -34,7 +34,7 @@ public class FluentAssertionTests
     [Fact]
     public void Verify_Collection_WhenValid_ShouldSucceedForToContainAndToBeEmpty()
     {
-        Verify(new[] { 1, 2, 3 }).ToContain(2);
+        Verify([1, 2, 3]).ToContain(2);
         Verify(Array.Empty<int>()).ToBeEmpty();
     }
 

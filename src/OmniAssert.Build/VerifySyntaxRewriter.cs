@@ -4,17 +4,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace OmniAssert.Build;
 
-internal sealed class VerifySyntaxRewriter : CSharpSyntaxRewriter
+internal sealed class VerifySyntaxRewriter(SemanticModel model) : CSharpSyntaxRewriter
 {
-    private readonly SemanticModel _model;
-    private readonly VerifyExpansionEngine _engine;
+    private readonly VerifyExpansionEngine _engine = new(model);
     private bool _changed;
-
-    public VerifySyntaxRewriter(SemanticModel model)
-    {
-        _model = model;
-        _engine = new VerifyExpansionEngine(model);
-    }
 
     public bool Changed => _changed;
 
@@ -33,7 +26,7 @@ internal sealed class VerifySyntaxRewriter : CSharpSyntaxRewriter
 
     private bool IsAssertVerifyBoolean(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
     {
-        var sym = _model.GetSymbolInfo(invocation, cancellationToken).Symbol as IMethodSymbol;
+        var sym = model.GetSymbolInfo(invocation, cancellationToken).Symbol as IMethodSymbol;
         if (sym is null || sym.Name == "VerifyBoolean")
             return false;
         if (sym.Name != "Verify")

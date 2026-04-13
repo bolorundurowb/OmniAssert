@@ -3,15 +3,10 @@ using System.Text;
 namespace OmniAssert;
 
 /// <summary>Thrown when a verification fails outside of a soft-assertion scope.</summary>
-public sealed class OmniAssertionException : Exception
+public sealed class OmniAssertionException(string message, AssertionCapture capture, Exception? innerException = null)
+    : Exception(message, innerException)
 {
-    public OmniAssertionException(string message, AssertionCapture capture, Exception? innerException = null)
-        : base(message, innerException)
-    {
-        Capture = capture;
-    }
-
-    public AssertionCapture Capture { get; }
+    public AssertionCapture Capture { get; } = capture;
 
     public string SourceExpression => Capture.SourceExpression;
 

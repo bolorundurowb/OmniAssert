@@ -11,9 +11,9 @@ namespace OmniAssert.Build;
 public sealed class OmniAssertRewriteTask : Microsoft.Build.Utilities.Task
 {
     [Required]
-    public ITaskItem[] Compile { get; set; } = Array.Empty<ITaskItem>();
+    public ITaskItem[] Compile { get; set; } = [];
 
-    public ITaskItem[] ReferencePath { get; set; } = Array.Empty<ITaskItem>();
+    public ITaskItem[] ReferencePath { get; set; } = [];
 
     [Required]
     public string IntermediateOutputPath { get; set; } = "";
@@ -26,7 +26,7 @@ public sealed class OmniAssertRewriteTask : Microsoft.Build.Utilities.Task
     public bool OmniAssertRewrite { get; set; } = true;
 
     [Output]
-    public ITaskItem[] RewrittenCompile { get; set; } = Array.Empty<ITaskItem>();
+    public ITaskItem[] RewrittenCompile { get; set; } = [];
 
     public override bool Execute()
     {
@@ -47,7 +47,7 @@ public sealed class OmniAssertRewriteTask : Microsoft.Build.Utilities.Task
         Directory.CreateDirectory(outDir);
 
         var refs = new List<MetadataReference>();
-        foreach (var r in ReferencePath ?? Array.Empty<ITaskItem>())
+        foreach (var r in ReferencePath ?? [])
         {
             var path = r.ItemSpec;
             if (File.Exists(path))

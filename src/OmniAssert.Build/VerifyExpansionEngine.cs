@@ -6,13 +6,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace OmniAssert.Build;
 
 /// <summary>Lowers boolean expressions into temporaries and builds an <see cref="AssertionCapture"/> dictionary for rewritten Verify calls.</summary>
-internal sealed class VerifyExpansionEngine
+internal sealed class VerifyExpansionEngine(SemanticModel model)
 {
-    private readonly SemanticModel _model;
     private int _tempId;
-    private readonly List<string> _captureKeys = new();
-
-    public VerifyExpansionEngine(SemanticModel model) => _model = model;
+    private readonly List<string> _captureKeys = [];
 
     public BlockSyntax? TryExpandVerifyInvocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
     {
@@ -20,7 +17,7 @@ internal sealed class VerifyExpansionEngine
             return null;
 
         var firstArg = invocation.ArgumentList.Arguments[0].Expression;
-        var typeInfo = _model.GetTypeInfo(firstArg, cancellationToken);
+        var typeInfo = model.GetTypeInfo(firstArg, cancellationToken);
         if (typeInfo.Type?.SpecialType != SpecialType.System_Boolean)
             return null;
 
@@ -42,11 +39,10 @@ internal sealed class VerifyExpansionEngine
 
         var captureExpr = ObjectCreationExpression(ParseTypeName("global::OmniAssert.AssertionCapture"))
             .WithArgumentList(
-                ArgumentList(SeparatedList(new[]
-                {
+                ArgumentList(SeparatedList([
                     Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(exprText))),
                     Argument(IdentifierName(dictVar))
-                })));
+                ])));
 
         var verifyCall = InvocationExpression(
                 MemberAccessExpression(
@@ -54,11 +50,10 @@ internal sealed class VerifyExpansionEngine
                     ParseTypeName("global::OmniAssert.Assert"),
                     IdentifierName("VerifyBoolean")))
             .WithArgumentList(
-                ArgumentList(SeparatedList(new[]
-                {
+                ArgumentList(SeparatedList([
                     Argument(resultExpr),
                     Argument(captureExpr)
-                })));
+                ])));
 
         var allStmts = new List<StatementSyntax>
         {
@@ -79,7 +74,7 @@ internal sealed class VerifyExpansionEngine
         out List<StatementSyntax> statements,
         out ExpressionSyntax resultExpr)
     {
-        statements = new List<StatementSyntax>();
+        statements = [];
         return TryExpandCore(expr, cancellationToken, dictVar, statements, out resultExpr);
     }
 
@@ -153,7 +148,7 @@ internal sealed class VerifyExpansionEngine
                 IdentifierName(resultId),
                 right));
 
-        var inner = Block(rightStmts.Concat(new StatementSyntax[] { assignRight }).ToArray());
+        var inner = Block(rightStmts.Concat([assignRight]).ToArray());
         statements.Add(IfStatement(left, inner));
 
         resultExpr = IdentifierName(resultId);
@@ -188,7 +183,7 @@ internal sealed class VerifyExpansionEngine
                 right));
 
         var negLeft = PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, Token(SyntaxKind.ExclamationToken), left);
-        var inner = Block(rightStmts.Concat(new StatementSyntax[] { assignRight }).ToArray());
+        var inner = Block(rightStmts.Concat([assignRight]).ToArray());
         statements.Add(IfStatement(negLeft, inner));
 
         resultExpr = IdentifierName(resultId);

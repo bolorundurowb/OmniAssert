@@ -1,15 +1,11 @@
 namespace OmniAssert;
 
 /// <summary>Structured capture for Power-Assert style diagnostics (populated by the build-time rewriter).</summary>
-public readonly struct AssertionCapture
+public readonly struct AssertionCapture(
+    string sourceExpression,
+    IReadOnlyDictionary<string, object?>? capturedValues = null)
 {
-    public AssertionCapture(string sourceExpression, IReadOnlyDictionary<string, object?>? capturedValues = null)
-    {
-        SourceExpression = sourceExpression;
-        CapturedValues = capturedValues;
-    }
+    public string SourceExpression { get; } = sourceExpression;
 
-    public string SourceExpression { get; }
-
-    public IReadOnlyDictionary<string, object?>? CapturedValues { get; }
+    public IReadOnlyDictionary<string, object?>? CapturedValues { get; } = capturedValues;
 }

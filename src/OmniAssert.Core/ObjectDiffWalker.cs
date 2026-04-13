@@ -122,18 +122,11 @@ public static class ObjectDiffWalker
     }
 }
 
-public readonly struct Mismatch
+public readonly struct Mismatch(string path, object? expected, object? actual)
 {
-    public Mismatch(string path, object? expected, object? actual)
-    {
-        Path = path;
-        Expected = expected;
-        Actual = actual;
-    }
-
-    public string Path { get; }
-    public object? Expected { get; }
-    public object? Actual { get; }
+    public string Path { get; } = path;
+    public object? Expected { get; } = expected;
+    public object? Actual { get; } = actual;
 }
 
 public sealed class ObjectDiffResult
