@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
@@ -39,8 +41,13 @@ public static partial class Assert
     public static BoolAssertions VerifyBool(bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
+    /// <summary>Begins verifying a subject that implements <see cref="INumber{T}"/>.</summary>
+    public static NumericAssertions<T> VerifyNumeric<T>(T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : INumber<T> =>
+        new(actual, expression ?? "actual");
+
     /// <summary>Begins verifying an integer subject.</summary>
-    public static IntAssertions Verify(int actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    [Obsolete("Use the generic Verify<T> overload for numeric types.")]
+    public static NumericAssertions<int> Verify(int actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a string subject.</summary>
@@ -53,6 +60,106 @@ public static partial class Assert
 
     /// <summary>Begins verifying an enum subject.</summary>
     public static EnumAssertions<T> Verify<T>(T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : struct, Enum =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a nullable value type or reference type subject.</summary>
+    public static NullableReferenceAssertions<T> VerifyNullable<T>(T? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : class =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a nullable value type subject.</summary>
+    public static NullableValueAssertions<T> VerifyNullable<T>(T? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : struct =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Verifies that the given action throws an exception of type <typeparamref name="T"/>.</summary>
+    public static ExceptionAssertions<T> Throws<T>(Action action, [CallerArgumentExpression(nameof(action))] string? expression = null) where T : Exception
+    {
+        try
+        {
+            action();
+        }
+        catch (T ex)
+        {
+            return new ExceptionAssertions<T>(ex, expression ?? "action");
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} to throw {typeof(T).Name}, but it threw {ex.GetType().Name}.", expression ?? "action");
+        }
+
+        VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} to throw {typeof(T).Name}, but it did not throw.", expression ?? "action");
+        throw new UnreachableException();
+    }
+
+    /// <summary>Verifies that the given action does not throw any exception.</summary>
+    public static void NotThrow(Action action, [CallerArgumentExpression(nameof(action))] string? expression = null)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "action");
+        }
+    }
+
+    /// <summary>Verifies that the given asynchronous action throws an exception of type <typeparamref name="T"/>.</summary>
+    public static async Task<ExceptionAssertions<T>> ThrowsAsync<T>(Func<Task> action, [CallerArgumentExpression(nameof(action))] string? expression = null) where T : Exception
+    {
+        try
+        {
+            await action();
+        }
+        catch (T ex)
+        {
+            return new ExceptionAssertions<T>(ex, expression ?? "action");
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} to throw {typeof(T).Name}, but it threw {ex.GetType().Name}.", expression ?? "action");
+        }
+
+        VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} to throw {typeof(T).Name}, but it did not throw.", expression ?? "action");
+        throw new UnreachableException();
+    }
+
+    /// <summary>Verifies that the given asynchronous action does not throw any exception.</summary>
+    public static async Task NotThrowAsync(Func<Task> action, [CallerArgumentExpression(nameof(action))] string? expression = null)
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "action");
+        }
+    }
+
+    /// <summary>Verifies that the given asynchronous action completes within the specified time span.</summary>
+    public static async Task CompleteWithin(TimeSpan timeout, Func<Task> action, [CallerArgumentExpression(nameof(action))] string? expression = null)
+    {
+        var task = action();
+        var completedTask = await Task.WhenAny(task, Task.Delay(timeout));
+        if (completedTask == task)
+        {
+            await task; // propagate any exceptions
+            return;
+        }
+
+        VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} to complete within {timeout}, but it timed out.", expression ?? "action");
+    }
+
+    /// <summary>Begins verifying a DateTime subject.</summary>
+    public static DateTimeAssertions Verify(DateTime actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a DateTimeOffset subject.</summary>
+    public static DateTimeOffsetAssertions Verify(DateTimeOffset actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a subject's type.</summary>
+    public static TypeAssertions VerifyType(object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Compares two objects by walking public properties and reports a structured diff on mismatch.</summary>
