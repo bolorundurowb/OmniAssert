@@ -2,19 +2,19 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Use <see cref="Assert.VerifyBool"/> for fluent true/false checks; <see cref="Assert.Verify(bool)"/> is for arbitrary boolean conditions (optionally rewritten by the build task).</summary>
 public readonly struct BoolAssertions
 {
     private readonly bool _actual;
     private readonly string _expression;
+    private readonly IReadOnlyDictionary<string, object?>? _capturedValues;
 
-    internal BoolAssertions(bool actual, string expression)
+    internal BoolAssertions(bool actual, string expression, IReadOnlyDictionary<string, object?>? capturedValues = null)
     {
         _actual = actual;
         _expression = expression;
+        _capturedValues = capturedValues;
     }
 
-    /// <summary>Verifies that the boolean value is true.</summary>
     public void ToBeTrue()
     {
         if (_actual)
@@ -26,10 +26,25 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("false"));
+        
+        // Include captured values if available
+        if (_capturedValues?.Count > 0)
+        {
+            msg.AppendLine();
+            msg.AppendLine("Context:");
+            foreach (var pair in _capturedValues)
+            {
+                msg.Append("  ");
+                msg.Append(pair.Key);
+                msg.Append(" = ");
+                msg.Append(OmniAssertionException.FormatValueForMessage(pair.Value));
+                msg.AppendLine();
+            }
+        }
+
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 
-    /// <summary>Verifies that the boolean value is false.</summary>
     public void ToBeFalse()
     {
         if (!_actual)
@@ -41,6 +56,21 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("true"));
+        
+        if (_capturedValues?.Count > 0)
+        {
+            msg.AppendLine();
+            msg.AppendLine("Context:");
+            foreach (var pair in _capturedValues)
+            {
+                msg.Append("  ");
+                msg.Append(pair.Key);
+                msg.Append(" = ");
+                msg.Append(OmniAssertionException.FormatValueForMessage(pair.Value));
+                msg.AppendLine();
+            }
+        }
+
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 }

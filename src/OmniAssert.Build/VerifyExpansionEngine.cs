@@ -66,6 +66,13 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
 
         return Block(allStmts);
     }
+    
+    // Add this method to VerifyExpansionEngine
+    internal bool IsSimpleBooleanIdentifier(ExpressionSyntax expr)
+    {
+        expr = expr.SkipParentheses();
+        return expr is IdentifierNameSyntax; // Simple variable/constant reference
+    }
 
     private bool TryExpandBooleanExpression(
         ExpressionSyntax expr,

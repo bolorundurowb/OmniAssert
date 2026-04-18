@@ -14,14 +14,49 @@ internal sealed class VerifySyntaxRewriter(SemanticModel model) : CSharpSyntaxRe
     public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
     {
         if (node.Expression is InvocationExpressionSyntax inv &&
-            IsAssertVerifyBoolean(inv, CancellationToken.None) &&
-            _engine.TryExpandVerifyInvocation(inv, CancellationToken.None) is { } block)
+            IsAssertVerifyBoolean(inv, CancellationToken.None))
         {
-            _changed = true;
-            return block;
+            var firstArg = inv.ArgumentList.Arguments[0].Expression;
+        
+            // Check if it's a simple boolean variable
+            if (_engine.IsSimpleBooleanIdentifier(firstArg))
+            {
+                // Route to VerifyBool for fluent assertions
+                return RewriteAsVerifyBool(node, firstArg);
+            }
+        
+            // Complex expression - use VerifyBoolean with captures
+            if (_engine.TryExpandVerifyInvocation(inv, CancellationToken.None) is { } block)
+            {
+                _changed = true;
+                return block;
+            }
         }
-
         return base.VisitExpressionStatement(node);
+    }
+
+    private SyntaxNode? RewriteAsVerifyBool(ExpressionStatementSyntax node, ExpressionSyntax expr)
+    {
+        // Rewrite: Verify(x) → VerifyBool(x).ToBeTrue()
+        var verifyBoolCall = SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.IdentifierName("Assert"),
+                    SyntaxFactory.IdentifierName("VerifyBool")))
+            .WithArgumentList(
+                SyntaxFactory.ArgumentList(
+                    SyntaxFactory.SingletonSeparatedList(
+                        SyntaxFactory.Argument(expr))));
+    
+        var toBeTrue = SyntaxFactory.InvocationExpression(
+                SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    verifyBoolCall,
+                    SyntaxFactory.IdentifierName("ToBeTrue")))
+            .WithArgumentList(SyntaxFactory.ArgumentList());
+    
+        _changed = true;
+        return node.WithExpression(toBeTrue);
     }
 
     private bool IsAssertVerifyBoolean(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
