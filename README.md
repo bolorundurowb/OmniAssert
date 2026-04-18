@@ -1,5 +1,7 @@
 # OmniAssert
 
+[![Build, Test & Coverage](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml) [![codecov](https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA)](https://codecov.io/gh/bolorundurowb/OmniAssert) [![License](https://img.shields.io/badge/license-GPLv3-orange.svg)](./LICENSE)
+
 OmniAssert is a lightweight, fluent assertion library for .NET designed for clarity and rich failure diagnostics. It combines a natural-language API with compile-time capture of operand values for boolean conditions.
 
 ## Key Features
