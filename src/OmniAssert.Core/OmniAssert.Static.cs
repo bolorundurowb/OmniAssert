@@ -284,34 +284,11 @@ public static partial class Assert
     public static DateTimeOffsetAssertions Verify(DateTimeOffset actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
-    /// <summary>Begins verifying a subject's type.</summary>
+    /// <summary>Begins verifying an object subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
-    /// <returns>A <see cref="TypeAssertions"/> object to continue the verification.</returns>
-    public static TypeAssertions VerifyType(object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    /// <returns>An <see cref="ObjectAssertions"/> object to continue the verification.</returns>
+    public static ObjectAssertions Verify(object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
-
-    /// <summary>Compares two objects by walking public properties and reports a structured diff on mismatch.</summary>
-    /// <param name="expected">The expected object state.</param>
-    /// <param name="actual">The actual object to compare.</param>
-    /// <param name="expression">The expression being verified (automatically captured).</param>
-    public static void VerifyEquivalent(object? expected, object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null)
-    {
-        var diff = ObjectDiffWalker.Diff(expected, actual, expression ?? "actual");
-        if (diff is null)
-            return;
-
-        var message = diff.FormatMessage();
-        var capture = new AssertionCapture(expression ?? "actual", null);
-        var ex = new OmniAssertionException(message, capture);
-        var ctx = AssertionScope.Current;
-        if (ctx is not null)
-        {
-            ctx.Failures.Add(ex);
-            return;
-        }
-
-        throw ex;
-    }
 }
 
