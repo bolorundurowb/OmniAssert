@@ -51,6 +51,10 @@ public static partial class Assert
     public static CollectionAssertions<T> Verify<T>(IEnumerable<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
+    /// <summary>Begins verifying an enum subject.</summary>
+    public static EnumAssertions<T> Verify<T>(T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : struct, Enum =>
+        new(actual, expression ?? "actual");
+
     /// <summary>Compares two objects by walking public properties and reports a structured diff on mismatch.</summary>
     public static void VerifyEquivalent(object? expected, object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null)
     {
