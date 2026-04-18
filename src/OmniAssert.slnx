@@ -3,6 +3,8 @@
     <Project Path="OmniAssert.Build/OmniAssert.Build.csproj" />
     <Project Path="OmniAssert.Core/OmniAssert.Core.csproj" />
     <Project Path="OmniAssert.Generator/OmniAssert.Generator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
     <Project Path="OmniAssert.Tests/OmniAssert.Tests.csproj" />
   </Folder>
 </Solution>
