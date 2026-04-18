@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="OmniAssert.Build/OmniAssert.Build.csproj" />
+    <Project Path="OmniAssert.Core/OmniAssert.Core.csproj" />
+    <Project Path="OmniAssert.Generator/OmniAssert.Generator.csproj" />
+    <Project Path="OmniAssert.Tests/OmniAssert.Tests.csproj" />
+  </Folder>
+</Solution>
