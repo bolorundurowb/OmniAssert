@@ -1,0 +1,38 @@
+name: Build, Test & Coverage
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET 10 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./src
+
+    - name: Restore dependencies
+      run: dotnet restore OmniAssert.slnx
+
+    - name: Build
+      run: dotnet build OmniAssert.slnx --no-restore -c Release
+
+    - name: Test
+      run: dotnet test OmniAssert.slnx --no-build -c Release --collect:"XPlat Code Coverage"
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: bolorundurowb/OmniAssert
