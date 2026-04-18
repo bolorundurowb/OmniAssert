@@ -14,6 +14,7 @@ public readonly struct BoolAssertions
         _expression = expression;
     }
 
+    /// <summary>Verifies that the boolean value is true.</summary>
     public void ToBeTrue()
     {
         if (_actual)
@@ -28,6 +29,7 @@ public readonly struct BoolAssertions
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 
+    /// <summary>Verifies that the boolean value is false.</summary>
     public void ToBeFalse()
     {
         if (!_actual)

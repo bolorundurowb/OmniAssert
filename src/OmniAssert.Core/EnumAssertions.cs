@@ -3,6 +3,8 @@ using System.Text;
 
 namespace OmniAssert;
 
+/// <summary>Provides assertions for enum subjects.</summary>
+/// <typeparam name="T">The enum type.</typeparam>
 public readonly struct EnumAssertions<T> where T : struct, Enum
 {
     private readonly T _actual;
@@ -14,6 +16,9 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
         _expression = expression;
     }
 
+    /// <summary>Verifies that the enum value is equal to the <paramref name="expected"/> value.</summary>
+    /// <param name="expected">The expected enum value.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
     public void ToBe(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (EqualityComparer<T>.Default.Equals(_actual, expected))
@@ -23,6 +28,9 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
         VerificationFlow.Fail(msg, _expression);
     }
 
+    /// <summary>Verifies that the enum value is not equal to the <paramref name="unexpected"/> value.</summary>
+    /// <param name="unexpected">The unexpected enum value.</param>
+    /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
     public void NotToBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (!EqualityComparer<T>.Default.Equals(_actual, unexpected))

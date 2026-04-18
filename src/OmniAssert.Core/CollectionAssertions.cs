@@ -2,6 +2,8 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
+/// <summary>Provides assertions for collections.</summary>
+/// <typeparam name="T">The type of items in the collection.</typeparam>
 public readonly struct CollectionAssertions<T>
 {
     private readonly IEnumerable<T> _actual;
@@ -13,6 +15,9 @@ public readonly struct CollectionAssertions<T>
         _expression = expression;
     }
 
+    /// <summary>Verifies that the collection contains the specified <paramref name="item"/>.</summary>
+    /// <param name="item">The item expected to be in the collection.</param>
+    /// <param name="itemExpression">The expression for the item (automatically captured).</param>
     public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         if (_actual is ICollection<T> list && list.Contains(item))
@@ -29,6 +34,7 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection is empty.</summary>
     public void ToBeEmpty()
     {
         if (_actual is ICollection<T> c && c.Count == 0)
@@ -43,6 +49,9 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection does not contain the specified <paramref name="item"/>.</summary>
+    /// <param name="item">The item that should not be in the collection.</param>
+    /// <param name="itemExpression">The expression for the item (automatically captured).</param>
     public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         var found = false;
@@ -70,6 +79,9 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection has the expected number of items.</summary>
+    /// <param name="expectedCount">The expected count.</param>
+    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     public void HasCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
     {
         var actualCount = 0;
@@ -90,6 +102,9 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that all elements in the collection satisfy the given <paramref name="predicate"/>.</summary>
+    /// <param name="predicate">The condition that every item must meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
     public void AllSatisfy(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
         var index = 0;
@@ -106,6 +121,9 @@ public readonly struct CollectionAssertions<T>
         }
     }
 
+    /// <summary>Verifies that the collection contains the same elements as <paramref name="expected"/>, regardless of order.</summary>
+    /// <param name="expected">The expected set of elements.</param>
+    /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
     public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         var actualList = _actual.ToList();
