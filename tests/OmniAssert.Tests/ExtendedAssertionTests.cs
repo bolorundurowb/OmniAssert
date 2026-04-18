@@ -5,15 +5,15 @@ namespace OmniAssert.Tests;
 public class ExtendedAssertionTests
 {
     [Fact]
-    public void VerifyNumeric_Double_ToBeApproximately_ShouldSucceed()
+    public void Verify_Double_ToBeApproximately_ShouldSucceed()
     {
-        VerifyNumeric(1.0).ToBeApproximately(1.001, 0.01);
+        Verify(1.0).ToBeApproximately(1.001, 0.01);
     }
 
     [Fact]
-    public void VerifyNumeric_Double_ToBeInRange_ShouldSucceed()
+    public void Verify_Double_ToBeInRange_ShouldSucceed()
     {
-        VerifyNumeric(5.0).ToBeInRange(1.0, 10.0);
+        Verify(5.0).ToBeInRange(1.0, 10.0);
     }
 
     [Fact]

@@ -41,13 +41,52 @@ public static partial class Assert
     public static BoolAssertions VerifyBool(bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
-    /// <summary>Begins verifying a subject that implements <see cref="INumber{T}"/>.</summary>
-    public static NumericAssertions<T> VerifyNumeric<T>(T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : INumber<T> =>
+    /// <summary>Begins verifying a double subject.</summary>
+    public static NumericAssertions<double> Verify(double actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a float subject.</summary>
+    public static NumericAssertions<float> Verify(float actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a long subject.</summary>
+    public static NumericAssertions<long> Verify(long actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a decimal subject.</summary>
+    public static NumericAssertions<decimal> Verify(decimal actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying an integer subject.</summary>
-    [Obsolete("Use the generic Verify<T> overload for numeric types.")]
     public static NumericAssertions<int> Verify(int actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a short subject.</summary>
+    public static NumericAssertions<short> Verify(short actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a byte subject.</summary>
+    public static NumericAssertions<byte> Verify(byte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a uint subject.</summary>
+    public static NumericAssertions<uint> Verify(uint actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a ulong subject.</summary>
+    public static NumericAssertions<ulong> Verify(ulong actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a ushort subject.</summary>
+    public static NumericAssertions<ushort> Verify(ushort actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying an sbyte subject.</summary>
+    public static NumericAssertions<sbyte> Verify(sbyte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a BigInteger subject.</summary>
+    public static NumericAssertions<BigInteger> Verify(BigInteger actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a string subject.</summary>
