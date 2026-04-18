@@ -1,10 +1,14 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="OmniAssert.Build/OmniAssert.Build.csproj" />
     <Project Path="OmniAssert.Core/OmniAssert.Core.csproj" />
     <Project Path="OmniAssert.Generator/OmniAssert.Generator.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="OmniAssert.Tests/OmniAssert.Tests.csproj" />
+    <Project Path="OmniAssert.Generator.Tests/OmniAssert.Generator.Tests.csproj" />
+    <Project Path="OmniAssert.Tests.NoInterceptors/OmniAssert.Tests.NoInterceptors.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj" />
   </Folder>
 </Solution>

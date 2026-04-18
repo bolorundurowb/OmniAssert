@@ -7,10 +7,14 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>OmniAssert.Tests</RootNamespace>
-    <!-- MSBuild rewrite is validated in consumer projects; the test host locks the task assembly if enabled here. -->
-    <OmniAssertRewrite>false</OmniAssertRewrite>
     <LangVersion>14</LangVersion>
+    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="8.0.1">

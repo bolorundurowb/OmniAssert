@@ -26,33 +26,4 @@ public class VerifyRewriterIntegrationTests
         Verify(x > 5 && y < 10);
     }
 
-    [Fact]
-    public void LogicalAnd_WhenLeftIsFalse_ShouldNotEvaluateRightOperand()
-    {
-        var left = false;
-        var rightInvoked = false;
-        bool Right()
-        {
-            rightInvoked = true;
-            return true;
-        }
-
-        _ = left && Right();
-        Xunit.Assert.False(rightInvoked);
-    }
-
-    [Fact]
-    public void LogicalOr_WhenLeftIsTrue_ShouldNotEvaluateRightOperand()
-    {
-        var left = true;
-        var rightInvoked = false;
-        bool Right()
-        {
-            rightInvoked = true;
-            return false;
-        }
-
-        _ = left || Right();
-        Xunit.Assert.False(rightInvoked);
-    }
 }

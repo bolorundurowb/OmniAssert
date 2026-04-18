@@ -1,6 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <OmniAssertBuildTaskSourceDir Condition="'$(OmniAssertBuildTaskSourceDir)' == ''">$(MSBuildThisFileDirectory)src\OmniAssert.Build\bin\$(Configuration)\net10.0\</OmniAssertBuildTaskSourceDir>
-    <OmniAssertCoreAssembly Condition="'$(OmniAssertCoreAssembly)' == ''">$(MSBuildThisFileDirectory)src\OmniAssert.Core\bin\$(Configuration)\net10.0\OmniAssert.Core.dll</OmniAssertCoreAssembly>
-  </PropertyGroup>
-</Project>
