@@ -14,7 +14,7 @@ public class AssertionScopeTests
     }
 
     [Fact]
-    public void Dispose_WhenSingleFailure_ShouldThrowOmniAssertionException()
+    public void Dispose_WhenSingleFailure_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {

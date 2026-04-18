@@ -19,7 +19,7 @@ public class VerifyRewriterIntegrationTests
     }
 
     [Fact]
-    public void Verify_WhenBooleanExpressionIsTrue_ShouldSucceed()
+    public void Verify_BooleanExpression_WhenTrue_ShouldSucceed()
     {
         var x = 10;
         var y = 5;

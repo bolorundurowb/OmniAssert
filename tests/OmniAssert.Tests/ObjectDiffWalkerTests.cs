@@ -11,7 +11,7 @@ public class ObjectDiffWalkerTests
     }
 
     [Fact]
-    public void Diff_WhenObjectsEquivalent_ShouldReturnNull()
+    public void Verify_NodeEquivalent_WhenObjectsEquivalent_ShouldReturnNull()
     {
         var a = new Node { Name = "a", Child = new Node { Name = "inner" } };
         var b = new Node { Name = "a", Child = new Node { Name = "inner" } };
@@ -20,7 +20,7 @@ public class ObjectDiffWalkerTests
     }
 
     [Fact]
-    public void Diff_WhenNestedPropertyDiffers_ShouldIncludeBreadcrumbPath()
+    public void Verify_NodeEquivalent_WhenNestedPropertyDiffers_ShouldIncludeBreadcrumbPath()
     {
         var a = new Node { Name = "x", Child = new Node { Name = "inner" } };
         var b = new Node { Name = "x", Child = new Node { Name = "other" } };
@@ -33,7 +33,7 @@ public class ObjectDiffWalkerTests
     }
 
     [Fact]
-    public void Diff_WhenGraphsContainCycles_ShouldNotStackOverflow()
+    public void Verify_NodeEquivalent_WhenGraphsContainCycles_ShouldNotStackOverflow()
     {
         var a = new Node { Name = "loop" };
         a.Child = a;
@@ -44,10 +44,38 @@ public class ObjectDiffWalkerTests
     }
 
     [Fact]
-    public void VerifyEquivalent_WhenPropertyValuesDiffer_ShouldThrowOmniAssertionException()
+    public void Verify_ToBeEquivalentTo_WhenPropertyValuesDiffer_ShouldThrow()
     {
         var a = new Node { Name = "one" };
         var b = new Node { Name = "two" };
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
+    }
+
+    [Fact]
+    public void Verify_ToBeEquivalentTo_WhenTypesDiffer_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new { A = 1 }).ToBeEquivalentTo(new { B = 1 }));
+    }
+
+    [Fact]
+    public void Verify_ToBeEquivalentTo_WhenActualIsNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify((object?)null).ToBeEquivalentTo(new { A = 1 }));
+    }
+
+    [Fact]
+    public void Verify_ToBeEquivalentTo_WhenCollectionElementsDiffer_ShouldThrow()
+    {
+        var a = new[] { 1, 2, 3 };
+        var b = new[] { 1, 2, 4 };
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
+    }
+
+    [Fact]
+    public void Verify_ToBeEquivalentTo_WhenCollectionCountsDiffer_ShouldThrow()
+    {
+        var a = new[] { 1, 2 };
+        var b = new[] { 1, 2, 3 };
         Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
     }
 }

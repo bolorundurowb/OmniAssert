@@ -13,7 +13,6 @@ public class EnumAssertionTests
     [Fact]
     public void Verify_EnumToBe_WhenValuesEqual_ShouldSucceed()
     {
-        // This should compile once EnumAssertions are added
         Verify(TestEnum.First).ToBe(TestEnum.First);
     }
 
