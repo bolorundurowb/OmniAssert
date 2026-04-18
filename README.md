@@ -1,131 +1,141 @@
 # OmniAssert
 
-OmniAssert is a small assertion library for .NET that combines **fluent checks** on values (`Verify(x).ToBe(expected)`) with **richer failures** for boolean conditions when you enable an MSBuild step that rewrites `Verify(bool)` call sites to capture operand values at compile time.
+OmniAssert is a lightweight, fluent assertion library for .NET designed for clarity and rich failure diagnostics. It combines a natural-language API with compile-time capture of operand values for boolean conditions.
 
-## What you get
+## Key Features
 
-- **Fluent assertions** for common types (for example `int`, `string`, `IEnumerable<T>`) with expression names in messages via `[CallerArgumentExpression]`.
-- **Boolean rewrite** (optional): `Verify(a == b && c > 0)` can fail with captured values and the original expression, not only “expected true”.
-- **`AssertionScope`**: collect multiple failures and throw when the scope ends (soft assertions).
-- **`VerifyEquivalent`**: compare two objects by public properties and emit a structured diff on mismatch.
+- **Fluent Assertions**: Natural `Verify(subject).To...` syntax for common types.
+- **Rich Boolean Failures**: Optional MSBuild-based rewriting to capture operand values in `Verify(a == b)`-style checks.
+- **Soft Assertions**: `AssertionScope` allows collecting multiple failures before throwing.
+- **Object Equivalence**: Deep structural comparison of objects with detailed diffs.
+- **Diagnostic Output**: Failures include source expressions and colorized terminal output.
 
-## Repository layout
+---
 
-| Path | Role |
-|------|------|
-| `src/OmniAssert.Core` | Runtime API: `Assert.Verify`, assertion types, `AssertionScope`, `ObjectDiffWalker`, and related types. |
-| `src/OmniAssert.Build` | MSBuild task and targets that rewrite `Verify(bool)` call sites before `CoreCompile` so failures can include captured values. |
-| `src/OmniAssert.Generator` | Roslyn incremental generator (placeholder for future compile-time features; boolean rewriting is handled by the Build task). |
-| `tests/OmniAssert.Tests` | xUnit tests for Core behavior and rewriter-related APIs. The test project references the generator as an analyzer only (`ReferenceOutputAssembly="false"`). |
+## Consumer Guide
 
-There is no solution (`.sln`) file in the repository; build and test using the project paths below.
+### Getting Started
 
-## Requirements
+1.  **Reference the library**: Add a reference to `OmniAssert.Core` in your test project.
+2.  **Import the API**:
+    ```csharp
+    using static OmniAssert.Assert;
+    ```
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) (projects target `net10.0`; the generator targets `netstandard2.0`)
+### Basic Assertions
 
-## Build
-
-```powershell
-dotnet build "src/OmniAssert.Core/OmniAssert.Core.csproj"
-dotnet build "src/OmniAssert.Build/OmniAssert.Build.csproj"
-dotnet build "src/OmniAssert.Generator/OmniAssert.Generator.csproj"
+#### Numeric
+Supports all types implementing `INumber<T>` (int, long, double, decimal, etc.).
+```csharp
+Verify(42).ToBe(42);
+Verify(10).ToBeGreaterThan(5);
+Verify(3.14159).ToBeApproximately(3.14, 0.01);
+Verify(age).ToBeInRange(18, 99);
 ```
 
-Build Core before Build if you are wiring the task from a local checkout (the rewriter resolves `OmniAssert.Core` for semantic analysis).
-
-## Using OmniAssert in a project
-
-1. Add a project reference to `OmniAssert.Core`.
-2. Reference `OmniAssert.Build` **without** referencing its assembly (so the task can load without conflicting with the app):
-
-   ```xml
-   <ProjectReference Include="path\to\OmniAssert.Build.csproj" ReferenceOutputAssembly="false" />
-   ```
-
-3. Import the targets (adjust the path to match your layout):
-
-   ```xml
-   <Import Project="path\to\OmniAssert.Build\build\OmniAssert.Build.targets" />
-   ```
-
-4. Enable rewriting (set explicitly if you do not rely on defaults from your own props):
-
-   ```xml
-   <PropertyGroup>
-     <OmniAssertRewrite>true</OmniAssertRewrite>
-   </PropertyGroup>
-   ```
-
-The targets copy task dependencies from `$(OmniAssertBuildTaskSourceDir)` and pass `$(OmniAssertCoreAssembly)` into the rewriter. Point those at your built `OmniAssert.Build` output folder and `OmniAssert.Core.dll` respectively (for this repo, `Directory.Build.props` sets defaults under `src/.../bin/$(Configuration)/net10.0/` after a local build).
-
-Set `OmniAssertRewrite` to `false` in test projects if the test host would lock the MSBuild task assembly; you can still exercise Core APIs and non-rewritten boolean checks.
-
-## API sketch
-
+#### Strings
 ```csharp
-using static OmniAssert.Assert;
+Verify("Hello World").ToContain("Hello");
+Verify("filename.txt").ToEndWith(".txt");
+Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+Verify("test").ToBe("TEST", StringComparison.OrdinalIgnoreCase);
+```
 
-Verify(42).ToBe(42);
-Verify("hello").ToContain("ell");
-Verify(new[] { 1, 2, 3 }).ToContain(2);
-VerifyBool(flag).ToBeTrue();
+#### Collections
+```csharp
+Verify(users).ToContain(currentUser);
+Verify(results).HasCount(3);
+Verify(list).AllSatisfy(x => x > 0);
+Verify(actualList).ToBeEquivalentTo(expectedList); // Unordered comparison
+```
 
-// With rewrite: failure can include captured operands and the source expression
-Verify(x > 0 && y < 100);
+#### Nullability
+```csharp
+VerifyNullable(someObject).NotToBeNull();
+Verify(someString).ToBeNullOrWhiteSpace();
+```
 
-VerifyEquivalent(expectedDto, actualDto);
+#### Exceptions
+```csharp
+Throws<ArgumentException>(() => someObject.DoWork());
+await ThrowsAsync<InvalidOperationException>(async () => await someTask);
 
+// Verify exception properties
+Throws<Exception>(() => action()).WithMessage("Error").WithInnerException<SocketException>();
+```
+
+#### Types & Dates
+```csharp
+VerifyType(instance).ToBeOfType<MyClass>();
+Verify(dateTime).ToBeAfter(DateTime.Now.AddDays(-1));
+```
+
+### Advanced Usage
+
+#### Assertion Scopes (Soft Assertions)
+Collect multiple failures and report them all at once when the scope is disposed.
+```csharp
 using (new AssertionScope())
 {
-    Verify(1).ToBe(1);
-    Verify(2).ToBe(3); // Collected; thrown on scope dispose
+    Verify(user.Name).ToBe("John");
+    Verify(user.Age).ToBe(30);
 }
 ```
 
-## Tests
-
-```powershell
-dotnet test "tests/OmniAssert.Tests/OmniAssert.Tests.csproj"
+#### Object Equivalence
+Perform a deep property-by-property comparison.
+```csharp
+VerifyEquivalent(expectedDto, actualDto);
 ```
 
-### Test naming
+### Enabling Boolean Rewriting
+To see operand values in `Verify(x == y)` failures, add the following to your `.csproj`:
 
-Tests follow **MethodUnderTest_Scenario_ExpectedBehavior** (PascalCase segments separated by underscores), for example `Dispose_WhenNoFailures_ShouldNotThrow`.
+1.  Reference the build task:
+    ```xml
+    <ProjectReference Include="path\to\OmniAssert.Build.csproj" ReferenceOutputAssembly="false" />
+    ```
+2.  Import the targets:
+    ```xml
+    <Import Project="path\to\OmniAssert.Build\build\OmniAssert.Build.targets" />
+    ```
+3.  Enable the feature:
+    ```xml
+    <PropertyGroup>
+      <OmniAssertRewrite>true</OmniAssertRewrite>
+    </PropertyGroup>
+    ```
 
-## Code coverage
+---
 
-Coverage uses [Coverlet](https://github.com/coverlet-coverage/coverlet). The test project references `coverlet.collector` (for `dotnet test --collect:"XPlat Code Coverage"`) and `coverlet.msbuild` (for MSBuild-driven reports).
+## Contributor Guide
 
-### MSBuild (summary table + Cobertura XML)
+### Repository Layout
 
-```powershell
-dotnet test "tests/OmniAssert.Tests/OmniAssert.Tests.csproj" `
-  /p:CollectCoverage=true `
-  /p:CoverletOutputFormat=cobertura `
-  /p:CoverletOutput="$PWD/TestResults/coverage/"
+| Path | Role |
+|------|------|
+| `src/OmniAssert.Core` | Runtime API and assertion implementations. |
+| `src/OmniAssert.Build` | MSBuild task for boolean expression rewriting. |
+| `src/OmniAssert.Generator` | Roslyn incremental generator (future use). |
+| `tests/OmniAssert.Tests` | Comprehensive test suite. |
+
+### Build and Test
+
+Projects target **.NET 10**. Use the following commands for development:
+
+```bash
+# Build
+dotnet build src/OmniAssert.Core/OmniAssert.Core.csproj
+
+# Run Tests
+dotnet test tests/OmniAssert.Tests/OmniAssert.Tests.csproj
+
+# Run Tests with Coverage
+dotnet test tests/OmniAssert.Tests/OmniAssert.Tests.csproj /p:CollectCoverage=true
 ```
 
-This instruments **OmniAssert.Core**. The console prints line, branch, and method coverage; `coverage.cobertura.xml` is written under `TestResults/coverage/`.
-
-### VSTest collector (XML under `TestResults`)
-
-```powershell
-dotnet test "tests/OmniAssert.Tests/OmniAssert.Tests.csproj" `
-  --collect:"XPlat Code Coverage" `
-  --results-directory "./TestResults"
-```
-
-### Measured snapshot (illustrative)
-
-The following figures were produced by the MSBuild command above on this repository; re-run the command for current numbers:
-
-| Module | Line | Branch | Method |
-|--------|------|--------|--------|
-| OmniAssert.Core | 68.2% | 54.65% | 91.66% |
-
-Coverage does not include the MSBuild rewriter (`OmniAssert.Build`); that code is validated by building consumer-style projects with `OmniAssertRewrite` enabled.
+### Test Naming Convention
+Tests should follow the pattern: `MethodUnderTest_Scenario_ExpectedBehavior` (e.g., `Dispose_WhenNoFailures_ShouldNotThrow`).
 
 ## License
-
 This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE).
