@@ -79,8 +79,8 @@ public class ExtendedAssertionTests
     public void Type_Assertions_ShouldSucceed()
     {
         object obj = "hello";
-        VerifyType(obj).ToBeOfType<string>();
-        VerifyType(obj).ToBeAssignableTo<IEnumerable<char>>();
+        Verify(obj).ToBeOfType<string>();
+        Verify(obj).ToBeAssignableTo<IEnumerable<char>>();
     }
 
     [Fact]

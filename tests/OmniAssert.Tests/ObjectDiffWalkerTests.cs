@@ -48,6 +48,6 @@ public class ObjectDiffWalkerTests
     {
         var a = new Node { Name = "one" };
         var b = new Node { Name = "two" };
-        Xunit.Assert.Throws<OmniAssertionException>(() => VerifyEquivalent(a, b));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
     }
 }
