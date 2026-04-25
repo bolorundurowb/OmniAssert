@@ -6,7 +6,8 @@
     <Nullable>enable</Nullable>
     <RootNamespace>OmniAssert</RootNamespace>
     <AssemblyName>OmniAssert.Core</AssemblyName>
-    <Description>OmniAssert runtime: fluent Verify overloads, VerifyExpression / VerifyBoolean, object diffing, and AssertionScope soft assertions.</Description>
+    <Description>OmniAssert runtime: fluent assertions for .NET tests with helpful failure messages, object diffing, exception helpers, and AssertionScope soft assertions.</Description>
+    <PackageDescription>OmniAssert runtime package for .NET tests. Provides fluent Verify-style assertions, expressive failure messages, object equivalence diffing, exception assertions, and AssertionScope for aggregated failures.</PackageDescription>
     <LangVersion>14</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>OmniAssert</PackageId>
@@ -18,6 +19,11 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
+    <PackageReleaseNotes>- Initial release</PackageReleaseNotes>
+    <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
 </Project>
