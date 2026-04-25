@@ -1,16 +1,211 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
+using OmniAssert.Generator.Rewrite;
 
 namespace OmniAssert.Generator;
 
 /// <summary>
-/// Incremental source generator placeholder for future OmniAssert compile-time features.
-/// Boolean <c>Assert.Verify</c> rewriting is performed by <c>OmniAssert.Build</c>.
+/// Emits C# interceptors for <c>OmniAssert.Assert.Verify(bool, ...)</c> when enabled via MSBuild.
 /// </summary>
 [Generator]
 public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 {
+    private const string EnableProperty = "build_property.OmniAssertEnableVerifyInterceptors";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // Reserved for incremental helpers (e.g. interceptor metadata) without slowing the IDE.
+        var interceptorsEnabled = context.AnalyzerConfigOptionsProvider.Select(
+            static (options, _) =>
+                options.GlobalOptions.TryGetValue(EnableProperty, out var v) &&
+                v.Equals("true", StringComparison.OrdinalIgnoreCase));
+
+        var compilationAndFlag = context.CompilationProvider.Combine(interceptorsEnabled);
+
+        context.RegisterSourceOutput(compilationAndFlag, (spc, tuple) =>
+        {
+            var compilation = tuple.Left;
+            var enabled = tuple.Right;
+            if (!enabled)
+                return;
+
+            var ct = spc.CancellationToken;
+            var byTree = new Dictionary<SyntaxTree, List<InterceptorCandidate>>();
+
+            foreach (var tree in compilation.SyntaxTrees)
+            {
+                if (tree.FilePath is null || !tree.FilePath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var model = compilation.GetSemanticModel(tree);
+                var root = tree.GetRoot(ct);
+                foreach (var node in root.DescendantNodes().OfType<InvocationExpressionSyntax>())
+                {
+                    if (model.GetSymbolInfo(node, ct).Symbol is not IMethodSymbol method)
+                        continue;
+                    if (!VerifyLoweringFacts.IsAssertVerifyBoolean(method))
+                        continue;
+
+#pragma warning disable RS0030 // GetInterceptableLocation is the supported interceptor authoring API
+                    if (model.GetInterceptableLocation(node, ct) is not { } location)
+#pragma warning restore RS0030
+                        continue;
+
+                    var firstArg = node.ArgumentList.Arguments[0].Expression;
+                    var engine = new VerifyExpansionEngine(model);
+                    var simple = engine.IsSimpleBooleanIdentifier(firstArg);
+
+                    if (!byTree.TryGetValue(tree, out var list))
+                    {
+                        list = new List<InterceptorCandidate>();
+                        byTree[tree] = list;
+                    }
+
+                    list.Add(new InterceptorCandidate(location, simple));
+                }
+            }
+
+            foreach (var kvp in byTree)
+            {
+                var tree = kvp.Key;
+                var candidates = kvp.Value;
+                if (candidates.Count == 0)
+                    continue;
+
+                var className = MakeFileScopedClassName(tree.FilePath);
+                var source = EmitInterceptorsFile(className, candidates);
+                var hint = SanitizeFileHint(tree.FilePath);
+                spc.AddSource($"OmniAssert.VerifyInterceptors.{hint}.g.cs", SourceText.From(source, Encoding.UTF8));
+            }
+        });
+    }
+
+    private static string MakeFileScopedClassName(string filePath)
+    {
+        var name = Path.GetFileNameWithoutExtension(filePath);
+        if (string.IsNullOrEmpty(name))
+            name = "Unknown";
+
+        var safe = new string(name.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+        if (safe.Length == 0)
+            safe = "File";
+        var hash = HexPrefix(Encoding.UTF8.GetBytes(filePath), 4);
+        return "OmniAssertVerifyInterceptors_" + safe + "_" + hash;
+    }
+
+    private static string SanitizeFileHint(string filePath)
+    {
+        var bytes = Encoding.UTF8.GetBytes(filePath);
+        return HexPrefix(bytes, 8);
+    }
+
+    /// <summary>Uppercase hex of the first <paramref name="byteCount"/> bytes of SHA256(input).</summary>
+    private static string HexPrefix(byte[] input, int byteCount)
+    {
+        using var sha = SHA256.Create();
+        var full = sha.ComputeHash(input);
+        var take = Math.Min(byteCount, full.Length);
+        return BitConverter.ToString(full, 0, take).Replace("-", string.Empty);
+    }
+
+    private static string EmitInterceptorsFile(string className, List<InterceptorCandidate> candidates)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("// <auto-generated/>");
+        sb.AppendLine("#nullable enable");
+        sb.AppendLine("namespace System.Runtime.CompilerServices");
+        sb.AppendLine("{");
+        sb.AppendLine("    [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]");
+        sb.AppendLine("    file sealed class InterceptsLocationAttribute : global::System.Attribute");
+        sb.AppendLine("    {");
+        sb.AppendLine("        public InterceptsLocationAttribute(int version, string data) { }");
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+        sb.AppendLine();
+        sb.AppendLine("namespace OmniAssert.Generated");
+        sb.AppendLine("{");
+        sb.AppendLine("    using System.Runtime.CompilerServices;");
+        sb.Append("    file static class ");
+        sb.AppendLine(className);
+        sb.AppendLine("    {");
+
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            var candidate = candidates[i];
+            sb.Append("        ");
+            sb.Append("[InterceptsLocation(");
+            sb.Append(candidate.Location.Version.ToString(CultureInfo.InvariantCulture));
+            sb.Append(", \"");
+            sb.Append(EscapeCSharpStringLiteral(candidate.Location.Data));
+            sb.AppendLine("\")]");
+            sb.Append("        internal static void OmniAssertVerifyIntercept_");
+            sb.Append(i.ToString(CultureInfo.InvariantCulture));
+            sb.AppendLine("(bool condition, string? expression = null)");
+            sb.AppendLine("        {");
+            if (candidate.SimpleIdentifierPath)
+            {
+                sb.AppendLine("            global::OmniAssert.Assert.VerifyBool(condition, expression).ToBeTrue();");
+            }
+            else
+            {
+                sb.AppendLine("            global::OmniAssert.Assert.VerifyBoolean(condition, new global::OmniAssert.AssertionCapture(expression ?? \"condition\", null));");
+            }
+
+            sb.AppendLine("        }");
+            if (i < candidates.Count - 1)
+                sb.AppendLine();
+        }
+
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+        return sb.ToString();
+    }
+
+    private static string EscapeCSharpStringLiteral(string value) =>
+        value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+
+    private readonly struct InterceptorCandidate
+    {
+        public InterceptorCandidate(InterceptableLocation location, bool simpleIdentifierPath)
+        {
+            Location = location;
+            SimpleIdentifierPath = simpleIdentifierPath;
+        }
+
+        public InterceptableLocation Location { get; }
+        public bool SimpleIdentifierPath { get; }
+    }
+}
+
+internal static class VerifyLoweringFacts
+{
+    public static bool IsAssertVerifyBoolean(IMethodSymbol sym)
+    {
+        if (sym.Name == "VerifyBoolean")
+            return false;
+        if (sym.Name != "Verify")
+            return false;
+
+        if (sym.ContainingType?.Name != "Assert" || sym.ContainingNamespace?.Name != "OmniAssert")
+            return false;
+
+        if (sym.Parameters.Length < 1 || sym.Parameters.Length > 2)
+            return false;
+
+        if (sym.Parameters[0].Type.SpecialType != SpecialType.System_Boolean)
+            return false;
+
+        if (sym.Parameters.Length == 2)
+        {
+            var t = sym.Parameters[1].Type;
+            if (t.SpecialType != SpecialType.System_String && t.Name != "String" && t.ToDisplayString() != "string?")
+                return false;
+        }
+
+        return true;
     }
 }

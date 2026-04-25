@@ -9,11 +9,14 @@ namespace OmniAssert;
 public static partial class Assert
 {
     /// <summary>
-    /// Verifies that a boolean condition holds. 
+    /// Verifies that a boolean condition holds.
     /// </summary>
     /// <remarks>
-    /// Prefer this form in user code; the OmniAssert build task rewrites call sites to capture operand values 
-    /// for more descriptive failure messages.
+    /// When the OmniAssert source generator is enabled with C# interceptors, boolean <c>Verify</c> calls are redirected
+    /// to structured handling: simple identifier conditions use the fluent <c>VerifyBool</c> path; other boolean
+    /// expressions use <see cref="VerifyBoolean"/> with the caller expression text. Enable
+    /// <c>OmniAssertEnableVerifyInterceptors</c>, reference <c>OmniAssert.Generator</c> as an analyzer, and add
+    /// <c>OmniAssert.Generated</c> to <c>InterceptorsNamespaces</c> (see repository README).
     /// </remarks>
     /// <param name="condition">The condition to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>

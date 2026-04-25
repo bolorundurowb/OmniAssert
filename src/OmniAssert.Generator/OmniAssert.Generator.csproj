@@ -16,4 +16,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="OmniAssert.Generator.Tests" />
+  </ItemGroup>
 </Project>
