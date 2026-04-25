@@ -2,26 +2,46 @@
 
 [![Build, Test & Coverage](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml) [![codecov](https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA)](https://codecov.io/gh/bolorundurowb/OmniAssert) [![License](https://img.shields.io/badge/license-GPLv3-orange.svg)](./LICENSE)
 
-OmniAssert is a lightweight, fluent assertion library for .NET focused on clear APIs and rich failure messages. Most checks use **`Verify(subject).To…`** with `[CallerArgumentExpression]` on the subject. For booleans you can use either **`Verify(flag).ToBeTrue()`** (fluent **`BoolAssertions`**) or **`VerifyExpression(condition)`** (immediate check, same failure shape as other structured boolean captures). Optional Roslyn **C# interceptors** (.NET 10) apply only to **`VerifyExpression(bool)`**. Failures throw **`OmniAssertionException`** with an **`AssertionCapture`** (source expression and optional operand dictionary) where applicable.
-
-## Key features
-
-- **Fluent `Verify`**: `Verify(subject).To…` for primitives (including **`bool`** via **`BoolAssertions`**), strings, collections, enums, nullables, `object`, dates, and more.
-- **`VerifyExpression(bool)` interceptors** (optional): source generator plus `InterceptorsNamespaces`; simple identifiers are lowered to `Verify(…).ToBeTrue()`, other boolean expressions call **`VerifyBoolean`** with the caller expression string (see [Enabling boolean `VerifyExpression` interceptors](#enabling-boolean-verifyexpression-interceptors)).
-- **Soft assertions**: `AssertionScope` collects multiple `OmniAssertionException` instances and throws once when the scope is disposed.
-- **Deep equivalence**: `Verify(actual).ToBeEquivalentTo(expected)` walks public properties and reports a structured diff.
-- **Terminal-friendly output**: messages use ANSI coloring where appropriate.
-- **Async helpers**: `ThrowsAsync` / `NotThrowAsync` and `CompleteWithin` for task-based code paths.
-
 ---
 
-## Consumer guide
+## For consumers
 
-### Installation
+OmniAssert is a small, fluent assertion library for **.NET** tests.
 
-**Runtime**
+Its design priorities are:
 
-The NuGet package ID is **`OmniAssert`** (assembly `OmniAssert.Core`). When you consume a pre-built package:
+- concise assertions (`Verify(subject).To...`)
+- useful failure messages (including caller expression text via `[CallerArgumentExpression]`)
+- predictable behavior in both single-assert and scoped-assert flows
+
+Failed checks throw `OmniAssertionException`. If you use `AssertionScope`, failures are collected and emitted together when the scope is disposed.
+
+### Consumer quick start
+
+1. Install the runtime package.
+2. Import `OmniAssert.Assert` statically.
+3. Write assertions with `Verify(...)`.
+
+```csharp
+using static OmniAssert.Assert;
+
+[Fact]
+public void Should_validate_user()
+{
+    Verify(user.Id).ToBeGreaterThan(0);
+    Verify(user.Email).ToContain("@");
+    Verify(user.IsActive).ToBeTrue();
+}
+```
+
+### What you need
+
+- **Runtime**: projects targeting **.NET 10** (or compatible) can reference the `OmniAssert` NuGet package or `OmniAssert.Core` directly.
+- **Optional boolean interceptors**: require **.NET 10 SDK**, **C# 14**, and MSBuild setup (shown below). Interceptors only affect `VerifyExpression(bool)`.
+
+### Install the runtime
+
+**From NuGet** (package id `OmniAssert`, assembly `OmniAssert.Core`):
 
 ```xml
 <ItemGroup>
@@ -29,133 +49,88 @@ The NuGet package ID is **`OmniAssert`** (assembly `OmniAssert.Core`). When you 
 </ItemGroup>
 ```
 
-From this repository, reference `src/OmniAssert.Core/OmniAssert.Core.csproj` instead.
+**From this repository**, reference `src\OmniAssert.Core\OmniAssert.Core.csproj`.
 
-**Boolean interceptors (analyzer)**
+Pin the version you want from NuGet; the snippet above may lag the latest release.
 
-`OmniAssert.Generator` is a Roslyn analyzer (`IsRoslynComponent`); it is not shipped as a separate NuGet in this repo. Add a **project reference** with `OutputItemType="Analyzer"` and `ReferenceOutputAssembly="false"`, then set the MSBuild properties under [Enabling boolean `VerifyExpression` interceptors](#enabling-boolean-verifyexpression-interceptors).
+### Core usage pattern
 
-### Getting started
+Import static members of `OmniAssert.Assert` so call sites stay short:
 
 ```csharp
 using static OmniAssert.Assert;
+
+[Fact]
+public void Example()
+{
+    Verify(answer).ToBe(42);
+    Verify(name).ToContain("Acme");
+    Verify(isReady).ToBeTrue();
+}
 ```
 
-### Basic assertions
+### Core API (at a glance)
 
-#### Numeric
+| Area | Pattern | Notes |
+|------|---------|--------|
+| **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately` | Numeric types use `INumber<T>`; `BigInteger` is included. |
+| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)` | Also `ToBeNull`, `NotToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
+| **Collections** | `Verify(list).ToContain`, `HasCount`, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is unordered multiset comparison. |
+| **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)` | |
+| **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
+| **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and reports a diff. |
+| **Dates** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin` | Works for `DateTime` and `DateTimeOffset`. |
+| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithInnerException<TInner>()` on the returned assertion object. |
+| **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
 
-Assertions use **`INumber<T>`** via `NumericAssertions<T>`. Overloads exist for the built-in numeric types and **`BigInteger`**.
+### Common consumer scenarios
+
+#### Assert a thrown exception
 
 ```csharp
-Verify(42).ToBe(42);
-Verify(10).ToBeGreaterThan(5);
-Verify(3.14159).ToBeApproximately(3.14, 0.01);
-Verify(age).ToBeInRange(18, 99);
+Throws<InvalidOperationException>(() => service.Execute())
+    .WithMessage("Operation is not valid*");
 ```
 
-#### Strings
-
-```csharp
-Verify("Hello World").ToContain("Hello");
-Verify("filename.txt").ToEndWith(".txt");
-Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-Verify("test").ToBe("TEST", StringComparison.OrdinalIgnoreCase);
-```
-
-#### Collections
-
-```csharp
-Verify(users).ToContain(currentUser);
-Verify(results).HasCount(3);
-Verify(list).AllSatisfy(x => x > 0);
-Verify(actualList).ToBeEquivalentTo(expectedList); // unordered comparison
-```
-
-#### Nullability
-
-```csharp
-VerifyNullable(someObject).NotToBeNull();
-Verify(someString).ToBeNullOrWhiteSpace();
-```
-
-#### Enums
-
-```csharp
-Verify(MyEnum.On).ToBe(MyEnum.On);
-```
-
-#### Booleans
-
-**Fluent** — `Verify(bool)` returns `BoolAssertions`. You must call `ToBeTrue()` or `ToBeFalse()`; failures use subject-style messages (expression string plus colored actual value).
-
-```csharp
-Verify(isValid).ToBeTrue();
-Verify(featureFlag).ToBeFalse();
-```
-
-**Immediate** — `VerifyExpression(bool)` asserts in one call (void). On failure it throws `OmniAssertionException` built from `AssertionCapture` / `ForBooleanFailure` (expression line and optional captured operands when supplied by tooling or `VerifyBoolean`).
-
-```csharp
-VerifyExpression(x > 0 && count < limit);
-```
-
-Use **`Verify(…).ToBeTrue()`** when you want the same fluent style as `Verify(42).ToBe(42)`. Use **`VerifyExpression(…)`** when a single call reads better, or when you [enable interceptors](#enabling-boolean-verifyexpression-interceptors) so compound expressions still get structured handling at the call site.
-
-#### Objects
-
-```csharp
-Verify(instance).ToBeOfType<MyClass>();
-Verify(instance).ToBeAssignableTo<IMyInterface>();
-```
-
-#### Exceptions and async behavior
-
-```csharp
-Throws<ArgumentException>(() => someObject.DoWork());
-await ThrowsAsync<InvalidOperationException>(async () => await someTask);
-
-NotThrow(() => { /* must not throw */ });
-await NotThrowAsync(async () => await someTask);
-
-await CompleteWithin(TimeSpan.FromSeconds(1), async () => await WorkAsync());
-
-// Further checks on the caught exception
-Throws<Exception>(() => action()).WithMessage("Error").WithInnerException<SocketException>();
-```
-
-#### Dates
-
-```csharp
-Verify(dateTime).ToBeAfter(DateTime.Now.AddDays(-1));
-Verify(dateTimeOffset).ToBeWithin(TimeSpan.FromMinutes(1), referenceInstant);
-```
-
-### Advanced usage
-
-#### Assertion scopes (soft assertions)
+#### Assert multiple outcomes in one test run
 
 ```csharp
 using (new AssertionScope())
 {
     Verify(user.Name).ToBe("John");
-    Verify(user.Age).ToBe(30);
+    Verify(user.Age).ToBeGreaterThan(17);
+    Verify(user.Email).ToContain("@");
 }
 ```
 
-#### Object equivalence
-
-Deep comparison is on **`ObjectAssertions`** (not a standalone `VerifyEquivalent` helper):
+#### Assert structural equivalence
 
 ```csharp
 Verify(actualDto).ToBeEquivalentTo(expectedDto);
 ```
 
-Boolean APIs in more detail: see [Booleans](#booleans) under *Basic assertions*. Interceptor lowering and **`VerifyBoolean`**: see the next section.
+### Booleans: `Verify(bool)` vs `VerifyExpression(bool)`
 
-### Enabling boolean `VerifyExpression` interceptors
+- **`Verify(flag).ToBeTrue()`** or `.ToBeFalse()` — `Verify(bool)` returns `BoolAssertions`. This is the primary fluent style.
 
-Use the **.NET 10** SDK and C# **14**. Configure the compiler and analyzer as follows (see **`src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`** for a working project):
+```csharp
+Verify(isValid).ToBeTrue();
+Verify(featureDisabled).ToBeFalse();
+```
+
+- **`VerifyExpression(condition)`** — one void call that asserts the condition is true immediately, with structured failure text.
+
+```csharp
+VerifyExpression(x > 0 && count < limit);
+```
+
+Use `Verify(...).ToBeTrue()` when you want consistency with other fluent assertions. Use `VerifyExpression(...)` when a single-call condition reads better, or when you enable interceptors.
+
+### Optional: richer boolean failures with interceptors
+
+Interceptors are off by default. When enabled, the `OmniAssert.Generator` analyzer emits stubs under `OmniAssert.Generated` so `VerifyExpression(bool, …)` call sites can be rewritten at compile time (simple identifiers → fluent `Verify(...).ToBeTrue()`; other expressions → internal `VerifyBoolean` with the expression string).
+
+Add the analyzer as a **project reference** (not a normal assembly reference), then match `src\samples\VerifyInterceptorsSample\VerifyInterceptorsSample.csproj`:
 
 ```xml
 <PropertyGroup>
@@ -176,49 +151,88 @@ Use the **.NET 10** SDK and C# **14**. Configure the compiler and analyzer as fo
 </ItemGroup>
 ```
 
-- **`OmniAssertEnableVerifyInterceptors`**: when `true`, the generator emits one file-scoped class per syntax tree under **`OmniAssert.Generated`**, with **`InterceptsLocationAttribute`** stubs for each interceptable **`Assert.VerifyExpression(bool, …)`** site. When `false` or omitted, nothing is emitted and **`VerifyExpression(bool)`** uses the normal **`[CallerArgumentExpression]`** path only.
-- **`InterceptorsNamespaces`**: must include **`OmniAssert.Generated`** so the compiler may apply emitted interceptors.
+- `OmniAssertEnableVerifyInterceptors`: `true` emits interceptors per syntax tree; `false` (or omitted) keeps `VerifyExpression` on the normal `[CallerArgumentExpression]` path.
+- `InterceptorsNamespaces`: must include `OmniAssert.Generated` so the compiler applies emitted interceptors.
 
-**What gets rewritten:** only **`VerifyExpression`** call sites are intercepted (not plain **`Verify(bool)`** fluent calls).
+Only `VerifyExpression` call sites are intercepted, not `Verify(bool).ToBeTrue()` fluent calls.
 
-| Condition shape at the call site | Interceptor redirect |
-|-----------------------------------|----------------------|
+| Condition at the call site | What the interceptor does |
+|----------------------------|-----------------------------|
 | Bare identifier (including parenthesized) | `Verify(condition, expression).ToBeTrue()` |
-| Anything else (operators, literals, `!flag`, compound logic, …) | `VerifyBoolean(condition, new AssertionCapture(expression, null))` |
+| Operators, literals, `!flag`, compound logical expressions, … | `VerifyBoolean(condition, new AssertionCapture(expression, null))` |
 
-**`VerifyBoolean(bool, in AssertionCapture)`** is **`[EditorBrowsable(Never)]`**: the public surface is **`VerifyExpression`** or hand-built captures for tooling. **`CapturedValues`** on the capture is populated when callers (or **`VerifyExpansionEngine`** output) supply a dictionary; emitted interceptors use **`null`** for compound expressions because arguments are evaluated before interception, so the generator cannot safely inline lowering that references caller locals. **`OmniAssert.Generator.Rewrite.VerifyExpansionEngine`** still lowers boolean trees for **tests and external tooling** that emit a full block in the original scope.
+### More examples
+
+Numeric, strings, collections, nullables, enums, objects, dates, and async helpers:
+
+```csharp
+Verify(42).ToBe(42);
+Verify(10).ToBeGreaterThan(5);
+Verify(3.14159).ToBeApproximately(3.14, 0.01);
+
+Verify("Hello World").ToContain("Hello");
+Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+Verify(users).ToContain(currentUser);
+Verify(results).HasCount(3);
+
+VerifyNullable(someObject).NotToBeNull();
+Verify(MyEnum.On).ToBe(MyEnum.On);
+
+Verify(instance).ToBeOfType<MyClass>();
+Verify(actualDto).ToBeEquivalentTo(expectedDto);
+
+Verify(dateTime).ToBeAfter(DateTime.UtcNow.AddDays(-1));
+
+using (new AssertionScope())
+{
+    Verify(user.Name).ToBe("John");
+    Verify(user.Age).ToBe(30);
+}
+```
 
 ---
 
-## Contributor guide
+## For contributors
+
+This section is for people building or changing OmniAssert itself. If you only consume the package, you can stop here.
+
+### Contribution workflow
+
+1. Fork and clone the repository.
+2. Build and run tests locally.
+3. Make focused changes with tests.
+4. Open a PR with a clear description of behavior changes.
 
 ### Repository layout
 
 | Path | Role |
 |------|------|
-| `src/OmniAssert.Core` | Runtime: `Assert` entry points, assertion types, diffing, scopes, **`OmniAssertionException`**, **`AssertionCapture`**. |
-| `src/OmniAssert.Generator` | Incremental source generator for **`VerifyExpression(bool)`** interceptors. |
-| `src/OmniAssert.Generator/Rewrite` | **`VerifyExpansionEngine`**: lowers boolean expressions for tooling/tests (not inlined into interceptors for arbitrary local-capturing expressions). |
-| `src/OmniAssert.Tests` | Main tests (interceptors **enabled**). |
-| `src/OmniAssert.Tests.NoInterceptors` | Smoke tests with interceptors **disabled**. |
-| `src/OmniAssert.Generator.Tests` | Generator and lowering tests. |
-| `src/samples/VerifyInterceptorsSample` | Minimal executable sample included in the solution. |
+| `src/OmniAssert.Core` | Runtime: `Assert`, assertion structs, `ObjectDiffWalker`, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`. |
+| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`. |
+| `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees for tests and tooling. |
+| `src/OmniAssert.Tests` | Main tests (interceptors enabled). |
+| `src/OmniAssert.Tests.NoInterceptors` | Smoke tests (interceptors disabled). |
+| `src/OmniAssert.Generator.Tests` | Generator / lowering compile tests. |
+| `src/samples/VerifyInterceptorsSample` | Minimal app showing interceptor MSBuild wiring. |
 
-### Build and test
+### Build, test, and coverage
 
-Projects target **.NET 10** (solution file: **`src/OmniAssert.slnx`**).
+Solution file: `src/OmniAssert.slnx`.
 
-```bash
+```powershell
 dotnet build src/OmniAssert.slnx
 dotnet test src/OmniAssert.slnx
 dotnet test src/OmniAssert.slnx /p:CollectCoverage=true
 ```
 
-CI (**`.github/workflows/build-and-test.yml`**) runs restore, Release build, and tests with Coverlet Cobertura output from the **`src`** directory.
+CI (`.github/workflows/build-and-test.yml`) runs restore, Release build, tests, and uploads Coverlet Cobertura to Codecov from the `src` directory.
 
-### Test naming
+### Conventions
 
-Use **`MethodUnderTest_Scenario_ExpectedBehavior`** (for example, `Dispose_WhenNoFailures_ShouldNotThrow`).
+Use test names like `MethodUnderTest_Scenario_ExpectedBehavior` (for example, `Dispose_WhenNoFailures_ShouldNotThrow`).
+
+---
 
 ## License
 
