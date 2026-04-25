@@ -19,15 +19,15 @@ jobs:
         dotnet-version: '10.x'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore OmniAssert.slnx
       working-directory: ./src
 
     - name: Build all projects
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build OmniAssert.slnx --configuration Release --no-restore
       working-directory: ./src
 
     - name: Run tests with code coverage
-      run: dotnet test --configuration Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=../../coverage/coverage.cobertura.xml
+      run: dotnet test OmniAssert.slnx --configuration Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=../../coverage/coverage.cobertura.xml
       working-directory: ./src
 
     - name: Upload coverage reports to Codecov
