@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>14</LangVersion>
+    <RootNamespace>VerifyInterceptorsSample</RootNamespace>
+    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\OmniAssert.Core\OmniAssert.Core.csproj" />
+    <ProjectReference Include="..\..\OmniAssert.Generator\OmniAssert.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>
