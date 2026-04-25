@@ -16,7 +16,7 @@ Its design priorities are:
 
 Failed checks throw `OmniAssertionException`. If you use `AssertionScope`, failures are collected and emitted together when the scope is disposed.
 
-### Consumer quick start
+### Quick start
 
 1. Install the runtime package.
 2. Import `OmniAssert.Assert` statically.
@@ -34,12 +34,12 @@ public void Should_validate_user()
 }
 ```
 
-### What you need
+### Requirements
 
 - **Runtime**: projects targeting **.NET 10** (or compatible) can reference the `OmniAssert` NuGet package or `OmniAssert.Core` directly.
 - **Optional boolean interceptors**: require **.NET 10 SDK**, **C# 14**, and MSBuild setup (shown below). Interceptors only affect `VerifyExpression(bool)`.
 
-### Install the runtime
+### Install
 
 **From NuGet** (package id `OmniAssert`, assembly `OmniAssert.Core`):
 
@@ -53,7 +53,7 @@ public void Should_validate_user()
 
 Pin the version you want from NuGet; the snippet above may lag the latest release.
 
-### Core usage pattern
+### Core usage
 
 Import static members of `OmniAssert.Assert` so call sites stay short:
 
@@ -69,7 +69,7 @@ public void Example()
 }
 ```
 
-### Core API (at a glance)
+### API at a glance
 
 | Area | Pattern | Notes |
 |------|---------|--------|
@@ -83,7 +83,7 @@ public void Example()
 | **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithInnerException<TInner>()` on the returned assertion object. |
 | **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
 
-### Common consumer scenarios
+### Common scenarios
 
 #### Assert a thrown exception
 
@@ -124,7 +124,8 @@ Verify(featureDisabled).ToBeFalse();
 VerifyExpression(x > 0 && count < limit);
 ```
 
-Use `Verify(...).ToBeTrue()` when you want consistency with other fluent assertions. Use `VerifyExpression(...)` when a single-call condition reads better, or when you enable interceptors.
+Use `Verify(...).ToBeTrue()` when you want consistency with other fluent assertions.
+Use `VerifyExpression(...)` when a single-call condition reads better, or when you enable interceptors.
 
 ### Optional: richer boolean failures with interceptors
 
@@ -154,7 +155,7 @@ Add the analyzer as a **project reference** (not a normal assembly reference), t
 - `OmniAssertEnableVerifyInterceptors`: `true` emits interceptors per syntax tree; `false` (or omitted) keeps `VerifyExpression` on the normal `[CallerArgumentExpression]` path.
 - `InterceptorsNamespaces`: must include `OmniAssert.Generated` so the compiler applies emitted interceptors.
 
-Only `VerifyExpression` call sites are intercepted, not `Verify(bool).ToBeTrue()` fluent calls.
+Only `VerifyExpression` call sites are intercepted (not `Verify(bool).ToBeTrue()` fluent calls).
 
 | Condition at the call site | What the interceptor does |
 |----------------------------|-----------------------------|
@@ -193,9 +194,10 @@ using (new AssertionScope())
 
 ---
 
-## For contributors
+## For contributors (secondary)
 
-This section is for people building or changing OmniAssert itself. If you only consume the package, you can stop here.
+This section is for people building or changing OmniAssert itself.
+If you only consume the package, you can stop after the consumer section above.
 
 ### Contribution workflow
 
