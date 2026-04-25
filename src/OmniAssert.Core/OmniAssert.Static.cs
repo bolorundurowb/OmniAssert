@@ -5,30 +5,42 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Entry points for OmniAssert verifications.</summary>
+/// <summary>
+/// Static entry points for verifications: fluent <c>Verify(...)</c> overloads, boolean <see cref="VerifyExpression"/>,
+/// exception helpers, and <see cref="VerifyBoolean"/> (used by interceptors and Roslyn lowering, not typical test code).
+/// </summary>
 public static partial class Assert
 {
+    /// <summary>Begins verifying a boolean subject; chain <see cref="BoolAssertions.ToBeTrue"/> or <see cref="BoolAssertions.ToBeFalse"/>.</summary>
+    /// <param name="actual">The boolean value under test.</param>
+    /// <param name="expression">Caller expression text for failures (compiler-supplied via <c>[CallerArgumentExpression]</c>).</param>
+    /// <returns>Fluent assertions for the boolean.</returns>
+    public static BoolAssertions Verify(bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
     /// <summary>
-    /// Verifies that a boolean condition holds.
+    /// Asserts that <paramref name="condition"/> is <c>true</c> immediately, with structured failure output (expression line and optional captured operands).
     /// </summary>
     /// <remarks>
-    /// When the OmniAssert source generator is enabled with C# interceptors, boolean <c>Verify</c> calls are redirected
-    /// to structured handling: simple identifier conditions use the fluent <c>VerifyBool</c> path; other boolean
-    /// expressions use <see cref="VerifyBoolean"/> with the caller expression text. Enable
-    /// <c>OmniAssertEnableVerifyInterceptors</c>, reference <c>OmniAssert.Generator</c> as an analyzer, and add
-    /// <c>OmniAssert.Generated</c> to <c>InterceptorsNamespaces</c> (see repository README).
+    /// With C# interceptors enabled (<c>OmniAssertEnableVerifyInterceptors</c>, analyzer <c>OmniAssert.Generator</c>,
+    /// <c>InterceptorsNamespaces</c> including <c>OmniAssert.Generated</c>), call sites are rewritten: bare identifiers
+    /// become <c>Verify(condition, expression).ToBeTrue()</c>; other expressions become
+    /// <see cref="VerifyBoolean"/> with an expression-only <see cref="AssertionCapture"/>. See the repository README.
     /// </remarks>
-    /// <param name="condition">The condition to verify.</param>
-    /// <param name="expression">The expression being verified (automatically captured).</param>
-    public static void Verify(bool condition, [CallerArgumentExpression(nameof(condition))] string? expression = null)
+    /// <param name="condition">The boolean result; must be <c>true</c>.</param>
+    /// <param name="expression">Caller expression text stored on the capture when the assertion fails.</param>
+    public static void VerifyExpression(bool condition, [CallerArgumentExpression(nameof(condition))] string? expression = null)
     {
         var capture = new AssertionCapture(expression ?? "condition", null);
         VerifyBoolean(condition, in capture);
     }
 
     /// <summary>
-    /// Invoked from rewritten code with structured captures. Not intended for direct use.
+    /// Low-level boolean check with a pre-built <see cref="AssertionCapture"/>. Used by <see cref="VerifyExpression"/>,
+    /// generated interceptors, and <c>VerifyExpansionEngine</c> output—not a normal application-level API.
     /// </summary>
+    /// <param name="result"><c>true</c> passes; <c>false</c> records or throws using <paramref name="capture"/>.</param>
+    /// <param name="capture">Source expression and optional operand dictionary for failure output.</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static void VerifyBoolean(bool result, in AssertionCapture capture)
     {
@@ -45,13 +57,6 @@ public static partial class Assert
 
         throw ex;
     }
-
-    /// <summary>Begins verifying a boolean subject.</summary>
-    /// <param name="actual">The value to verify.</param>
-    /// <param name="expression">The expression being verified (automatically captured).</param>
-    /// <returns>A <see cref="BoolAssertions"/> object to continue the verification.</returns>
-    public static BoolAssertions VerifyBool(bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
-        new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a double subject.</summary>
     /// <param name="actual">The value to verify.</param>

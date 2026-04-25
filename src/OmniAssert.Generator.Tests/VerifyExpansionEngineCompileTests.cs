@@ -6,6 +6,7 @@ using OmniAssert.Generator.Rewrite;
 
 namespace OmniAssert.Generator.Tests;
 
+/// <summary>Ensures <see cref="OmniAssert.Generator.Rewrite.VerifyExpansionEngine.TryExpandVerifyInvocation"/> emits compilable syntax for a <c>VerifyExpression</c>-shaped call.</summary>
 public class VerifyExpansionEngineCompileTests
 {
     [Fact]
@@ -19,7 +20,7 @@ public static class T
     {
         int x = 1;
         int y = 0;
-        Verify(x > y);
+        VerifyExpression(x > y);
     }
 }
 """;
@@ -39,7 +40,7 @@ public static class T
         var root = syntaxTree.GetRoot();
         var invocation = root.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "Verify" });
+            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
 
         var engine = new VerifyExpansionEngine(model);
         var block = engine.TryExpandVerifyInvocation(invocation, default);

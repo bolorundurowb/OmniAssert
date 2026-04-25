@@ -6,8 +6,9 @@ internal static class Program
 {
     private static void Main()
     {
+        // Requires OmniAssertEnableVerifyInterceptors + InterceptorsNamespaces (see README).
         var x = 2;
         var y = 3;
-        Verify(x < y);
+        VerifyExpression(x < y);
     }
 }

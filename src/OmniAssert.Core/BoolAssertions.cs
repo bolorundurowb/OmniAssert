@@ -2,6 +2,7 @@ using System.Text;
 
 namespace OmniAssert;
 
+/// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Assert.Verify(bool)"/>.</summary>
 public readonly struct BoolAssertions
 {
     private readonly bool _actual;
@@ -15,6 +16,7 @@ public readonly struct BoolAssertions
         _capturedValues = capturedValues;
     }
 
+    /// <summary>Fails when the subject is <c>false</c>; respects <see cref="AssertionScope"/> or throws <see cref="OmniAssertionException"/>.</summary>
     public void ToBeTrue()
     {
         if (_actual)
@@ -27,7 +29,7 @@ public readonly struct BoolAssertions
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("false"));
         
-        // Include captured values if available
+        // Optional operand snapshot (e.g. from advanced lowering), not from default Verify(bool) path.
         if (_capturedValues?.Count > 0)
         {
             msg.AppendLine();
@@ -45,6 +47,7 @@ public readonly struct BoolAssertions
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 
+    /// <summary>Fails when the subject is <c>true</c>; respects <see cref="AssertionScope"/> or throws <see cref="OmniAssertionException"/>.</summary>
     public void ToBeFalse()
     {
         if (!_actual)
@@ -56,7 +59,8 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("true"));
-        
+
+        // Optional operand snapshot (e.g. from advanced lowering), not from default Verify(bool) path.
         if (_capturedValues?.Count > 0)
         {
             msg.AppendLine();

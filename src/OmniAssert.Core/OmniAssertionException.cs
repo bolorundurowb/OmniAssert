@@ -2,7 +2,10 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Thrown when a verification fails outside of a soft-assertion scope.</summary>
+/// <summary>
+/// Thrown when a verification fails and no <see cref="AssertionScope"/> is collecting failures. Carries
+/// <see cref="Capture"/> so callers can read <see cref="AssertionCapture.SourceExpression"/> and optional operands.
+/// </summary>
 public sealed class OmniAssertionException(string message, AssertionCapture capture, Exception? innerException = null)
     : Exception(message, innerException)
 {
@@ -21,12 +24,14 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
         _ => value.ToString() ?? "null"
     };
 
+    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyBoolean"/> / <see cref="Assert.VerifyExpression"/> path.</summary>
     internal static OmniAssertionException ForBooleanFailure(in AssertionCapture capture)
     {
         var message = FormatBooleanFailure(capture);
         return new OmniAssertionException(message, capture);
     }
 
+    /// <summary>Formats the multi-line message listing the expression and any <see cref="AssertionCapture.CapturedValues"/>.</summary>
     internal static string FormatBooleanFailure(in AssertionCapture capture)
     {
         var sb = new StringBuilder();

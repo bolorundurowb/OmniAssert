@@ -2,6 +2,7 @@ using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests;
 
+/// <summary>Integration checks for <see cref="Assert.VerifyBoolean"/> and boolean <see cref="Assert.Verify(bool)"/> success paths.</summary>
 public class VerifyRewriterIntegrationTests
 {
     [Fact]
@@ -23,7 +24,7 @@ public class VerifyRewriterIntegrationTests
     {
         var x = 10;
         var y = 5;
-        Verify(x > 5 && y < 10);
+        Verify(x > 5 && y < 10).ToBeTrue();
     }
 
 }

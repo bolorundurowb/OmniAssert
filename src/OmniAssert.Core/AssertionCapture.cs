@@ -1,6 +1,12 @@
 namespace OmniAssert;
 
-/// <summary>Structured capture for Power-Assert style diagnostics (populated by callers of <see cref="Assert.VerifyBoolean"/> or tooling that embeds captures).</summary>
+/// <summary>
+/// Source expression text and optional operand snapshot for structured failures (expression + captured sub-values).
+/// Produced by <see cref="Assert.VerifyExpression"/> / <see cref="Assert.VerifyBoolean"/>, emitted interceptors, or
+/// boolean-expression lowering in the <c>OmniAssert.Generator</c> tooling layer.
+/// </summary>
+/// <param name="sourceExpression">Expression text or a synthetic label shown on <see cref="OmniAssertionException"/>.</param>
+/// <param name="capturedValues">Operand map for diagnostics; <c>null</c> when only the expression string is available.</param>
 public readonly struct AssertionCapture(
     string sourceExpression,
     IReadOnlyDictionary<string, object?>? capturedValues = null)

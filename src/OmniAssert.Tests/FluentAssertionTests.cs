@@ -39,9 +39,9 @@ public class FluentAssertionTests
     }
 
     [Fact]
-    public void VerifyBool_WhenTrueOrFalse_ShouldSucceed()
+    public void Verify_Boolean_WhenTrueOrFalse_ShouldSucceed()
     {
-        VerifyBool(true).ToBeTrue();
-        VerifyBool(false).ToBeFalse();
+        Verify(true).ToBeTrue();
+        Verify(false).ToBeFalse();
     }
 }

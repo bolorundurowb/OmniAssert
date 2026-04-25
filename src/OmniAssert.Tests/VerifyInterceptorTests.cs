@@ -2,6 +2,7 @@ using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests;
 
+/// <summary>Covers <see cref="Assert.VerifyExpression"/> with interceptors enabled and related <see cref="Assert.VerifyBoolean"/> behavior.</summary>
 public class VerifyInterceptorTests
 {
     [Fact]
@@ -9,7 +10,7 @@ public class VerifyInterceptorTests
     {
         var x = 3;
         var y = 12;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(x > 5 && y < 10));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(x > 5 && y < 10));
         Xunit.Assert.Contains("x > 5 && y < 10", ex.SourceExpression, StringComparison.Ordinal);
         Xunit.Assert.Null(ex.CapturedValues);
     }
@@ -19,22 +20,22 @@ public class VerifyInterceptorTests
     {
         var x = 10;
         var y = 5;
-        Verify(x > 5 && y < 10);
+        VerifyExpression(x > 5 && y < 10);
     }
 
     [Fact]
-    public void SimpleIdentifier_False_ShouldUseVerifyBoolPath()
+    public void SimpleIdentifier_False_ShouldUseVerifyFluentPath()
     {
         var flag = false;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(flag));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(flag));
         Xunit.Assert.Contains("flag", ex.SourceExpression, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void ParenthesizedIdentifier_ShouldUseVerifyBoolPath()
+    public void ParenthesizedIdentifier_ShouldUseVerifyFluentPath()
     {
         var flag = false;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify((flag)));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression((flag)));
         Xunit.Assert.Contains("flag", ex.SourceExpression, StringComparison.Ordinal);
     }
 
@@ -42,7 +43,7 @@ public class VerifyInterceptorTests
     public void UnaryNot_OnIdentifier_ShouldFailWithExpressionText()
     {
         var flag = true;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(!flag));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(!flag));
         Xunit.Assert.Contains("!flag", ex.SourceExpression, StringComparison.Ordinal);
         Xunit.Assert.Null(ex.CapturedValues);
     }
@@ -60,20 +61,20 @@ public class VerifyInterceptorTests
     [Fact]
     public void LiteralTrue_ShouldSucceed()
     {
-        Verify(true);
+        Verify(true).ToBeTrue();
     }
 
     [Fact]
     public void LiteralFalse_ShouldThrowWithExpression()
     {
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(false));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(false));
         Xunit.Assert.Contains("false", ex.SourceExpression, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     public void EqualityLiteral_ShouldThrowWithExpression()
     {
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(1 == 2));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(1 == 2));
         Xunit.Assert.Contains("1 == 2", ex.SourceExpression, StringComparison.Ordinal);
         Xunit.Assert.Null(ex.CapturedValues);
     }
@@ -85,9 +86,17 @@ public class VerifyInterceptorTests
         {
             using (new AssertionScope())
             {
-                Verify(1 > 2);
+                VerifyExpression(1 > 2);
             }
         });
         Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public void Verify_BooleanFalse_ToBeTrue_ShouldUseBoolAssertionsMessage()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(false).ToBeTrue());
+        Xunit.Assert.Contains("expected expression to be true", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Xunit.Assert.Contains("false", ex.SourceExpression, StringComparison.OrdinalIgnoreCase);
     }
 }

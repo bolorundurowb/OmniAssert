@@ -2,6 +2,7 @@ using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests;
 
+/// <summary>Boolean short-circuit evaluation with fluent <see cref="Assert.Verify(bool)"/> and expression failures via <see cref="Assert.VerifyExpression"/>.</summary>
 public class VerifyInterceptorShortCircuitTests
 {
     [Fact]
@@ -15,8 +16,8 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        // `left && Right()` is false with short-circuit; negate so Verify receives true while RHS stays unevaluated.
-        Verify(!(left && Right()));
+        // `left && Right()` is false with short-circuit; negate so Verify(...).ToBeTrue() sees true while RHS stays unevaluated.
+        Verify(!(left && Right())).ToBeTrue();
         Xunit.Assert.False(rightInvoked);
     }
 
@@ -31,7 +32,7 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        Verify(left && Right());
+        Verify(left && Right()).ToBeTrue();
         Xunit.Assert.True(rightInvoked);
     }
 
@@ -46,7 +47,7 @@ public class VerifyInterceptorShortCircuitTests
             return false;
         }
 
-        Verify(left || Right());
+        Verify(left || Right()).ToBeTrue();
         Xunit.Assert.False(rightInvoked);
     }
 
@@ -61,7 +62,7 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        Verify(left || Right());
+        Verify(left || Right()).ToBeTrue();
         Xunit.Assert.True(rightInvoked);
     }
 
@@ -70,7 +71,7 @@ public class VerifyInterceptorShortCircuitTests
     {
         var left = false;
         var right = false;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(left || right));
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(left || right));
         Xunit.Assert.Contains("left || right", ex.SourceExpression, StringComparison.Ordinal);
         Xunit.Assert.Null(ex.CapturedValues);
     }

@@ -2,19 +2,20 @@ using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests.NoInterceptors;
 
+/// <summary>Regression tests when <c>OmniAssertEnableVerifyInterceptors</c> is false (no generated interceptors).</summary>
 public class VerifyInterceptorsDisabledSmokeTests
 {
     [Fact]
     public void Verify_BooleanLiteral_ShouldSucceed()
     {
-        Verify(true);
+        Verify(true).ToBeTrue();
     }
 
     [Fact]
-    public void Verify_BooleanExpression_ShouldUseCallerArgumentExpressionOnly()
+    public void VerifyExpression_BooleanExpression_ShouldUseCallerArgumentExpressionOnly()
     {
         var x = 10;
         var y = 5;
-        Verify(x > 5 && y < 10);
+        VerifyExpression(x > 5 && y < 10);
     }
 }

@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>OmniAssert</RootNamespace>
     <AssemblyName>OmniAssert.Core</AssemblyName>
-    <Description>OmniAssert runtime: Verify API, diffing, and soft assertion scopes.</Description>
+    <Description>OmniAssert runtime: fluent Verify overloads, VerifyExpression / VerifyBoolean, object diffing, and AssertionScope soft assertions.</Description>
     <LangVersion>14</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>OmniAssert</PackageId>

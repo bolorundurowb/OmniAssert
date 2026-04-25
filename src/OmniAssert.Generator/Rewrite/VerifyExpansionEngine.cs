@@ -5,18 +5,24 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace OmniAssert.Generator.Rewrite;
 
-/// <summary>Lowers boolean expressions into temporaries and builds an <see cref="AssertionCapture"/> dictionary for expanded Verify call sites.</summary>
+/// <summary>
+/// Lowers a boolean tree into temporaries, fills a dictionary of operand values, and emits a final
+/// <see cref="Assert.VerifyBoolean"/> call. Intended for tests and external tooling that compile the lowered block in
+/// the original lexical scope.
+/// </summary>
 /// <remarks>
-/// Used for tooling/tests that compile the lowered block in the same lexical scope as the original expression.
-/// Interceptor methods cannot contain this lowering for expressions that reference caller locals, because C# evaluates
-/// arguments before interception.
+/// Emitted C# interceptors do not use this lowering for arbitrary expressions that reference caller locals, because
+/// arguments are evaluated before interception.
 /// </remarks>
 internal sealed class VerifyExpansionEngine(SemanticModel model)
 {
     private int _tempId;
     private readonly List<string> _captureKeys = [];
 
-    /// <summary>Same lowering as the legacy MSBuild rewriter: a block suited for replacing a whole statement.</summary>
+    /// <summary>Builds a statement block that evaluates the first argument as <c>bool</c> and calls <see cref="Assert.VerifyBoolean"/>.</summary>
+    /// <param name="invocation">Call whose first argument is a boolean expression (e.g. <c>VerifyExpression(x &gt; y)</c>).</param>
+    /// <param name="cancellationToken">Cancellation token for semantic analysis.</param>
+    /// <returns>A block of statements, or <c>null</c> if the expression cannot be lowered.</returns>
     public BlockSyntax? TryExpandVerifyInvocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
     {
         if (invocation.ArgumentList.Arguments.Count < 1)
@@ -73,10 +79,11 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         return Block(allStmts);
     }
 
-    /// <summary>Façade for generator/tests: same statements as <see cref="TryExpandVerifyInvocation"/> for use as a method body block.</summary>
+    /// <summary>Same lowering as <see cref="TryExpandVerifyInvocation"/>; reserved for scenarios that need a method body block.</summary>
     public BlockSyntax? TryBuildInterceptorBody(InvocationExpressionSyntax invocation, CancellationToken cancellationToken) =>
         TryExpandVerifyInvocation(invocation, cancellationToken);
 
+    /// <summary><c>true</c> when <paramref name="expr"/> is a single identifier (after stripping parentheses).</summary>
     internal bool IsSimpleBooleanIdentifier(ExpressionSyntax expr)
     {
         expr = expr.SkipParentheses();
@@ -259,8 +266,10 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
     private static string KeyFor(ExpressionSyntax expr) => expr.ToString().Trim();
 }
 
+/// <summary>Syntax helpers for boolean lowering.</summary>
 internal static class ExpressionExtensions
 {
+    /// <summary>Strips redundant parentheses from <paramref name="expr"/>.</summary>
     public static ExpressionSyntax SkipParentheses(this ExpressionSyntax expr)
     {
         while (expr is ParenthesizedExpressionSyntax p)
