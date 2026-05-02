@@ -146,7 +146,7 @@ public sealed class ObjectDiffResult
             sb.Append(m.Path);
             sb.Append(": ");
             sb.AppendLine(AnsiColour.Expected(OmniAssertionException.FormatValueForMessage(m.Expected)));
-            sb.Append(AnsiColour.Actual("Actual "));
+            sb.Append(AnsiColour.Actual("Got "));
             sb.Append(m.Path);
             sb.Append(": ");
             sb.Append(AnsiColour.Actual(OmniAssertionException.FormatValueForMessage(m.Actual)));
