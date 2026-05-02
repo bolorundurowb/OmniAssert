@@ -18,8 +18,8 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
     internal static string FormatValueForMessage(object? value) => value switch
     {
         null => "null",
-        string s => "\"" + s.Replace("\"", "\\\"", StringComparison.Ordinal) + "\"",
-        char c => "'" + c + "'",
+        string s => StringFormatter.Quote(s),
+        char c => "'" + StringFormatter.EscapeChar(c) + "'",
         IFormattable f => f.ToString(null, System.Globalization.CultureInfo.InvariantCulture),
         _ => value.ToString() ?? "null"
     };

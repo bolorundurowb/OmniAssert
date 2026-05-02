@@ -48,7 +48,7 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
         sb.Append(expectedLabel);
         sb.Append(": ");
         sb.AppendLine(AnsiColour.Expected(expected.ToString()));
-        sb.Append(AnsiColour.Actual("Actual "));
+        sb.Append(AnsiColour.Actual("Got "));
         sb.Append(actualLabel);
         sb.Append(": ");
         sb.Append(AnsiColour.Actual(actual.ToString()));
