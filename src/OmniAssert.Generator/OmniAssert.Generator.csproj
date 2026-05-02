@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <IsPackable>false</IsPackable>
     <Description>Roslyn incremental source generator for OmniAssert VerifyExpression interceptors.</Description>
     <PackageDescription>OmniAssert source-generator package that emits compile-time interceptors for VerifyExpression(bool) when OmniAssertEnableVerifyInterceptors is enabled, improving boolean assertion diagnostics.</PackageDescription>
     <TargetFramework>netstandard2.0</TargetFramework>
