@@ -28,7 +28,7 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("false"));
-        
+
         // Optional operand snapshot (e.g. from advanced lowering), not from default Verify(bool) path.
         if (_capturedValues?.Count > 0)
         {

@@ -101,7 +101,7 @@ public class ExtendedAssertionTests
     {
         Throws<ArgumentException>(() => throw new ArgumentException("bad"))
             .WithMessage("bad");
-        
+
         NotThrow(() => { });
     }
 
@@ -114,7 +114,7 @@ public class ExtendedAssertionTests
     [Fact]
     public async Task Verify_AsyncExceptionAssertions_WhenConditionsMet_ShouldSucceed()
     {
-        await ThrowsAsync<ArgumentException>(async () => 
+        await ThrowsAsync<ArgumentException>(async () =>
         {
             await Task.Yield();
             throw new ArgumentException("bad");
@@ -126,7 +126,7 @@ public class ExtendedAssertionTests
     [Fact]
     public async Task Verify_NotThrowAsync_WhenThrows_ShouldThrow()
     {
-        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => await NotThrowAsync(async () => 
+        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => await NotThrowAsync(async () =>
         {
             await Task.Yield();
             throw new Exception("fail");
@@ -142,7 +142,7 @@ public class ExtendedAssertionTests
     [Fact]
     public async Task CompleteWithin_Action_WhenTimesOut_ShouldThrow()
     {
-        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => 
+        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
             await CompleteWithin(TimeSpan.FromMilliseconds(10), async () => await Task.Delay(100)));
     }
 
