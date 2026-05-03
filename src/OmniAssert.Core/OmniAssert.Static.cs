@@ -6,8 +6,8 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>
-/// Static entry points for verifications: fluent <c>Verify(...)</c> overloads, boolean <see cref="VerifyExpression"/>,
-/// exception helpers, and <see cref="VerifyBoolean"/> (used by interceptors and Roslyn lowering, not typical test code).
+/// Provides a centralised set of assertion methods that can be used to validate conditions
+/// or verify expected outcomes in a variety of scenarios, such as testing and runtime checks.
 /// </summary>
 public static partial class Assert
 {
@@ -18,33 +18,25 @@ public static partial class Assert
     public static BoolAssertions Verify(bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
-    /// <summary>
-    /// Asserts that <paramref name="condition"/> is <c>true</c> immediately, with structured failure output (expression line and optional captured operands).
-    /// </summary>
-    /// <remarks>
-    /// With C# interceptors enabled (<c>OmniAssertEnableVerifyInterceptors</c>, analyzer <c>OmniAssert.Generator</c>,
-    /// <c>InterceptorsNamespaces</c> including <c>OmniAssert.Generated</c>), call sites are rewritten: bare identifiers
-    /// become <c>Verify(condition, expression).ToBeTrue()</c>; other expressions become
-    /// <see cref="VerifyBoolean"/> with an expression-only <see cref="AssertionCapture"/>. See the repository README.
-    /// </remarks>
-    /// <param name="condition">The boolean result; must be <c>true</c>.</param>
-    /// <param name="expression">Caller expression text stored on the capture when the assertion fails.</param>
-    public static void VerifyExpression(bool condition, [CallerArgumentExpression(nameof(condition))] string? expression = null)
-    {
-        var capture = new AssertionCapture(expression ?? "condition", null);
-        VerifyBoolean(condition, in capture);
-    }
 
     /// <summary>
-    /// Low-level boolean check with a pre-built <see cref="AssertionCapture"/>. Used by <see cref="VerifyExpression"/>,
-    /// generated interceptors, and <c>VerifyExpansionEngine</c> output—not a normal application-level API.
+    /// Verifies that a boolean condition is true. If the condition is false, it generates an assertion failure
+    /// with diagnostic information about the evaluated expression.
     /// </summary>
-    /// <param name="result"><c>true</c> passes; <c>false</c> records or throws using <paramref name="capture"/>.</param>
-    /// <param name="capture">Source expression and optional operand dictionary for failure output.</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    public static void VerifyBoolean(bool result, in AssertionCapture capture)
+    /// <param name="condition">The boolean value to be verified.</param>
+    /// <param name="expression">The caller's expression text, provided automatically by the compiler.</param>
+    /// <exception cref="OmniAssertionException">Thrown when the verification fails and no assertion context exists.</exception>
+    public static void VerifyExpression(bool condition,
+        [CallerArgumentExpression(nameof(condition))] string? expression = null) =>
+        VerifyExpression(condition, new AssertionCapture(expression ?? "condition", null));
+
+    /// <summary>
+    /// Verifies that <paramref name="condition"/> is true using an explicit <see cref="AssertionCapture"/> (source text and optional operand snapshots).
+    /// Intended for boolean-expression lowering in tooling; ordinary call sites should use <see cref="VerifyExpression(bool, string?)"/>.
+    /// </summary>
+    public static void VerifyExpression(bool condition, AssertionCapture capture)
     {
-        if (result)
+        if (condition)
             return;
 
         var ex = OmniAssertionException.ForBooleanFailure(in capture);

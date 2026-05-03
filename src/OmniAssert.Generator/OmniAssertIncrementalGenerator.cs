@@ -12,7 +12,7 @@ namespace OmniAssert.Generator;
 /// <summary>
 /// When <c>OmniAssertEnableVerifyInterceptors</c> is true, emits interceptors for each interceptable
 /// <c>OmniAssert.Assert.VerifyExpression(bool, string?)</c> call site: bare identifiers redirect to fluent
-/// <c>Verify(...).ToBeTrue()</c>; other boolean shapes call <c>VerifyBoolean</c> with an expression-only capture.
+/// <c>Verify(...).ToBeTrue()</c>; other boolean shapes call <c>VerifyExpression(bool, string?)</c> with the captured expression text.
 /// </summary>
 [Generator]
 public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
@@ -155,7 +155,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
             }
             else
             {
-                sb.AppendLine("            global::OmniAssert.Assert.VerifyBoolean(condition, new global::OmniAssert.AssertionCapture(expression ?? \"condition\", null));");
+                sb.AppendLine("            global::OmniAssert.Assert.VerifyExpression(condition, expression);");
             }
 
             sb.AppendLine("        }");
@@ -197,8 +197,6 @@ internal static class VerifyLoweringFacts
     /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Assert</c>.</summary>
     public static bool IsAssertVerifyExpression(IMethodSymbol sym)
     {
-        if (sym.Name == "VerifyBoolean")
-            return false;
         if (sym.Name != "VerifyExpression")
             return false;
 

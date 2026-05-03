@@ -7,7 +7,7 @@ namespace OmniAssert.Generator.Rewrite;
 
 /// <summary>
 /// Lowers a boolean tree into temporaries, fills a dictionary of operand values, and emits a final
-/// <see cref="Assert.VerifyBoolean"/> call. Intended for tests and external tooling that compile the lowered block in
+/// <see cref="Assert.VerifyExpression(bool, AssertionCapture)"/> call. Intended for tests and external tooling that compile the lowered block in
 /// the original lexical scope.
 /// </summary>
 /// <remarks>
@@ -19,7 +19,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
     private int _tempId;
     private readonly List<string> _captureKeys = [];
 
-    /// <summary>Builds a statement block that evaluates the first argument as <c>bool</c> and calls <see cref="Assert.VerifyBoolean"/>.</summary>
+    /// <summary>Builds a statement block that evaluates the first argument as <c>bool</c> and calls <see cref="Assert.VerifyExpression(bool, AssertionCapture)"/>.</summary>
     /// <param name="invocation">Call whose first argument is a boolean expression (e.g. <c>VerifyExpression(x &gt; y)</c>).</param>
     /// <param name="cancellationToken">Cancellation token for semantic analysis.</param>
     /// <returns>A block of statements, or <c>null</c> if the expression cannot be lowered.</returns>
@@ -60,7 +60,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     ParseTypeName("global::OmniAssert.Assert"),
-                    IdentifierName("VerifyBoolean")))
+                    IdentifierName("VerifyExpression")))
             .WithArgumentList(
                 ArgumentList(SeparatedList([
                     Argument(resultExpr),

@@ -24,7 +24,7 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
         _ => value.ToString() ?? "null"
     };
 
-    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyBoolean"/> / <see cref="Assert.VerifyExpression"/> path.</summary>
+    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyExpression"/> path.</summary>
     internal static OmniAssertionException ForBooleanFailure(in AssertionCapture capture)
     {
         var message = FormatBooleanFailure(capture);

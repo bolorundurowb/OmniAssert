@@ -2,7 +2,7 @@ namespace OmniAssert;
 
 /// <summary>
 /// Source expression text and optional operand snapshot for structured failures (expression + captured sub-values).
-/// Produced by <see cref="Assert.VerifyExpression"/> / <see cref="Assert.VerifyBoolean"/>, emitted interceptors, or
+/// Produced by <see cref="Assert.VerifyExpression"/>, emitted interceptors, or
 /// boolean-expression lowering in the <c>OmniAssert.Generator</c> tooling layer.
 /// </summary>
 /// <param name="sourceExpression">Expression text or a synthetic label shown on <see cref="OmniAssertionException"/>.</param>
