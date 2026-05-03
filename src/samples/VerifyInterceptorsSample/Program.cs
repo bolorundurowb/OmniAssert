@@ -9,6 +9,6 @@ internal static class Program
         // Requires OmniAssertEnableVerifyInterceptors + InterceptorsNamespaces (see README).
         var x = 2;
         var y = 3;
-        VerifyExpression(x < y);
+        VerifyExpression(x > y);
     }
 }

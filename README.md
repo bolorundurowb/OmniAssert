@@ -37,7 +37,7 @@ public void Should_validate_user()
 ### Requirements
 
 - **Runtime**: projects targeting **.NET 10** (or compatible) can reference the `OmniAssert` NuGet package or `OmniAssert.Core` directly.
-- **Optional boolean interceptors**: require **.NET 10 SDK**, **C# 14**, and MSBuild setup (shown below). Interceptors only affect `VerifyExpression(bool)`.
+- **Optional boolean interceptors**: require **.NET 10 SDK**, **C# 14**, and MSBuild setup (shown below). Interceptors only affect the `VerifyExpression(bool, string?)` overload (the `string` is normally supplied by `[CallerArgumentExpression]`).
 
 ### Install
 
@@ -49,9 +49,9 @@ public void Should_validate_user()
 </ItemGroup>
 ```
 
-**From this repository**, reference `src\OmniAssert.Core\OmniAssert.Core.csproj`.
+**From this repository**, add a project reference to `src/OmniAssert.Core/OmniAssert.Core.csproj` for the runtime. The `OmniAssert` NuGet package also ships the Roslyn generator under `analyzers/dotnet/cs`. When you build against the repo and want interceptors, reference `OmniAssert.Generator` as an analyzer as well (see below and `src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`).
 
-Pin the version you want from NuGet; the snippet above may lag the latest release.
+Pin the NuGet version you want; the snippet above may lag the latest release.
 
 ### Core usage
 
@@ -129,9 +129,9 @@ Use `VerifyExpression(...)` when a single-call condition reads better, or when y
 
 ### Optional: richer boolean failures with interceptors
 
-Interceptors are off by default. When enabled, the `OmniAssert.Generator` analyzer emits stubs under `OmniAssert.Generated` so `VerifyExpression(bool, …)` call sites can be rewritten at compile time (simple identifiers → fluent `Verify(...).ToBeTrue()`; other expressions → internal `VerifyBoolean` with the expression string).
+Interceptors are off by default. When enabled, the `OmniAssert.Generator` analyzer emits stubs under `OmniAssert.Generated` so `VerifyExpression(bool, …)` call sites can be rewritten at compile time: bare identifiers become fluent `Verify(...).ToBeTrue()`; every other boolean shape becomes `VerifyExpression(condition, expression)` with the captured expression text (same failure path as the non-intercepted API).
 
-Add the analyzer as a **project reference** (not a normal assembly reference), then match `src\samples\VerifyInterceptorsSample\VerifyInterceptorsSample.csproj`:
+**NuGet consumers** — the `OmniAssert` package already includes the generator as an analyzer. Enable interceptors with MSBuild only:
 
 ```xml
 <PropertyGroup>
@@ -145,8 +145,26 @@ Add the analyzer as a **project reference** (not a normal assembly reference), t
 </ItemGroup>
 
 <ItemGroup>
-  <ProjectReference Include="path\to\OmniAssert.Core\OmniAssert.Core.csproj" />
-  <ProjectReference Include="path\to\OmniAssert.Generator\OmniAssert.Generator.csproj"
+  <PackageReference Include="OmniAssert" Version="1.0.0-alpha.0" />
+</ItemGroup>
+```
+
+**Building from this repository** — reference the runtime and attach the generator to your project’s compilation (same wiring as `src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`):
+
+```xml
+<PropertyGroup>
+  <LangVersion>14</LangVersion>
+  <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
+  <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
+</PropertyGroup>
+
+<ItemGroup>
+  <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
+</ItemGroup>
+
+<ItemGroup>
+  <ProjectReference Include="path/to/OmniAssert.Core/OmniAssert.Core.csproj" />
+  <ProjectReference Include="path/to/OmniAssert.Generator/OmniAssert.Generator.csproj"
                     OutputItemType="Analyzer"
                     ReferenceOutputAssembly="false" />
 </ItemGroup>
@@ -155,12 +173,12 @@ Add the analyzer as a **project reference** (not a normal assembly reference), t
 - `OmniAssertEnableVerifyInterceptors`: `true` emits interceptors per syntax tree; `false` (or omitted) keeps `VerifyExpression` on the normal `[CallerArgumentExpression]` path.
 - `InterceptorsNamespaces`: must include `OmniAssert.Generated` so the compiler applies emitted interceptors.
 
-Only `VerifyExpression` call sites are intercepted (not `Verify(bool).ToBeTrue()` fluent calls).
+Only `VerifyExpression(bool, string?)` call sites are intercepted (not `Verify(bool).ToBeTrue()` fluent calls). A separate overload, `VerifyExpression(bool, AssertionCapture)`, is used by boolean lowering in tooling (`VerifyExpansionEngine`); it is not intercepted.
 
 | Condition at the call site | What the interceptor does |
 |----------------------------|-----------------------------|
 | Bare identifier (including parenthesized) | `Verify(condition, expression).ToBeTrue()` |
-| Operators, literals, `!flag`, compound logical expressions, … | `VerifyBoolean(condition, new AssertionCapture(expression, null))` |
+| Operators, literals, `!flag`, compound logical expressions, … | `VerifyExpression(condition, expression)` |
 
 ### More examples
 
@@ -211,8 +229,8 @@ If you only consume the package, you can stop after the consumer section above.
 | Path | Role |
 |------|------|
 | `src/OmniAssert.Core` | Runtime: `Assert`, assertion structs, `ObjectDiffWalker`, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`. |
-| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`. |
-| `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees for tests and tooling. |
+| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`. |
+| `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `VerifyExpression(bool, AssertionCapture)` for tests and tooling. |
 | `src/OmniAssert.Tests` | Main tests (interceptors enabled). |
 | `src/OmniAssert.Tests.NoInterceptors` | Smoke tests (interceptors disabled). |
 | `src/OmniAssert.Generator.Tests` | Generator / lowering compile tests. |
