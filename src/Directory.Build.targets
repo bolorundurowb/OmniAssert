@@ -1,7 +1,7 @@
 <Project>
   <!-- Imported after each project file: IsTestProject is available (Directory.Build.props runs too early). -->
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
-    <CoverletOutput>$(MSBuildThisFileDirectory)coverage\$(MSBuildProjectName).cobertura.xml</CoverletOutput>
+    <CoverletOutput>$(MSBuildThisFileDirectory)coverage/$(MSBuildProjectName).cobertura.xml</CoverletOutput>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
   </PropertyGroup>
 

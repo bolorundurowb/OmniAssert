@@ -38,7 +38,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          VERSION_FILE="Directory.Build.props"
+          VERSION_FILE="src/Directory.Build.props"
           if [[ ! -f "$VERSION_FILE" ]]; then
             echo "::error::Version file not found: $VERSION_FILE"
             exit 1
