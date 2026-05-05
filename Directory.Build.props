@@ -3,6 +3,6 @@
     <Version>1.0.0-alpha.0</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <CoverletPackageVersion>8.0.1</CoverletPackageVersion>
+    <CoverletPackageVersion>10.0.0</CoverletPackageVersion>
   </PropertyGroup>
 </Project>

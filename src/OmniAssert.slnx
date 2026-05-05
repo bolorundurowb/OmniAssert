@@ -4,8 +4,8 @@
     <Project Path="OmniAssert.Generator/OmniAssert.Generator.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="OmniAssert.Tests/OmniAssert.Tests.csproj" />
-    <Project Path="OmniAssert.Generator.Tests/OmniAssert.Generator.Tests.csproj" />
+    <Project Path="../tests/OmniAssert.Tests/OmniAssert.Tests.csproj" />
+    <Project Path="../tests/OmniAssert.Generator.Tests/OmniAssert.Generator.Tests.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj" />

@@ -18,8 +18,8 @@ The codebase was bootstrapped with **significant AI assistance**; treat contribu
 | `src/OmniAssert.Core` | Runtime: `Assert`, fluent assertion structs, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`, plus internal diff and colour helpers. |
 | `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`; optional rewrite when `OmniAssertEnableRewrite` is `true`. |
 | `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `VerifyExpression(bool, AssertionCapture)` for tests and tooling. |
-| `src/OmniAssert.Tests` | Main tests (interceptors enabled). |
-| `src/OmniAssert.Generator.Tests` | Generator and lowering compile tests. |
+| `tests/OmniAssert.Tests` | Main tests (interceptors enabled). |
+| `tests/OmniAssert.Generator.Tests` | Generator and lowering compile tests. |
 | `src/samples/VerifyInterceptorsSample` | Minimal project showing interceptor and rewrite MSBuild wiring. |
 
 ## Build, test, and coverage
@@ -32,7 +32,7 @@ dotnet test src/OmniAssert.slnx
 dotnet test src/OmniAssert.slnx /p:CollectCoverage=true
 ```
 
-With `CollectCoverage=true`, Coverlet writes **one Cobertura file per test project** under `coverage/` at the repository root (for example `coverage/OmniAssert.Tests.cobertura.xml` and `coverage/OmniAssert.Generator.Tests.cobertura.xml`). Shared package and assembly versions live in `src/Directory.Build.props`; test-only Coverlet settings are in `src/Directory.Build.targets` so `IsTestProject` is evaluated correctly.
+With `CollectCoverage=true`, Coverlet writes **one Cobertura file per test project** under `coverage/` at the repository root (for example `coverage/OmniAssert.Tests.cobertura.xml` and `coverage/OmniAssert.Generator.Tests.cobertura.xml`). Shared package and assembly versions live in **`Directory.Build.props`** at the repository root; test-only Coverlet settings are in **`Directory.Build.targets`** there so `IsTestProject` is evaluated correctly.
 
 CI (`.github/workflows/build-and-test.yml`) runs restore, a Release build, tests with coverage for all solution test projects, and uploads those Cobertura files to Codecov.
 

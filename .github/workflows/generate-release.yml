@@ -38,7 +38,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          VERSION_FILE="src/OmniAssert.Core/OmniAssert.Core.csproj"
+          VERSION_FILE="Directory.Build.props"
           if [[ ! -f "$VERSION_FILE" ]]; then
             echo "::error::Version file not found: $VERSION_FILE"
             exit 1
@@ -63,7 +63,7 @@ jobs:
         id: bump
         run: |
           set -euo pipefail
-          VERSION_FILE="src/OmniAssert.Core/OmniAssert.Core.csproj"
+          VERSION_FILE="Directory.Build.props"
           CURRENT="${{ steps.version.outputs.current }}"
 
           PREV_REF=""
@@ -97,7 +97,7 @@ jobs:
 
       - name: Exit when version unchanged
         if: steps.bump.outputs.changed != 'true'
-        run: echo "No release: <Version> in OmniAssert.Core.csproj unchanged or could not compare."
+        run: echo "No release: <Version> in Directory.Build.props unchanged or could not compare."
 
       - name: Check if release tag already exists
         id: tag
