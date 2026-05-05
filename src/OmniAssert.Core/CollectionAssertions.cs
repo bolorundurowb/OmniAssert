@@ -2,8 +2,8 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Provides assertions for collections.</summary>
-/// <typeparam name="T">The type of items in the collection.</typeparam>
+/// <summary>Assertions for <see cref="IEnumerable{T}"/> subjects from <see cref="Assert.Verify{T}(IEnumerable{T}, string?)"/>.</summary>
+/// <typeparam name="T">Element type.</typeparam>
 public readonly struct CollectionAssertions<T>
 {
     private readonly IEnumerable<T> _actual;
@@ -121,8 +121,10 @@ public readonly struct CollectionAssertions<T>
         }
     }
 
-    /// <summary>Verifies that the collection contains the same elements as <paramref name="expected"/>, regardless of order.</summary>
-    /// <param name="expected">The expected set of elements.</param>
+    /// <summary>
+    /// Multiset equivalence: same cardinality per distinct element (order ignored). Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">Expected multiset of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
     public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {

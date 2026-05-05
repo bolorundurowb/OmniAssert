@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Generic assertions for object subjects.</summary>
+/// <summary>Assertions for arbitrary <see cref="object"/> (or boxed) subjects from <see cref="Assert.Verify(object?, string?)"/>.</summary>
 public readonly struct ObjectAssertions
 {
     private readonly object? _actual;
@@ -14,7 +14,7 @@ public readonly struct ObjectAssertions
         _expression = expression;
     }
 
-    /// <summary>Verifies that the actual object is of the specified type.</summary>
+    /// <summary>Asserts the runtime type is exactly <typeparamref name="T"/> (not a derived type).</summary>
     public void ToBeOfType<T>()
     {
         if (_actual is T && _actual.GetType() == typeof(T))
@@ -24,7 +24,7 @@ public readonly struct ObjectAssertions
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be of type {typeof(T).Name}, but was {actualType}.", _expression);
     }
 
-    /// <summary>Verifies that the actual object is assignable to the specified type.</summary>
+    /// <summary>Asserts the subject is assignable to <typeparamref name="T"/> (including derived instances).</summary>
     public void ToBeAssignableTo<T>()
     {
         if (_actual is T)
@@ -34,8 +34,10 @@ public readonly struct ObjectAssertions
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be assignable to {typeof(T).Name}, but was {actualType}.", _expression);
     }
 
-    /// <summary>Compares the actual object to the expected object by walking public properties and reports a structured diff on mismatch.</summary>
-    /// <param name="expected">The expected object state.</param>
+    /// <summary>
+    /// Deep structural comparison: walks public instance properties and sequences, then reports a coloured diff on mismatch.
+    /// </summary>
+    /// <param name="expected">Expected graph (order of enumerable elements must match).</param>
     public void ToBeEquivalentTo(object? expected)
     {
         var diff = ObjectDiffWalker.Diff(expected, _actual, _expression);

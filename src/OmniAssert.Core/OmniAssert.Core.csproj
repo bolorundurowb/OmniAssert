@@ -27,6 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="OmniAssert.Tests" />
+    <InternalsVisibleTo Include="OmniAssert.Tests.NoInterceptors" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OmniAssert.Generator\OmniAssert.Generator.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />

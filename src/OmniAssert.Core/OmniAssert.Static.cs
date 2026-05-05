@@ -6,9 +6,13 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>
-/// Provides a centralised set of assertion methods that can be used to validate conditions
-/// or verify expected outcomes in a variety of scenarios, such as testing and runtime checks.
+/// Entry point for fluent assertions. Overloads capture the caller’s expression text via
+/// <see cref="CallerArgumentExpressionAttribute"/> so failures name the value or expression under test.
 /// </summary>
+/// <remarks>
+/// <para>Use <see cref="AssertionScope"/> to defer failures until the scope is disposed (soft asserts).</para>
+/// <para><see cref="VerifyExpression(bool, string?)"/> can be rewritten at compile time when the optional OmniAssert Roslyn generator and interceptor MSBuild properties are enabled—see the README.</para>
+/// </remarks>
 public static partial class Assert
 {
     /// <summary>Begins verifying a boolean subject; chain <see cref="BoolAssertions.ToBeTrue"/> or <see cref="BoolAssertions.ToBeFalse"/>.</summary>
@@ -24,8 +28,8 @@ public static partial class Assert
     /// with diagnostic information about the evaluated expression.
     /// </summary>
     /// <param name="condition">The boolean value to be verified.</param>
-    /// <param name="expression">The caller's expression text, provided automatically by the compiler.</param>
-    /// <exception cref="OmniAssertionException">Thrown when the verification fails and no assertion context exists.</exception>
+    /// <param name="expression">The caller’s expression text, supplied automatically by the compiler.</param>
+    /// <exception cref="OmniAssertionException">Thrown when the condition is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
     public static void VerifyExpression(bool condition,
         [CallerArgumentExpression(nameof(condition))] string? expression = null) =>
         VerifyExpression(condition, new AssertionCapture(expression ?? "condition", null));
@@ -34,6 +38,7 @@ public static partial class Assert
     /// Verifies that <paramref name="condition"/> is true using an explicit <see cref="AssertionCapture"/> (source text and optional operand snapshots).
     /// Intended for boolean-expression lowering in tooling; ordinary call sites should use <see cref="VerifyExpression(bool, string?)"/>.
     /// </summary>
+    /// <exception cref="OmniAssertionException">Thrown when <paramref name="condition"/> is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
     public static void VerifyExpression(bool condition, AssertionCapture capture)
     {
         if (condition)

@@ -8,13 +8,11 @@
 
 > **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
 
-OmniAssert is a small, fluent assertion library for **.NET** tests. You chain methods on `Verify(subject)` (for example `Verify(x).ToBe(42)`), and failures throw `OmniAssertionException` with the caller’s expression text where the compiler supplies it via `[CallerArgumentExpression]`.
+**OmniAssert** is on NuGet as **[`OmniAssert`](https://www.nuget.org/packages/OmniAssert)**. The first line is **`1.0.0-alpha.0`**: a small runtime (`OmniAssert.Core`) plus an optional Roslyn generator shipped inside the same package.
 
-Design goals:
+### Why this package exists
 
-- concise call sites (`Verify(subject).To…`)
-- useful failure messages
-- predictable behaviour in single-assert mode and inside `AssertionScope` (soft asserts)
+OmniAssert brings together ideas that are scattered across popular .NET assertion stacks: **fluent APIs that read in natural language** (`Verify(subject).To…`), **rich exception text and tidy failure output** (including caller expression names via `[CallerArgumentExpression]`), a **deep object graph diff** behind `ToBeEquivalentTo` (public properties, sequences, cycle-safe walks), **`AssertionScope`** for soft asserts that aggregate many failures into one report, and—when you opt in—**compile-time support for complex boolean checks** so failures are easier to diagnose (`VerifyExpression` interceptors for full expression text; an advanced **rewrite** mode can record **intermediate sub-values** when a compound condition fails).
 
 If you use `AssertionScope`, failures are collected and reported together when the scope is disposed.
 
@@ -51,9 +49,11 @@ public void Should_validate_user()
 </ItemGroup>
 ```
 
-**From this repository**: reference `src/OmniAssert.Core/OmniAssert.Core.csproj`. The shipped NuGet package also includes the Roslyn generator under `analyzers/dotnet/cs`. To enable interceptors when building from the repo, add an analyzer reference to `src/OmniAssert.Generator/OmniAssert.Generator.csproj` (see `src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`).
+**From this repository**: reference `src/OmniAssert.Core/OmniAssert.Core.csproj`. The same Roslyn generator that ships in the NuGet package lives under `analyzers/dotnet/cs`; to enable it from a fork, add an analyzer reference to `src/OmniAssert.Generator/OmniAssert.Generator.csproj` (see `src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`).
 
-Pin the package version you want; the snippet above may lag the latest release.
+### Public API (what you reference in tests)
+
+Consumers rely on **`Assert`** (usually with `using static OmniAssert.Assert`), the fluent assertion structs it returns, **`AssertionScope`**, **`OmniAssertionException`**, and **`AssertionCapture`** (for advanced `VerifyExpression` scenarios). Types such as the diff engine and terminal colour helpers are **internal implementation details**—you exercise them through **`Verify(…).ToBeEquivalentTo(…)`** and other public assertions. Optional generator output appears under **`OmniAssert.Generated`** when interceptors are enabled.
 
 ### Core usage
 
@@ -78,7 +78,7 @@ public void Example()
 | **Collections** | `Verify(list).ToContain`, `HasCount`, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison. |
 | **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)` | |
 | **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
-| **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and reports a diff. |
+| **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
 | **Dates** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin` | Works for `DateTime` and `DateTimeOffset`. |
 | **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithInnerException<TInner>()` on the returned assertion object. |
 | **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
@@ -233,7 +233,7 @@ The codebase was bootstrapped with **significant AI assistance**; treat contribu
 
 | Path | Role |
 |------|------|
-| `src/OmniAssert.Core` | Runtime: `Assert`, assertion structs, `ObjectDiffWalker`, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`. |
+| `src/OmniAssert.Core` | Runtime: `Assert`, fluent assertion structs, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`, plus internal diff/colour helpers. |
 | `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`; optional rewrite when `OmniAssertEnableRewrite` is `true`. |
 | `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `VerifyExpression(bool, AssertionCapture)` for tests and tooling. |
 | `src/OmniAssert.Tests` | Main tests (interceptors enabled). |
