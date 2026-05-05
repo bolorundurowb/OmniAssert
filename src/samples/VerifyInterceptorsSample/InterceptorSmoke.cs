@@ -2,7 +2,7 @@ using static OmniAssert.Assert;
 
 namespace VerifyInterceptorsSample;
 
-/// <summary>Compiled entry point so the generator can emit interceptors for a real syntax tree (Program.cs is only an AdditionalFile for rewrite).</summary>
+/// <summary>Holds a compiled <see cref="Assert.VerifyExpression(bool)"/> call site so interceptors are generated; <c>Program.cs</c> is supplied only as an AdditionalFile for rewrite.</summary>
 internal static class InterceptorSmoke
 {
     internal static void Run()

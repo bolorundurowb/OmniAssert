@@ -6,7 +6,7 @@ public static class Program
 {
     public static void Main()
     {
-        // Requires OmniAssertEnableVerifyInterceptors + InterceptorsNamespaces (see README).
+        // See README: OmniAssertEnableVerifyInterceptors and InterceptorsNamespaces.
         var x = 2;
         var y = 3;
         var z = 10;

@@ -58,12 +58,7 @@ internal sealed class VerifyCallSiteRewriter(SemanticModel model, CancellationTo
         if (expanded == null)
             return false;
 
-        // NormalizeWhitespace adds newlines and indentation between tokens so the emitted
-        // source is readable and compiles without token-run-together errors.
-        // Also drop the leading #line hidden and trailing #line default statements — those
-        // are only useful when embedding generated code inside an interceptor body so the
-        // debugger skips over it.  In a rewritten source file the generated code IS the
-        // source, so the directives are both unnecessary and harmful.
+        // Readable formatting; strip #line directives (they suit embedded interceptor bodies, not a standalone rewrite file).
         var normalized = (BlockSyntax)expanded.NormalizeWhitespace();
         expandedStatements = normalized.Statements.Where(s => !IsLineDirectiveStatement(s));
         return true;
@@ -71,8 +66,6 @@ internal sealed class VerifyCallSiteRewriter(SemanticModel model, CancellationTo
 
     private static bool IsLineDirectiveStatement(StatementSyntax s)
     {
-        // ParseStatement("#line hidden") / ParseStatement("#line default") produce an
-        // EmptyStatementSyntax whose leading trivia contains the directive text.
         var text = s.ToFullString().Trim();
         return text is "#line hidden" or "#line default" or "#line hidden;" or "#line default;";
     }

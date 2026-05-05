@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace OmniAssert;
 
-/// <summary>Provides assertions for string subjects.</summary>
+/// <summary>Assertions for <see cref="string"/> (or null) subjects from <see cref="Assert.Verify(string?, string?)"/>.</summary>
 public readonly struct StringAssertions
 {
     private readonly string? _actual;
@@ -73,13 +73,13 @@ public readonly struct StringAssertions
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be null or empty, but was {Quote(_actual)}.", _expression);
     }
 
-    /// <summary>Verifies that the string is null, empty, or consists only of white-space characters.</summary>
+    /// <summary>Verifies that the string is null, empty, or consists only of whitespace characters.</summary>
     public void ToBeNullOrWhiteSpace()
     {
         if (string.IsNullOrWhiteSpace(_actual))
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be null or white space, but was {Quote(_actual)}.", _expression);
+        VerificationFlow.Fail($"Verification failed: expected {_expression} to be null or whitespace, but was {Quote(_actual)}.", _expression);
     }
 
     /// <summary>Verifies that the string is null.</summary>

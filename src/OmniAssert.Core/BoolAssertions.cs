@@ -3,6 +3,7 @@ using System.Text;
 namespace OmniAssert;
 
 /// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Assert.Verify(bool)"/>.</summary>
+/// <remarks>Failures respect an enclosing <see cref="AssertionScope"/> when present; otherwise they throw <see cref="OmniAssertionException"/>.</remarks>
 public readonly struct BoolAssertions
 {
     private readonly bool _actual;
@@ -16,7 +17,8 @@ public readonly struct BoolAssertions
         _capturedValues = capturedValues;
     }
 
-    /// <summary>Fails when the subject is <c>false</c>; respects <see cref="AssertionScope"/> or throws <see cref="OmniAssertionException"/>.</summary>
+    /// <summary>Fails when the subject is <c>false</c>.</summary>
+    /// <exception cref="OmniAssertionException">Thrown when the subject is false and no <see cref="AssertionScope"/> is collecting failures.</exception>
     public void ToBeTrue()
     {
         if (_actual)
@@ -28,26 +30,12 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("false"));
-
-        // Optional operand snapshot (e.g. from advanced lowering), not from default Verify(bool) path.
-        if (_capturedValues?.Count > 0)
-        {
-            msg.AppendLine();
-            msg.AppendLine("Context:");
-            foreach (var pair in _capturedValues)
-            {
-                msg.Append("  ");
-                msg.Append(pair.Key);
-                msg.Append(" = ");
-                msg.Append(OmniAssertionException.FormatValueForMessage(pair.Value));
-                msg.AppendLine();
-            }
-        }
-
+        AppendOperandContext(msg);
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 
-    /// <summary>Fails when the subject is <c>true</c>; respects <see cref="AssertionScope"/> or throws <see cref="OmniAssertionException"/>.</summary>
+    /// <summary>Fails when the subject is <c>true</c>.</summary>
+    /// <exception cref="OmniAssertionException">Thrown when the subject is true and no <see cref="AssertionScope"/> is collecting failures.</exception>
     public void ToBeFalse()
     {
         if (!_actual)
@@ -59,22 +47,25 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("true"));
-
-        // Optional operand snapshot (e.g. from advanced lowering), not from default Verify(bool) path.
-        if (_capturedValues?.Count > 0)
-        {
-            msg.AppendLine();
-            msg.AppendLine("Context:");
-            foreach (var pair in _capturedValues)
-            {
-                msg.Append("  ");
-                msg.Append(pair.Key);
-                msg.Append(" = ");
-                msg.Append(OmniAssertionException.FormatValueForMessage(pair.Value));
-                msg.AppendLine();
-            }
-        }
-
+        AppendOperandContext(msg);
         VerificationFlow.Fail(msg.ToString(), _expression);
+    }
+
+    /// <summary>Operand snapshots from lowered <c>VerifyExpression</c>; unused on the default <c>Verify(bool)</c> path.</summary>
+    private void AppendOperandContext(StringBuilder msg)
+    {
+        if (_capturedValues is not { Count: > 0 })
+            return;
+
+        msg.AppendLine();
+        msg.AppendLine("Context:");
+        foreach (var pair in _capturedValues)
+        {
+            msg.Append("  ");
+            msg.Append(pair.Key);
+            msg.Append(" = ");
+            msg.Append(OmniAssertionException.FormatValueForMessage(pair.Value));
+            msg.AppendLine();
+        }
     }
 }

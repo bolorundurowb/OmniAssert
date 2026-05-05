@@ -250,7 +250,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
     }
 }
 
-/// <summary>Recognizes <c>Assert.VerifyExpression(bool, string?)</c> for the incremental generator.</summary>
+/// <summary>Identifies <c>Assert.VerifyExpression(bool, string?)</c> for the incremental generator.</summary>
 internal static class VerifyLoweringFacts
 {
     /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Assert</c>.</summary>

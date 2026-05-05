@@ -11,8 +11,10 @@ namespace OmniAssert.Generator.Rewrite;
 /// the original lexical scope.
 /// </summary>
 /// <remarks>
-/// Emitted C# interceptors do not use this lowering for arbitrary expressions that reference caller locals, because
-/// arguments are evaluated before interception.
+/// <para>C# interceptors do not use this lowering for arbitrary expressions that reference caller locals, because
+/// arguments are evaluated before interception.</para>
+/// <para>Unary <c>!</c> operands are parenthesised so <c>!a &gt;= b</c> cannot parse as <c>(!a) &gt;= b</c>.</para>
+/// <para>Compile-time constant leaves (literals, <c>const</c> fields, and similar) are still evaluated but are omitted from the capture dictionary.</para>
 /// </remarks>
 internal sealed class VerifyExpansionEngine(SemanticModel model)
 {
@@ -79,10 +81,6 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         return Block(allStmts);
     }
 
-    /// <summary>Same lowering as <see cref="TryExpandVerifyInvocation"/>; reserved for scenarios that need a method body block.</summary>
-    public BlockSyntax? TryBuildInterceptorBody(InvocationExpressionSyntax invocation, CancellationToken cancellationToken) =>
-        TryExpandVerifyInvocation(invocation, cancellationToken);
-
     /// <summary><c>true</c> when <paramref name="expr"/> is a single identifier (after stripping parentheses).</summary>
     internal bool IsSimpleBooleanIdentifier(ExpressionSyntax expr)
     {
@@ -114,7 +112,6 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
             case PrefixUnaryExpressionSyntax u when u.IsKind(SyntaxKind.LogicalNotExpression):
                 if (!TryExpandCore(u.Operand, cancellationToken, dictVar, statements, out var inner))
                     return Fail(out resultExpr);
-                // Parenthesize so `!a >= b` cannot parse as `(!a) >= b` when `inner` is a comparison.
                 resultExpr = PrefixUnaryExpression(
                     SyntaxKind.LogicalNotExpression,
                     Token(SyntaxKind.ExclamationToken),
@@ -209,7 +206,6 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 IdentifierName(resultId),
                 right));
 
-        // Parenthesize `left` so `!a >= b` cannot parse as `(!a) >= b` when `left` is a comparison chain.
         var negLeft = PrefixUnaryExpression(
             SyntaxKind.LogicalNotExpression,
             Token(SyntaxKind.ExclamationToken),
@@ -241,7 +237,6 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 .WithVariables(SingletonSeparatedList(
                     VariableDeclarator(id).WithInitializer(EqualsValueClause(expr))))));
 
-        // Literals, const fields, enum constants, `default(T)`, etc. are not useful as "Captured values" lines.
         if (!IsConstantOperand(expr, cancellationToken))
         {
             var disambiguated = DisambiguateKey(key);
@@ -288,7 +283,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
 /// <summary>Syntax helpers for boolean lowering.</summary>
 internal static class ExpressionExtensions
 {
-    /// <summary>Strips redundant parentheses from <paramref name="expr"/>.</summary>
+    /// <summary>Removes redundant parentheses from <paramref name="expr"/>.</summary>
     public static ExpressionSyntax SkipParentheses(this ExpressionSyntax expr)
     {
         while (expr is ParenthesizedExpressionSyntax p)

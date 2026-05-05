@@ -32,7 +32,7 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <!-- ProjectReference analyzers are not packed by default; ship the generator beside lib/ for NuGet consumers. -->
+  <!-- ProjectReference analyzer assets are not packed by default; ship the generator next to lib/ for NuGet consumers. -->
   <Target Name="IncludeOmniAssertGeneratorInPackage" BeforeTargets="_GetPackageFiles" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
       <None Include="$(MSBuildThisFileDirectory)..\OmniAssert.Generator\bin\$(Configuration)\netstandard2.0\OmniAssert.Generator.dll"
