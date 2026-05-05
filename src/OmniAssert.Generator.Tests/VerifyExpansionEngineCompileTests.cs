@@ -162,7 +162,7 @@ public static class T
         Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
     }
 
-    private static IEnumerable<MetadataReference> MetadataReferencesForOmniAssertConsumer()
+    internal static IEnumerable<MetadataReference> MetadataReferencesForOmniAssertConsumer()
     {
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         void Collect(Assembly asm)
