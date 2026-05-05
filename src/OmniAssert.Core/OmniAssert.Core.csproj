@@ -11,7 +11,7 @@
     <PackageId>OmniAssert</PackageId>
     <Title>Omni Assert</Title>
     <Authors>Winner-Timothy Bolorunduro</Authors>
-    <PackageTags>omni, assert, testing, assertion</PackageTags>
+    <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>- Initial release</PackageReleaseNotes>
@@ -19,6 +19,7 @@
     <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
