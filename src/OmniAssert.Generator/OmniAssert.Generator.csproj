@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <Description>Roslyn incremental source generator for OmniAssert VerifyExpression interceptors.</Description>
@@ -12,11 +11,8 @@
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <NoWarn>$(NoWarn);RS2008</NoWarn>
-    <Version>1.0.0-alpha.0</Version>
-    <Title>OmnIAssert Generator</Title>
+    <Title>OmniAssert Generator</Title>
     <PackageTags>omni;assert;testing;assertions;source-generator;roslyn;interceptors</PackageTags>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

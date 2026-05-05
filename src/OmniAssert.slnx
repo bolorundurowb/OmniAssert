@@ -6,7 +6,6 @@
   <Folder Name="/tests/">
     <Project Path="OmniAssert.Tests/OmniAssert.Tests.csproj" />
     <Project Path="OmniAssert.Generator.Tests/OmniAssert.Generator.Tests.csproj" />
-    <Project Path="OmniAssert.Tests.NoInterceptors/OmniAssert.Tests.NoInterceptors.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj" />
