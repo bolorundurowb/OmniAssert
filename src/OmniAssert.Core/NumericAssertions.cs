@@ -4,8 +4,8 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Provides assertions for numeric types.</summary>
-/// <typeparam name="T">A numeric type that implements <see cref="INumber{T}"/>.</typeparam>
+/// <summary>Assertions for numeric types that implement <see cref="INumber{T}"/> (including <see cref="System.Numerics.BigInteger"/>).</summary>
+/// <typeparam name="T">Numeric type under test.</typeparam>
 public readonly struct NumericAssertions<T> where T : INumber<T>
 {
     private readonly T _actual;

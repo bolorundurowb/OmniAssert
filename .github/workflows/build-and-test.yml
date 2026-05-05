@@ -27,12 +27,12 @@ jobs:
       working-directory: ./src
 
     - name: Run tests with code coverage
-      run: dotnet test OmniAssert.slnx --configuration Release --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=../../coverage/coverage.cobertura.xml
+      run: dotnet test OmniAssert.slnx --configuration Release --no-build /p:CollectCoverage=true
       working-directory: ./src
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./coverage/
+        files: ./coverage/*.cobertura.xml
         fail_ci_if_error: true

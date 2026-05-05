@@ -1,9 +1,10 @@
 namespace OmniAssert;
 
 /// <summary>
-/// Collects verification failures until disposal, then throws a single exception listing every failure.
-/// Nested scopes use a stack: each dispose only aggregates failures recorded while that scope was innermost.
+/// Collects verification failures until disposal, then throws one exception that lists every failure.
+/// Nested scopes use a stack: disposing an inner scope only aggregates failures recorded whilst that scope was innermost.
 /// </summary>
+/// <remarks>Nested scopes follow async call chains via async-local storage.</remarks>
 public sealed class AssertionScope : IDisposable
 {
     private static readonly AsyncLocal<Stack<AssertionContext>?> ScopeStack = new();
@@ -12,6 +13,7 @@ public sealed class AssertionScope : IDisposable
     private readonly Stack<AssertionContext> _stack;
     private bool _disposed;
 
+    /// <summary>Opens a new scope and pushes it onto the ambient stack.</summary>
     public AssertionScope()
     {
         _stack = ScopeStack.Value ??= new Stack<AssertionContext>();
@@ -21,6 +23,7 @@ public sealed class AssertionScope : IDisposable
 
     internal static AssertionContext? Current => ScopeStack.Value is { Count: > 0 } s ? s.Peek() : null;
 
+    /// <summary>Pops this scope, then throws if any failures were recorded whilst it was innermost.</summary>
     public void Dispose()
     {
         if (_disposed)

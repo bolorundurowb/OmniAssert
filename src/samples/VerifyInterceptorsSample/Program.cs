@@ -2,13 +2,15 @@ using static OmniAssert.Assert;
 
 namespace VerifyInterceptorsSample;
 
-internal static class Program
+public static class Program
 {
-    private static void Main()
+    public static void Main()
     {
-        // Requires OmniAssertEnableVerifyInterceptors + InterceptorsNamespaces (see README).
+        // See README: OmniAssertEnableVerifyInterceptors and InterceptorsNamespaces.
         var x = 2;
         var y = 3;
-        VerifyExpression(x < y);
+        var z = 10;
+        InterceptorSmoke.Run();
+        VerifyExpression(z > 10 || x > y);
     }
 }

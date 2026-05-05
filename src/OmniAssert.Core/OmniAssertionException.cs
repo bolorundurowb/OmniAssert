@@ -3,16 +3,22 @@ using System.Text;
 namespace OmniAssert;
 
 /// <summary>
-/// Thrown when a verification fails and no <see cref="AssertionScope"/> is collecting failures. Carries
-/// <see cref="Capture"/> so callers can read <see cref="AssertionCapture.SourceExpression"/> and optional operands.
+/// Thrown when a verification fails and no <see cref="AssertionScope"/> is collecting failures.
+/// Exposes structured <see cref="Capture"/> data (expression text and optional operand snapshots).
 /// </summary>
+/// <param name="message">Full human-readable failure text.</param>
+/// <param name="capture">Expression label and optional operand map for diagnostics.</param>
+/// <param name="innerException">Optional inner exception when this failure wraps another error.</param>
 public sealed class OmniAssertionException(string message, AssertionCapture capture, Exception? innerException = null)
     : Exception(message, innerException)
 {
+    /// <summary>Structured data attached to this failure.</summary>
     public AssertionCapture Capture { get; } = capture;
 
+    /// <summary>Shorthand for <see cref="AssertionCapture.SourceExpression"/>.</summary>
     public string SourceExpression => Capture.SourceExpression;
 
+    /// <summary>Shorthand for <see cref="AssertionCapture.CapturedValues"/> when operand snapshots exist; otherwise <c>null</c>.</summary>
     public IReadOnlyDictionary<string, object?>? CapturedValues => Capture.CapturedValues;
 
     internal static string FormatValueForMessage(object? value) => value switch
@@ -24,7 +30,7 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
         _ => value.ToString() ?? "null"
     };
 
-    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyBoolean"/> / <see cref="Assert.VerifyExpression"/> path.</summary>
+    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyExpression"/> path.</summary>
     internal static OmniAssertionException ForBooleanFailure(in AssertionCapture capture)
     {
         var message = FormatBooleanFailure(capture);

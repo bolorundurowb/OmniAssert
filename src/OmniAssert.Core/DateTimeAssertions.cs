@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Provides assertions for <see cref="DateTime"/> subjects.</summary>
+/// <summary>Assertions for <see cref="DateTime"/> (unspecified, UTC, or local per how the value was constructed).</summary>
 public readonly struct DateTimeAssertions
 {
     private readonly DateTime _actual;
@@ -49,7 +49,7 @@ public readonly struct DateTimeAssertions
     }
 }
 
-/// <summary>Provides assertions for <see cref="DateTimeOffset"/> subjects.</summary>
+/// <summary>Assertions for <see cref="DateTimeOffset"/> subjects (includes offset in comparisons).</summary>
 public readonly struct DateTimeOffsetAssertions
 {
     private readonly DateTimeOffset _actual;

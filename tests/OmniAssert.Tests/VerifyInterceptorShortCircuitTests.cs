@@ -75,4 +75,14 @@ public class VerifyInterceptorShortCircuitTests
         Xunit.Assert.Contains("left || right", ex.SourceExpression, StringComparison.Ordinal);
         Xunit.Assert.Null(ex.CapturedValues);
     }
+
+    [Fact]
+    public void VerifyExpression_OrOfComparisons_WhenFalse_ShouldIncludeExpressionText()
+    {
+        var x = 2;
+        var y = 3;
+        var z = 10;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyExpression(z > 10 || x > y));
+        Xunit.Assert.Contains("z > 10 || x > y", ex.SourceExpression, StringComparison.Ordinal);
+    }
 }

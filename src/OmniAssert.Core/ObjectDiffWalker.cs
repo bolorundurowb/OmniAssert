@@ -5,9 +5,17 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Reflective property graph comparison with cycle detection.</summary>
-public static class ObjectDiffWalker
+/// <summary>
+/// Walks two object graphs reflectively (public instance properties, indexers excluded) and detects differences.
+/// Handles cycles via visited reference pairs; compares sequences element-wise; treats primitives, enums, strings, and decimals as leaves.
+/// </summary>
+internal static class ObjectDiffWalker
 {
+    /// <summary>Compares <paramref name="expected"/> to <paramref name="actual"/> starting at <paramref name="rootLabel"/>.</summary>
+    /// <param name="expected">Reference object graph (expected side).</param>
+    /// <param name="actual">Candidate object graph (actual side).</param>
+    /// <param name="rootLabel">Path label for the root (often the caller expression).</param>
+    /// <returns><c>null</c> when equivalent; otherwise a result you can format for <see cref="ObjectAssertions.ToBeEquivalentTo"/> failures.</returns>
     public static ObjectDiffResult? Diff(object? expected, object? actual, string rootLabel)
     {
         var visitedPairs = new HashSet<(object, object)>(ReferencePairComparer.Instance);
@@ -122,19 +130,31 @@ public static class ObjectDiffWalker
     }
 }
 
-public readonly struct Mismatch(string path, object? expected, object? actual)
+/// <summary>One differing path when two object graphs are compared.</summary>
+/// <param name="path">Dot/bracket path from the root (for example <c>Items[0].Name</c>).</param>
+/// <param name="expected">Expected value at that path.</param>
+/// <param name="actual">Actual value at that path.</param>
+internal readonly struct Mismatch(string path, object? expected, object? actual)
 {
+    /// <summary>Path from the root to the mismatch.</summary>
     public string Path { get; } = path;
+
+    /// <summary>Expected side snapshot.</summary>
     public object? Expected { get; } = expected;
+
+    /// <summary>Actual side snapshot.</summary>
     public object? Actual { get; } = actual;
 }
 
-public sealed class ObjectDiffResult
+/// <summary>Non-empty set of <see cref="Mismatch"/> entries from <see cref="ObjectDiffWalker.Diff"/>.</summary>
+internal sealed class ObjectDiffResult
 {
     private readonly IReadOnlyList<Mismatch> _mismatches;
 
     internal ObjectDiffResult(IReadOnlyList<Mismatch> mismatches) => _mismatches = mismatches;
 
+    /// <summary>Formats a multi-line message with expected/actual colouring when enabled.</summary>
+    /// <returns>Human-readable diff text suitable for an assertion failure.</returns>
     public string FormatMessage()
     {
         var sb = new StringBuilder();

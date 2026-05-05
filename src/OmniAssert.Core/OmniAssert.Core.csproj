@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,14 +10,11 @@
     <LangVersion>14</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>OmniAssert</PackageId>
-    <Version>1.0.0-alpha.0</Version>
     <Title>Omni Assert</Title>
     <Authors>Winner-Timothy Bolorunduro</Authors>
     <PackageTags>omni, assert, testing, assertion</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
     <PackageReleaseNotes>- Initial release</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
@@ -26,4 +22,28 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="OmniAssert.Tests" />
+    <InternalsVisibleTo Include="OmniAssert.Tests.NoInterceptors" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OmniAssert.Generator\OmniAssert.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- ProjectReference analyzer assets are not packed by default; ship the generator next to lib/ for NuGet consumers. -->
+  <Target Name="IncludeOmniAssertGeneratorInPackage" BeforeTargets="_GetPackageFiles" DependsOnTargets="ResolveProjectReferences">
+    <ItemGroup>
+      <None Include="$(MSBuildThisFileDirectory)..\OmniAssert.Generator\bin\$(Configuration)\netstandard2.0\OmniAssert.Generator.dll"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
 </Project>

@@ -7,19 +7,21 @@ namespace OmniAssert.Generator.Rewrite;
 
 /// <summary>
 /// Lowers a boolean tree into temporaries, fills a dictionary of operand values, and emits a final
-/// <see cref="Assert.VerifyBoolean"/> call. Intended for tests and external tooling that compile the lowered block in
+/// <see cref="Assert.VerifyExpression(bool, AssertionCapture)"/> call. Intended for tests and external tooling that compile the lowered block in
 /// the original lexical scope.
 /// </summary>
 /// <remarks>
-/// Emitted C# interceptors do not use this lowering for arbitrary expressions that reference caller locals, because
-/// arguments are evaluated before interception.
+/// <para>C# interceptors do not use this lowering for arbitrary expressions that reference caller locals, because
+/// arguments are evaluated before interception.</para>
+/// <para>Unary <c>!</c> operands are parenthesised so <c>!a &gt;= b</c> cannot parse as <c>(!a) &gt;= b</c>.</para>
+/// <para>Compile-time constant leaves (literals, <c>const</c> fields, and similar) are still evaluated but are omitted from the capture dictionary.</para>
 /// </remarks>
 internal sealed class VerifyExpansionEngine(SemanticModel model)
 {
     private int _tempId;
     private readonly List<string> _captureKeys = [];
 
-    /// <summary>Builds a statement block that evaluates the first argument as <c>bool</c> and calls <see cref="Assert.VerifyBoolean"/>.</summary>
+    /// <summary>Builds a statement block that evaluates the first argument as <c>bool</c> and calls <see cref="Assert.VerifyExpression(bool, AssertionCapture)"/>.</summary>
     /// <param name="invocation">Call whose first argument is a boolean expression (e.g. <c>VerifyExpression(x &gt; y)</c>).</param>
     /// <param name="cancellationToken">Cancellation token for semantic analysis.</param>
     /// <returns>A block of statements, or <c>null</c> if the expression cannot be lowered.</returns>
@@ -60,7 +62,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     ParseTypeName("global::OmniAssert.Assert"),
-                    IdentifierName("VerifyBoolean")))
+                    IdentifierName("VerifyExpression")))
             .WithArgumentList(
                 ArgumentList(SeparatedList([
                     Argument(resultExpr),
@@ -78,10 +80,6 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
 
         return Block(allStmts);
     }
-
-    /// <summary>Same lowering as <see cref="TryExpandVerifyInvocation"/>; reserved for scenarios that need a method body block.</summary>
-    public BlockSyntax? TryBuildInterceptorBody(InvocationExpressionSyntax invocation, CancellationToken cancellationToken) =>
-        TryExpandVerifyInvocation(invocation, cancellationToken);
 
     /// <summary><c>true</c> when <paramref name="expr"/> is a single identifier (after stripping parentheses).</summary>
     internal bool IsSimpleBooleanIdentifier(ExpressionSyntax expr)
@@ -114,12 +112,15 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
             case PrefixUnaryExpressionSyntax u when u.IsKind(SyntaxKind.LogicalNotExpression):
                 if (!TryExpandCore(u.Operand, cancellationToken, dictVar, statements, out var inner))
                     return Fail(out resultExpr);
-                resultExpr = PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, Token(SyntaxKind.ExclamationToken), inner);
+                resultExpr = PrefixUnaryExpression(
+                    SyntaxKind.LogicalNotExpression,
+                    Token(SyntaxKind.ExclamationToken),
+                    ParenthesizedExpression(inner));
                 return true;
             case BinaryExpressionSyntax b:
                 return TryExpandBinary(b, cancellationToken, dictVar, statements, out resultExpr);
             default:
-                return Materialise(expr, KeyFor(expr), dictVar, statements, out resultExpr);
+                return Materialise(expr, KeyFor(expr), dictVar, statements, cancellationToken, out resultExpr);
         }
     }
 
@@ -205,7 +206,10 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 IdentifierName(resultId),
                 right));
 
-        var negLeft = PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, Token(SyntaxKind.ExclamationToken), left);
+        var negLeft = PrefixUnaryExpression(
+            SyntaxKind.LogicalNotExpression,
+            Token(SyntaxKind.ExclamationToken),
+            ParenthesizedExpression(left));
         var inner = Block(rightStmts.Concat([assignRight]).ToArray());
         statements.Add(IfStatement(negLeft, inner));
 
@@ -224,6 +228,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         string key,
         SyntaxToken dictVar,
         List<StatementSyntax> statements,
+        CancellationToken cancellationToken,
         out ExpressionSyntax resultExpr)
     {
         var id = NewTempName();
@@ -232,11 +237,20 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 .WithVariables(SingletonSeparatedList(
                     VariableDeclarator(id).WithInitializer(EqualsValueClause(expr))))));
 
-        var disambiguated = DisambiguateKey(key);
-        statements.Add(MakeDictAssign(dictVar, disambiguated, IdentifierName(id)));
+        if (!IsConstantOperand(expr, cancellationToken))
+        {
+            var disambiguated = DisambiguateKey(key);
+            statements.Add(MakeDictAssign(dictVar, disambiguated, IdentifierName(id)));
+        }
 
         resultExpr = IdentifierName(id);
         return true;
+    }
+
+    private bool IsConstantOperand(ExpressionSyntax expr, CancellationToken cancellationToken)
+    {
+        var v = model.GetConstantValue(expr, cancellationToken);
+        return v.HasValue;
     }
 
     private string DisambiguateKey(string key)
@@ -269,7 +283,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
 /// <summary>Syntax helpers for boolean lowering.</summary>
 internal static class ExpressionExtensions
 {
-    /// <summary>Strips redundant parentheses from <paramref name="expr"/>.</summary>
+    /// <summary>Removes redundant parentheses from <paramref name="expr"/>.</summary>
     public static ExpressionSyntax SkipParentheses(this ExpressionSyntax expr)
     {
         while (expr is ParenthesizedExpressionSyntax p)

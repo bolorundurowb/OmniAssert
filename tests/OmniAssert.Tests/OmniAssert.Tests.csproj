@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>OmniAssert.Tests.NoInterceptors</RootNamespace>
+    <RootNamespace>OmniAssert.Tests</RootNamespace>
     <LangVersion>14</LangVersion>
-    <OmniAssertEnableVerifyInterceptors>false</OmniAssertEnableVerifyInterceptors>
+    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,8 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OmniAssert.Core\OmniAssert.Core.csproj" />
-    <ProjectReference Include="..\OmniAssert.Generator\OmniAssert.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\src\OmniAssert.Core\OmniAssert.Core.csproj" />
+    <ProjectReference Include="..\..\src\OmniAssert.Generator\OmniAssert.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-
 </Project>

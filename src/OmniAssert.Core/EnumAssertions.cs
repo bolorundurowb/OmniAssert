@@ -3,8 +3,8 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Provides assertions for enum subjects.</summary>
-/// <typeparam name="T">The enum type.</typeparam>
+/// <summary>Assertions for enum subjects from <see cref="Assert.Verify{T}(T, string?)"/>.</summary>
+/// <typeparam name="T">Backed enum type.</typeparam>
 public readonly struct EnumAssertions<T> where T : struct, Enum
 {
     private readonly T _actual;
