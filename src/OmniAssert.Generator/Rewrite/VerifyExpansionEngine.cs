@@ -114,12 +114,16 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
             case PrefixUnaryExpressionSyntax u when u.IsKind(SyntaxKind.LogicalNotExpression):
                 if (!TryExpandCore(u.Operand, cancellationToken, dictVar, statements, out var inner))
                     return Fail(out resultExpr);
-                resultExpr = PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, Token(SyntaxKind.ExclamationToken), inner);
+                // Parenthesize so `!a >= b` cannot parse as `(!a) >= b` when `inner` is a comparison.
+                resultExpr = PrefixUnaryExpression(
+                    SyntaxKind.LogicalNotExpression,
+                    Token(SyntaxKind.ExclamationToken),
+                    ParenthesizedExpression(inner));
                 return true;
             case BinaryExpressionSyntax b:
                 return TryExpandBinary(b, cancellationToken, dictVar, statements, out resultExpr);
             default:
-                return Materialise(expr, KeyFor(expr), dictVar, statements, out resultExpr);
+                return Materialise(expr, KeyFor(expr), dictVar, statements, cancellationToken, out resultExpr);
         }
     }
 
@@ -205,7 +209,11 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 IdentifierName(resultId),
                 right));
 
-        var negLeft = PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, Token(SyntaxKind.ExclamationToken), left);
+        // Parenthesize `left` so `!a >= b` cannot parse as `(!a) >= b` when `left` is a comparison chain.
+        var negLeft = PrefixUnaryExpression(
+            SyntaxKind.LogicalNotExpression,
+            Token(SyntaxKind.ExclamationToken),
+            ParenthesizedExpression(left));
         var inner = Block(rightStmts.Concat([assignRight]).ToArray());
         statements.Add(IfStatement(negLeft, inner));
 
@@ -224,6 +232,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         string key,
         SyntaxToken dictVar,
         List<StatementSyntax> statements,
+        CancellationToken cancellationToken,
         out ExpressionSyntax resultExpr)
     {
         var id = NewTempName();
@@ -232,11 +241,21 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 .WithVariables(SingletonSeparatedList(
                     VariableDeclarator(id).WithInitializer(EqualsValueClause(expr))))));
 
-        var disambiguated = DisambiguateKey(key);
-        statements.Add(MakeDictAssign(dictVar, disambiguated, IdentifierName(id)));
+        // Literals, const fields, enum constants, `default(T)`, etc. are not useful as "Captured values" lines.
+        if (!IsConstantOperand(expr, cancellationToken))
+        {
+            var disambiguated = DisambiguateKey(key);
+            statements.Add(MakeDictAssign(dictVar, disambiguated, IdentifierName(id)));
+        }
 
         resultExpr = IdentifierName(id);
         return true;
+    }
+
+    private bool IsConstantOperand(ExpressionSyntax expr, CancellationToken cancellationToken)
+    {
+        var v = model.GetConstantValue(expr, cancellationToken);
+        return v.HasValue;
     }
 
     private string DisambiguateKey(string key)
