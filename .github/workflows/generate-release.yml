@@ -97,7 +97,7 @@ jobs:
 
       - name: Exit when version unchanged
         if: steps.bump.outputs.changed != 'true'
-        run: echo "No release: <Version> in Directory.Build.props unchanged or could not compare."
+        run: 'echo "No release: <Version> in Directory.Build.props unchanged or could not compare."'
 
       - name: Check if release tag already exists
         id: tag
@@ -118,7 +118,7 @@ jobs:
 
       - name: Exit when tag already exists
         if: steps.bump.outputs.changed == 'true' && steps.tag.outputs.exists == 'true'
-        run: echo "No release: tag already published."
+        run: 'echo "No release: tag already published."'
 
       - name: Restore and pack (Release)
         id: pack
