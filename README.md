@@ -4,13 +4,43 @@
 
 > **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
 
-**OmniAssert** is on NuGet as **[`OmniAssert`](https://www.nuget.org/packages/OmniAssert)**. The current line is **`1.0.0-alpha.0`**: a small runtime (`OmniAssert.Core`) plus an optional Roslyn generator shipped inside the same package.
+## Introduction
 
-## Why this package exists
+**OmniAssert** is a modern, fluent assertion library for .NET that makes your test code more readable and your test
+failures more informative. Built for **.NET 10** and **C# 14**, it combines the best ideas from established assertion
+frameworks while adding powerful compile-time features that help you write better tests faster.
 
-OmniAssert brings together ideas that are scattered across popular .NET assertion stacks: **fluent APIs that read in natural language** (`Verify(subject).To…`), **rich exception text and tidy failure output** (including caller expression names via `[CallerArgumentExpression]`), a **deep object graph diff** behind `ToBeEquivalentTo` (public properties, sequences, cycle-safe walks), **`AssertionScope`** for soft asserts that aggregate many failures into one report, and—when you opt in—**compile-time support for complex boolean checks** so failures are easier to diagnose (`VerifyExpression` interceptors for full expression text; an advanced **rewrite** mode can record **intermediate sub-values** when a compound condition fails).
+At its core, OmniAssert provides an expressive, natural-language API for assertions: `Verify(user.Email).ToContain("@")`
+reads like plain English. When assertions fail, you get rich, detailed error messages that include the actual and
+expected values, the expression that failed, and contextual information about what went wrong—making debugging faster
+and less frustrating.
 
-If you use `AssertionScope`, failures are collected and reported together when the scope is disposed.
+### What sets OmniAssert apart
+
+- **Deep object comparison**: The `ToBeEquivalentTo` assertion performs intelligent structural comparison of complex
+  object graphs, recursively comparing public properties, handling collections as unordered multisets, and safely
+  navigating circular references. When objects don't match, you get a clear, hierarchical diff showing exactly where
+  they diverge.
+
+- **Soft assertions with AssertionScope**: Wrap multiple assertions in an `AssertionScope` to collect all failures in a
+  test before reporting them together. No more fixing one assertion at a time—see everything that's wrong in one test
+  run.
+
+- **Compile-time assertion enhancement** *(optional)*: Enable Roslyn interceptors to get richer diagnostics for boolean
+  expressions. When `VerifyExpression(x > 0 && count < limit)` fails, you see not just "condition was false" but the
+  actual values of `x`, `count`, and `limit`. An advanced rewrite mode can even capture intermediate sub-expression
+  values for complex logical conditions.
+
+- **Comprehensive API coverage**: From basic equality and comparison checks to collection assertions, exception
+  testing (sync and async), type checks, string pattern matching, date/time comparisons, nullable handling, and more—all
+  with consistent, fluent syntax.
+
+- **Exceptional diagnostics**: Leveraging `[CallerArgumentExpression]` and optional source generators, OmniAssert
+  captures the text of your assertion expressions automatically, so failure messages show you exactly what you tested,
+  not just that something failed.
+
+Whether you're writing unit tests, integration tests, or behavior-driven scenarios, OmniAssert helps you express intent
+clearly and diagnose failures quickly.
 
 ## Requirements
 
@@ -23,7 +53,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.0.0-alpha.0" />
+  <PackageReference Include="OmniAssert" Version="1.0.0-alpha.1" />
 </ItemGroup>
 ```
 
