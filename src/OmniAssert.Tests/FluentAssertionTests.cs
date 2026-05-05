@@ -15,7 +15,7 @@ public class FluentAssertionTests
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(1).ToBe(2));
         Xunit.Assert.Contains("Expected", ex.Message, StringComparison.Ordinal);
-        Xunit.Assert.Contains("Actual", ex.Message, StringComparison.Ordinal);
+        Xunit.Assert.Contains("Got", ex.Message, StringComparison.Ordinal);
     }
 
     [Fact]

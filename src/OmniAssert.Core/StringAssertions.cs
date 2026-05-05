@@ -171,23 +171,89 @@ public readonly struct StringAssertions
 
     private static string FormatStrings(string relation, string? expected, string expectedLabel, string? actual, string actualLabel)
     {
+        if (relation == "not to be")
+        {
+            var sbNot = new StringBuilder();
+            sbNot.AppendLine("Verification failed.");
+            sbNot.Append("Expected ");
+            sbNot.Append(actualLabel);
+            sbNot.Append(" not to be ");
+            sbNot.Append(AnsiColour.Expected(Quote(expected)));
+            sbNot.Append(", but it was.");
+            return sbNot.ToString();
+        }
+
+        if (expected == null || actual == null)
+        {
+            var sbFallback = new StringBuilder();
+            sbFallback.AppendLine("Verification failed.");
+            sbFallback.Append(AnsiColour.Expected("Expected "));
+            sbFallback.Append(expectedLabel);
+            sbFallback.Append(": ");
+            sbFallback.AppendLine(AnsiColour.Expected(Quote(expected)));
+            sbFallback.Append(AnsiColour.Actual("Got "));
+            sbFallback.Append(actualLabel);
+            sbFallback.Append(": ");
+            sbFallback.Append(AnsiColour.Actual(Quote(actual)));
+            return sbFallback.ToString();
+        }
+
+        int firstDiff = 0;
+        int minLen = Math.Min(expected.Length, actual.Length);
+        while (firstDiff < minLen && expected[firstDiff] == actual[firstDiff])
+        {
+            firstDiff++;
+        }
+
+        var (visibleExpected, _) = ToVisibleString(expected, firstDiff);
+        var (visibleActual, actualOffset) = ToVisibleString(actual, firstDiff);
+
         var sb = new StringBuilder();
         sb.AppendLine("Verification failed.");
-        sb.Append(AnsiColour.Expected("Expected "));
-        sb.Append(expectedLabel);
-        sb.Append(": ");
-        sb.AppendLine(AnsiColour.Expected(Quote(expected)));
-        sb.Append(AnsiColour.Actual("Actual "));
-        sb.Append(actualLabel);
-        sb.Append(": ");
-        sb.Append(AnsiColour.Actual(Quote(actual)));
+        sb.Append("  Expected: ");
+        sb.AppendLine(AnsiColour.Expected($"\"{visibleExpected}\""));
+        sb.Append("  Got:      ");
+        sb.AppendLine(AnsiColour.Actual($"\"{visibleActual}\""));
+
+        // "  Got:      " is 12 chars, +1 for opening quote
+        int caretPadding = 12 + 1 + actualOffset;
+        sb.Append(new string(' ', caretPadding));
+        sb.Append('^');
+        sb.Append(" expected ");
+        sb.Append(DescribeChar(expected, firstDiff));
+        sb.Append(", got ");
+        sb.Append(DescribeChar(actual, firstDiff));
+        sb.Append(" at position ");
+        sb.Append(firstDiff);
+        sb.AppendLine();
+
+        sb.Append("  Lengths: ");
+        sb.Append(expected.Length);
+        sb.Append(" vs ");
+        sb.Append(actual.Length);
+        sb.Append(" chars");
+
         return sb.ToString();
     }
 
-    private static string Quote(string? s) => s switch
+    private static (string Visible, int OffsetAtFirstDiff) ToVisibleString(string s, int firstDiff)
     {
-        null => "null",
-        "" => "\"\"",
-        _ => "\"" + s.Replace("\"", "\\\"", StringComparison.Ordinal) + "\""
-    };
+        var sb = new StringBuilder();
+        int offset = 0;
+        for (int i = 0; i < s.Length; i++)
+        {
+            if (i == firstDiff) offset = sb.Length;
+            StringFormatter.AppendVisible(sb, s[i]);
+        }
+        if (firstDiff >= s.Length) offset = sb.Length;
+        return (sb.ToString(), offset);
+    }
+
+    private static string DescribeChar(string s, int index)
+    {
+        if (index >= s.Length) return "end of string";
+        return $"'{StringFormatter.EscapeChar(s[index])}'";
+    }
+
+    private static string Quote(string? s) => StringFormatter.Quote(s);
 }

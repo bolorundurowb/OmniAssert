@@ -122,7 +122,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
         sb.AppendLine("Verification failed.");
         sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
         sb.AppendLine(AnsiColour.Expected(FormatValue(expected)));
-        sb.Append(AnsiColour.Actual($"Actual {actualLabel}: "));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
         sb.Append(AnsiColour.Actual(FormatValue(actual)));
         return sb.ToString();
     }
@@ -133,7 +133,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
         sb.AppendLine("Verification failed.");
         sb.Append(AnsiColour.Expected($"Expected {actualLabel} {expectedDesc}."));
         sb.AppendLine();
-        sb.Append(AnsiColour.Actual($"Actual {actualLabel}: "));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
         sb.Append(AnsiColour.Actual(FormatValue(actual)));
         return sb.ToString();
     }
