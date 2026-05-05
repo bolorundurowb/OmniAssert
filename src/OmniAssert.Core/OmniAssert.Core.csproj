@@ -8,7 +8,6 @@
     <Description>OmniAssert runtime: fluent assertions for .NET tests with helpful failure messages, object diffing, exception helpers, and AssertionScope soft assertions.</Description>
     <PackageDescription>OmniAssert runtime package for .NET tests. Provides fluent Verify-style assertions, expressive failure messages, object equivalence diffing, exception assertions, and AssertionScope for aggregated failures.</PackageDescription>
     <LangVersion>14</LangVersion>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>OmniAssert</PackageId>
     <Title>Omni Assert</Title>
     <Authors>Winner-Timothy Bolorunduro</Authors>
