@@ -38,7 +38,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          VERSION_FILE="Directory.Build.props"
+          VERSION_FILE="src/Directory.Build.props"
           if [[ ! -f "$VERSION_FILE" ]]; then
             echo "::error::Version file not found: $VERSION_FILE"
             exit 1
@@ -59,49 +59,8 @@ jobs:
           echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
           echo "Package version: $CURRENT"
 
-      - name: Detect version change
-        id: bump
-        run: |
-          set -euo pipefail
-          VERSION_FILE="Directory.Build.props"
-          CURRENT="${{ steps.version.outputs.current }}"
-
-          PREV_REF=""
-          if [[ "${{ github.event_name }}" == "push" ]]; then
-            BEFORE="${{ github.event.before }}"
-            if [[ -n "$BEFORE" && "$BEFORE" != "0000000000000000000000000000000000000000" ]] && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
-              PREV_REF="$BEFORE"
-            elif git rev-parse HEAD~1 >/dev/null 2>&1; then
-              PREV_REF="HEAD~1"
-            fi
-          elif git rev-parse HEAD~1 >/dev/null 2>&1; then
-            PREV_REF="HEAD~1"
-          fi
-
-          PREVIOUS=""
-          if [[ -n "$PREV_REF" ]]; then
-            PREV_TEXT="$(git show "${PREV_REF}:${VERSION_FILE}" 2>/dev/null || true)"
-            PREVIOUS="$(printf '%s' "$PREV_TEXT" | sed -n 's/^[[:space:]]*<Version>\([^<]*\)<\/Version>/\1/p' | head -1 | xargs)"
-          fi
-
-          echo "previous=${PREVIOUS:-}" >> "$GITHUB_OUTPUT"
-          echo "Compared against: ${PREV_REF:-<no parent>}  Previous <Version>: ${PREVIOUS:-<none>}"
-
-          if [[ -n "$PREVIOUS" && "$PREVIOUS" == "$CURRENT" ]]; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No version change; exiting."
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Version change: '${PREVIOUS:-<none>}' -> '$CURRENT'"
-          fi
-
-      - name: Exit when version unchanged
-        if: steps.bump.outputs.changed != 'true'
-        run: 'echo "No release: <Version> in Directory.Build.props unchanged or could not compare."'
-
       - name: Check if release tag already exists
         id: tag
-        if: steps.bump.outputs.changed == 'true'
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.current }}"
@@ -117,12 +76,12 @@ jobs:
           fi
 
       - name: Exit when tag already exists
-        if: steps.bump.outputs.changed == 'true' && steps.tag.outputs.exists == 'true'
+        if: steps.tag.outputs.exists == 'true'
         run: 'echo "No release: tag already published."'
 
       - name: Restore and pack (Release)
         id: pack
-        if: steps.bump.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        if: steps.tag.outputs.exists == 'false'
         working-directory: src
         run: |
           set -euo pipefail
@@ -146,7 +105,7 @@ jobs:
           echo "out_dir=$OUT" >> "$GITHUB_OUTPUT"
 
       - name: Create and push release tag
-        if: steps.bump.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        if: steps.tag.outputs.exists == 'false'
         env:
           TAG: ${{ steps.tag.outputs.tag }}
         run: |
@@ -157,7 +116,7 @@ jobs:
           git push origin "refs/tags/$TAG"
 
       - name: Create GitHub release and upload packages
-        if: steps.bump.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        if: steps.tag.outputs.exists == 'false'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.tag.outputs.tag }}

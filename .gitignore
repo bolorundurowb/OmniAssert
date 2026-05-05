@@ -1,4 +1,5 @@
 coverage/
+src/coverage/
 bin/
 obj/
 TestResults/
