@@ -37,6 +37,10 @@ public class ExtendedAssertionTests
         Verify("hello world").ToEndWith("world");
         Verify("123-456").ToMatch(@"^\d{3}-\d{3}$");
         Verify("HELLO").ToBe("hello", StringComparison.OrdinalIgnoreCase);
+        Verify("hello").NotToBeEmpty();
+        Verify("hello").HasLength(5);
+        Verify("hello").HasLengthGreaterThan(3);
+        Verify("hello").HasLengthLessThan(10);
     }
 
     [Fact]
@@ -61,8 +65,13 @@ public class ExtendedAssertionTests
     public void Verify_CollectionAdvanced_WhenValid_ShouldSucceed()
     {
         Verify([1, 2, 3]).HasCount(3);
+        Verify([1, 2, 3]).HasCountGreaterThan(2);
+        Verify([1, 2, 3]).HasCountLessThan(4);
+        Verify([1, 2, 3]).NotToBeEmpty();
         Verify([1, 2, 3]).AllSatisfy(x => x > 0);
         Verify([1, 2, 3]).ToBeEquivalentTo([3, 2, 1]);
+        Verify([1, 2, 3]).ToBeUnique();
+        Verify([1, 1, 2, 3]).HasUniqueCount(3);
         Verify([1, 2, 3]).NotToContain(4);
     }
 

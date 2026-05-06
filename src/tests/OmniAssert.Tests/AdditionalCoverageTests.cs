@@ -113,6 +113,30 @@ public class AdditionalCoverageTests
     }
 
     [Fact]
+    public void Verify_StringNotToBeEmpty_WhenEmpty_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("").NotToBeEmpty());
+    }
+
+    [Fact]
+    public void Verify_StringHasLength_WhenLengthDiffers_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLength(2));
+    }
+
+    [Fact]
+    public void Verify_StringHasLengthGreaterThan_WhenTooShort_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLengthGreaterThan(3));
+    }
+
+    [Fact]
+    public void Verify_StringHasLengthLessThan_WhenTooLong_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLengthLessThan(3));
+    }
+
+    [Fact]
     public void Verify_StringToContain_WithComparison_WhenMatch_ShouldSucceed()
     {
         Verify("AbC").ToContain("bc", StringComparison.OrdinalIgnoreCase);
@@ -273,6 +297,36 @@ public class AdditionalCoverageTests
     public void Verify_CollectionToBeEmpty_WhenNotEmpty_ShouldFail()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1 }).ToBeEmpty());
+    }
+
+    [Fact]
+    public void Verify_CollectionNotToBeEmpty_WhenEmpty_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(Array.Empty<int>()).NotToBeEmpty());
+    }
+
+    [Fact]
+    public void Verify_CollectionHasCountGreaterThan_WhenCountNotGreater_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2 }).HasCountGreaterThan(2));
+    }
+
+    [Fact]
+    public void Verify_CollectionHasCountLessThan_WhenCountNotLess_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2 }).HasCountLessThan(2));
+    }
+
+    [Fact]
+    public void Verify_CollectionToBeUnique_WhenDuplicatesExist_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 1 }).ToBeUnique());
+    }
+
+    [Fact]
+    public void Verify_CollectionHasUniqueCount_WhenCountDiffers_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 2, 3 }).HasUniqueCount(4));
     }
 
     [Fact]
