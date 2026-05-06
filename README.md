@@ -100,8 +100,8 @@ public void Example()
 | Area | Pattern | Notes |
 |------|---------|--------|
 | **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately` | Numeric types use `INumber<T>`; `BigInteger` is included. |
-| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)` | Also `ToBeNull`, `NotToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
-| **Collections** | `Verify(list).ToContain`, `HasCount`, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison. |
+| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)`, `HasLength` | Also `ToBeEmpty`, `NotToBeEmpty`, `ToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
+| **Collections** | `Verify(list).ToContain`, `HasCount`, `ToBeUnique`, `HasUniqueCount`, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison. |
 | **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)` | |
 | **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
 | **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
@@ -196,9 +196,11 @@ Verify(3.14159).ToBeApproximately(3.14, 0.01);
 
 Verify("Hello World").ToContain("Hello");
 Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+Verify(email).HasLengthGreaterThan(5);
 
 Verify(users).ToContain(currentUser);
 Verify(results).HasCount(3);
+Verify(results).ToBeUnique();
 
 VerifyNullable(someObject).NotToBeNull();
 Verify(MyEnum.On).ToBe(MyEnum.On);
