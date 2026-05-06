@@ -64,6 +64,59 @@ public readonly struct StringAssertions
             _expression);
     }
 
+    /// <summary>Verifies that the string is not null or empty.</summary>
+    public void NotToBeEmpty()
+    {
+        if (!string.IsNullOrEmpty(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be empty, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string has exactly <paramref name="expectedLength"/> characters.</summary>
+    /// <param name="expectedLength">The expected string length.</param>
+    /// <param name="lengthExpression">The expression for the expected length (automatically captured).</param>
+    public void HasLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
+    {
+        if (_actual is not null && _actual.Length == expectedLength)
+            return;
+
+        var actualLengthText = _actual is null ? "null" : _actual.Length.ToString();
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have length {expectedLength} ({lengthExpression ?? "expectedLength"}), but had length {actualLengthText}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string length is greater than <paramref name="minimumLength"/>.</summary>
+    /// <param name="minimumLength">The exclusive lower bound for the string length.</param>
+    /// <param name="lengthExpression">The expression for the minimum length (automatically captured).</param>
+    public void HasLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null)
+    {
+        if (_actual is not null && _actual.Length > minimumLength)
+            return;
+
+        var actualLengthText = _actual is null ? "null" : _actual.Length.ToString();
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have length greater than {minimumLength} ({lengthExpression ?? "minimumLength"}), but had length {actualLengthText}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string length is less than <paramref name="maximumLength"/>.</summary>
+    /// <param name="maximumLength">The exclusive upper bound for the string length.</param>
+    /// <param name="lengthExpression">The expression for the maximum length (automatically captured).</param>
+    public void HasLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null)
+    {
+        if (_actual is not null && _actual.Length < maximumLength)
+            return;
+
+        var actualLengthText = _actual is null ? "null" : _actual.Length.ToString();
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have length less than {maximumLength} ({lengthExpression ?? "maximumLength"}), but had length {actualLengthText}.",
+            _expression);
+    }
+
     /// <summary>Verifies that the string is null or empty.</summary>
     public void ToBeNullOrEmpty()
     {
