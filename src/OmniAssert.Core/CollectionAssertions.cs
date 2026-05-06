@@ -49,6 +49,21 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection is not empty.</summary>
+    public void NotToBeEmpty()
+    {
+        if (_actual is ICollection<T> c && c.Count > 0)
+            return;
+
+        using var e = _actual.GetEnumerator();
+        if (e.MoveNext())
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be empty, but it had no elements.",
+            _expression);
+    }
+
     /// <summary>Verifies that the collection does not contain the specified <paramref name="item"/>.</summary>
     /// <param name="item">The item that should not be in the collection.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
@@ -102,6 +117,66 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection count is greater than <paramref name="minimumCount"/>.</summary>
+    /// <param name="minimumCount">The exclusive lower bound for the collection count.</param>
+    /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
+    public void HasCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
+    {
+        var actualCount = GetActualCount();
+        if (actualCount > minimumCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count greater than {minimumCount} ({countExpression ?? "minimumCount"}), but had {actualCount}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the collection count is less than <paramref name="maximumCount"/>.</summary>
+    /// <param name="maximumCount">The exclusive upper bound for the collection count.</param>
+    /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
+    public void HasCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
+    {
+        var actualCount = GetActualCount();
+        if (actualCount < maximumCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count less than {maximumCount} ({countExpression ?? "maximumCount"}), but had {actualCount}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that all elements in the collection are unique.</summary>
+    public void ToBeUnique()
+    {
+        var seen = new HashSet<T>();
+        var index = 0;
+        foreach (var item in _actual)
+        {
+            if (!seen.Add(item))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to contain unique elements, but found duplicate {FormatItem(item)} at index {index}.",
+                    _expression);
+                return;
+            }
+            index++;
+        }
+    }
+
+    /// <summary>Verifies that the collection contains exactly <paramref name="expectedUniqueCount"/> distinct elements.</summary>
+    /// <param name="expectedUniqueCount">The expected number of distinct elements.</param>
+    /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
+    public void HasUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
+    {
+        var uniqueCount = new HashSet<T>(_actual).Count;
+        if (uniqueCount == expectedUniqueCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have unique count {expectedUniqueCount} ({countExpression ?? "expectedUniqueCount"}), but had {uniqueCount}.",
+            _expression);
+    }
+
     /// <summary>Verifies that all elements in the collection satisfy the given <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that every item must meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
@@ -152,6 +227,17 @@ public readonly struct CollectionAssertions<T>
                 return;
             }
         }
+    }
+
+    private int GetActualCount()
+    {
+        if (_actual is ICollection<T> c)
+            return c.Count;
+
+        var count = 0;
+        foreach (var _ in _actual)
+            count++;
+        return count;
     }
 
     private static string FormatItem(T item) => OmniAssertionException.FormatValueForMessage(item!);
