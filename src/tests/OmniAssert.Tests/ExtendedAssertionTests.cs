@@ -2,217 +2,239 @@ using static OmniAssert.Assert;
 
 namespace OmniAssert.Tests;
 
-public class ExtendedAssertionTests
+public class CollectionAssertionTests
 {
+    // ── ToContain ────────────────────────────────────────────────────────────
+
     [Fact]
-    public void Verify_DoubleToBeApproximately_WhenWithinTolerance_ShouldSucceed()
+    public void ToContain_WhenItemPresent_ShouldSucceed()
     {
-        Verify(1.0).ToBeApproximately(1.001, 0.01);
+        Verify(new[] { 1, 2, 3 }).ToContain(2);
     }
 
     [Fact]
-    public void Verify_DoubleToBeInRange_WhenInBounds_ShouldSucceed()
+    public void ToContain_WhenItemAbsent_ShouldThrow()
     {
-        Verify(5.0).ToBeInRange(1.0, 10.0);
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 3 }).ToContain(4));
     }
 
     [Fact]
-    public void VerifyNullable_ReferenceTypeToBeNull_WhenNull_ShouldSucceed()
+    public void ToContain_NonICollectionEnumerable_WhenItemPresent_ShouldSucceed()
     {
-        string? val = null;
-        VerifyNullable(val).ToBeNull();
-    }
-
-    [Fact]
-    public void VerifyNullable_ValueTypeNotToBeNull_WhenNotNull_ShouldSucceed()
-    {
-        int? val = 42;
-        VerifyNullable(val).NotToBeNull();
-    }
-
-    [Fact]
-    public void Verify_StringAdvanced_WhenMatching_ShouldSucceed()
-    {
-        Verify("hello world").ToStartWith("hello");
-        Verify("hello world").ToEndWith("world");
-        Verify("123-456").ToMatch(@"^\d{3}-\d{3}$");
-        Verify("HELLO").ToBe("hello", StringComparison.OrdinalIgnoreCase);
-        Verify("hello").NotToBeEmpty();
-        Verify("hello").HasLength(5);
-        Verify("hello").HasLengthGreaterThan(3);
-        Verify("hello").HasLengthLessThan(10);
-    }
-
-    [Fact]
-    public void Verify_StringToStartWith_WhenMismatch_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToStartWith("hi"));
-    }
-
-    [Fact]
-    public void Verify_StringToEndWith_WhenMismatch_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToEndWith("bye"));
-    }
-
-    [Fact]
-    public void Verify_StringToMatch_WhenMismatch_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("123").ToMatch(@"^[a-z]+$"));
-    }
-
-    [Fact]
-    public void Verify_CollectionAdvanced_WhenValid_ShouldSucceed()
-    {
-        Verify([1, 2, 3]).HasCount(3);
-        Verify([1, 2, 3]).HasCountGreaterThan(2);
-        Verify([1, 2, 3]).HasCountLessThan(4);
-        Verify([1, 2, 3]).NotToBeEmpty();
-        Verify([1, 2, 3]).AllSatisfy(x => x > 0);
-        Verify([1, 2, 3]).ToBeEquivalentTo([3, 2, 1]);
-        Verify([1, 2, 3]).ToBeUnique();
-        Verify([1, 1, 2, 3]).HasUniqueCount(3);
-        Verify([1, 2, 3]).NotToContain(4);
-    }
-
-    [Fact]
-    public void Verify_CollectionToContain_WhenMissing_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify([1, 2, 3]).ToContain(4));
-    }
-
-    [Fact]
-    public void Verify_CollectionNotToContain_WhenPresent_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify([1, 2, 3]).NotToContain(2));
-    }
-
-    [Fact]
-    public void Verify_CollectionHasCount_WhenCountDiffers_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify([1, 2, 3]).HasCount(2));
-    }
-
-    [Fact]
-    public void Verify_CollectionAllSatisfy_WhenOneFails_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify([1, 2, -1]).AllSatisfy(x => x > 0));
-    }
-
-    [Fact]
-    public void Verify_CollectionToBeEquivalentTo_WhenElementsDiffer_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify([1, 2, 3]).ToBeEquivalentTo([1, 2, 4]));
-    }
-
-    [Fact]
-    public void Verify_ExceptionAssertions_WhenConditionsMet_ShouldSucceed()
-    {
-        Throws<ArgumentException>(() => throw new ArgumentException("bad"))
-            .WithMessage("bad");
-
-        NotThrow(() => { });
-    }
-
-    [Fact]
-    public void Verify_NotThrow_WhenThrows_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => NotThrow(() => throw new Exception("fail")));
-    }
-
-    [Fact]
-    public async Task Verify_AsyncExceptionAssertions_WhenConditionsMet_ShouldSucceed()
-    {
-        await ThrowsAsync<ArgumentException>(async () =>
+        static IEnumerable<int> Yield123()
         {
-            await Task.Yield();
-            throw new ArgumentException("bad");
-        }).ContinueWith(t => t.Result.WithMessage("bad"));
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
 
-        await NotThrowAsync(async () => await Task.Yield());
+        Verify(Yield123()).ToContain(2);
+    }
+
+    // ── NotToContain ─────────────────────────────────────────────────────────
+
+    [Fact]
+    public void NotToContain_WhenItemAbsent_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).NotToContain(4);
     }
 
     [Fact]
-    public async Task Verify_NotThrowAsync_WhenThrows_ShouldThrow()
+    public void NotToContain_WhenItemPresent_ShouldThrow()
     {
-        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => await NotThrowAsync(async () =>
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 3 }).NotToContain(2));
+    }
+
+    // ── ToBeEmpty / NotToBeEmpty ─────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeEmpty_WhenEmpty_ShouldSucceed()
+    {
+        Verify(Array.Empty<int>()).ToBeEmpty();
+    }
+
+    [Fact]
+    public void ToBeEmpty_WhenNotEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1 }).ToBeEmpty());
+    }
+
+    [Fact]
+    public void ToBeEmpty_NonICollection_WhenEmpty_ShouldSucceed()
+    {
+        static IEnumerable<int> YieldNone()
         {
-            await Task.Yield();
-            throw new Exception("fail");
-        }));
+            yield break;
+        }
+
+        Verify(YieldNone()).ToBeEmpty();
     }
 
     [Fact]
-    public async Task CompleteWithin_Action_WhenCompletesInTime_ShouldSucceed()
+    public void NotToBeEmpty_WhenNotEmpty_ShouldSucceed()
     {
-        await CompleteWithin(TimeSpan.FromSeconds(1), async () => await Task.Delay(10));
+        Verify(new[] { 1, 2, 3 }).NotToBeEmpty();
     }
 
     [Fact]
-    public async Task CompleteWithin_Action_WhenTimesOut_ShouldThrow()
+    public void NotToBeEmpty_WhenEmpty_ShouldThrow()
     {
-        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
-            await CompleteWithin(TimeSpan.FromMilliseconds(10), async () => await Task.Delay(100)));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(Array.Empty<int>()).NotToBeEmpty());
+    }
+
+    // ── HasCount ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasCount_WhenCountMatches_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).HasCount(3);
     }
 
     [Fact]
-    public void Verify_TypeAssertions_WhenTypeMatches_ShouldSucceed()
+    public void HasCount_WhenCountDiffers_ShouldThrow()
     {
-        object obj = "hello";
-        Verify(obj).ToBeOfType<string>();
-        Verify(obj).ToBeAssignableTo<IEnumerable<char>>();
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 3 }).HasCount(2));
     }
 
     [Fact]
-    public void Verify_ToBeOfType_WhenTypeDiffers_ShouldThrow()
+    public void HasCount_NonICollection_WhenCountMatches_ShouldSucceed()
     {
-        object obj = 42;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(obj).ToBeOfType<string>());
+        static IEnumerable<int> YieldThree()
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+
+        Verify(YieldThree()).HasCount(3);
+    }
+
+    // ── HasCountGreaterThan ──────────────────────────────────────────────────
+
+    [Fact]
+    public void HasCountGreaterThan_WhenCountIsGreater_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).HasCountGreaterThan(2);
     }
 
     [Fact]
-    public void Verify_ToBeAssignableTo_WhenNotAssignable_ShouldThrow()
+    public void HasCountGreaterThan_WhenCountIsEqual_ShouldThrow()
     {
-        object obj = 42;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(obj).ToBeAssignableTo<IEnumerable<int>>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2 }).HasCountGreaterThan(2));
     }
 
     [Fact]
-    public void Verify_DateTimeAssertions_WhenConditionsMet_ShouldSucceed()
+    public void HasCountGreaterThan_WhenCountIsLess_ShouldThrow()
     {
-        var now = DateTime.UtcNow;
-        Verify(now).ToBeAfter(now.AddSeconds(-1));
-        Verify(now).ToBeBefore(now.AddSeconds(1));
-        Verify(now).ToBeWithin(TimeSpan.FromSeconds(1), now.AddMilliseconds(500));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1 }).HasCountGreaterThan(2));
+    }
+
+    // ── HasCountLessThan ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasCountLessThan_WhenCountIsLess_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).HasCountLessThan(4);
     }
 
     [Fact]
-    public void Verify_DateTimeToBeAfter_WhenBefore_ShouldThrow()
+    public void HasCountLessThan_WhenCountIsEqual_ShouldThrow()
     {
-        var now = DateTime.UtcNow;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(now).ToBeAfter(now.AddSeconds(1)));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2 }).HasCountLessThan(2));
+    }
+
+    // ── ToBeUnique ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeUnique_WhenAllElementsUnique_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).ToBeUnique();
     }
 
     [Fact]
-    public void Verify_DateTimeToBeBefore_WhenAfter_ShouldThrow()
+    public void ToBeUnique_WhenDuplicatesExist_ShouldThrow()
     {
-        var now = DateTime.UtcNow;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(now).ToBeBefore(now.AddSeconds(-1)));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 1 }).ToBeUnique());
+    }
+
+    // ── HasUniqueCount ───────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasUniqueCount_WhenCorrect_ShouldSucceed()
+    {
+        Verify(new[] { 1, 1, 2, 3 }).HasUniqueCount(3);
     }
 
     [Fact]
-    public void Verify_DateTimeToBeWithin_WhenOutsidePrecision_ShouldThrow()
+    public void HasUniqueCount_WhenCountDiffers_ShouldThrow()
     {
-        var now = DateTime.UtcNow;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(now).ToBeWithin(TimeSpan.FromMilliseconds(100), now.AddSeconds(1)));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 2, 3 }).HasUniqueCount(4));
+    }
+
+    // ── AllSatisfy ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void AllSatisfy_WhenAllElementsSatisfy_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).AllSatisfy(x => x > 0);
     }
 
     [Fact]
-    public void Verify_DateTimeOffsetAssertions_WhenConditionsMet_ShouldSucceed()
+    public void AllSatisfy_WhenOneElementFails_ShouldThrow()
     {
-        var now = DateTimeOffset.UtcNow;
-        Verify(now).ToBeAfter(now.AddSeconds(-1));
-        Verify(now).ToBeBefore(now.AddSeconds(1));
-        Verify(now).ToBeWithin(TimeSpan.FromSeconds(1), now.AddMilliseconds(500));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, -1 }).AllSatisfy(x => x > 0));
+    }
+
+    // ── ToBeEquivalentTo ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeEquivalentTo_WhenOrderDiffers_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).ToBeEquivalentTo(new[] { 3, 2, 1 });
+    }
+
+    [Fact]
+    public void ToBeEquivalentTo_WhenElementsDiffer_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 3 }).ToBeEquivalentTo(new[] { 1, 2, 4 }));
+    }
+
+    [Fact]
+    public void ToBeEquivalentTo_WhenCountDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Verify(new[] { 1, 2 }).ToBeEquivalentTo(new[] { 1, 2, 3 }));
+    }
+
+    [Fact]
+    public void ToBeEquivalentTo_WhenMultisetDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Verify(new[] { 1, 1, 2 }).ToBeEquivalentTo(new[] { 1, 2, 2 }));
+    }
+
+    // ── Scope ────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToContain_WithinScope_WhenItemAbsent_ShouldCollectRatherThanThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+        {
+            using var scope = new AssertionScope();
+            Verify(new[] { 1, 2 }).ToContain(9);
+        });
+        Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public void HasCount_WithinScope_MultipleFailures_ShouldThrowAggregate()
+    {
+        var ex = Xunit.Assert.Throws<AggregateException>(() =>
+        {
+            using var scope = new AssertionScope();
+            Verify(new[] { 1 }).HasCount(5);
+            Verify(new[] { 2 }).HasCount(5);
+        });
+        Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
 }
