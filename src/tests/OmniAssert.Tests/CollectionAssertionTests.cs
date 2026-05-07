@@ -109,6 +109,18 @@ public class CollectionAssertionTests
         Verify(YieldThree()).HasCount(3);
     }
 
+    [Fact]
+    public void ToHaveCount_WhenCountMatches_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 3 }).ToHaveCount(3);
+    }
+
+    [Fact]
+    public void ToHaveCount_WhenCountDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 3 }).ToHaveCount(2));
+    }
+
     // ── HasCountGreaterThan ──────────────────────────────────────────────────
 
     [Fact]
@@ -169,6 +181,32 @@ public class CollectionAssertionTests
     public void HasUniqueCount_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 2, 2, 3 }).HasUniqueCount(4));
+    }
+
+    // ── Ordering ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeInAscendingOrder_WhenSorted_ShouldSucceed()
+    {
+        Verify(new[] { 1, 2, 2, 3 }).ToBeInAscendingOrder();
+    }
+
+    [Fact]
+    public void ToBeInAscendingOrder_WhenUnsorted_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 1, 3, 2 }).ToBeInAscendingOrder());
+    }
+
+    [Fact]
+    public void ToBeInDescendingOrder_WhenSorted_ShouldSucceed()
+    {
+        Verify(new[] { 3, 2, 2, 1 }).ToBeInDescendingOrder();
+    }
+
+    [Fact]
+    public void ToBeInDescendingOrder_WhenUnsorted_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new[] { 3, 1, 2 }).ToBeInDescendingOrder());
     }
 
     // ── AllSatisfy ───────────────────────────────────────────────────────────

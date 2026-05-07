@@ -45,7 +45,7 @@ public readonly struct StringAssertions
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
     public void ToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
-        if (_actual is not null && substring.Length > 0 && _actual.Contains(substring, StringComparison.Ordinal))
+        if (_actual is not null && _actual.Contains(substring, StringComparison.Ordinal))
             return;
 
         VerificationFlow.Fail(
@@ -208,13 +208,40 @@ public readonly struct StringAssertions
         VerificationFlow.Fail(msg, _expression);
     }
 
+    /// <summary>Verifies that the string is equal to the <paramref name="expected"/> string using ordinal case-insensitive comparison.</summary>
+    /// <param name="expected">The expected string.</param>
+    /// <param name="expectedExpression">The expression for the expected string (automatically captured).</param>
+    public void ToBeIgnoringCase(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) =>
+        ToBe(expected, StringComparison.OrdinalIgnoreCase, expectedExpression);
+
+    /// <summary>Verifies that the string is equal to one of the provided expected values using ordinal comparison.</summary>
+    /// <param name="expected">Allowed expected string values.</param>
+    public void ToBeOneOf(params string?[] expected)
+    {
+        if (expected is not null)
+        {
+            foreach (var candidate in expected)
+            {
+                if (string.Equals(_actual, candidate, StringComparison.Ordinal))
+                    return;
+            }
+        }
+
+        var expectedList = expected is null || expected.Length == 0
+            ? "[]"
+            : $"[{string.Join(", ", expected.Select(Quote))}]";
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be one of {expectedList}, but was {Quote(_actual)}.",
+            _expression);
+    }
+
     /// <summary>Verifies that the string contains the specified <paramref name="substring"/> using the specified <paramref name="comparison"/>.</summary>
     /// <param name="substring">The substring expected to be present.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
     public void ToContain(string substring, StringComparison comparison, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
-        if (_actual is not null && substring.Length > 0 && _actual.Contains(substring, comparison))
+        if (_actual is not null && _actual.Contains(substring, comparison))
             return;
 
         VerificationFlow.Fail(

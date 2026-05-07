@@ -14,7 +14,7 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>- Expanded assertion surface (Guid, Uri, DateOnly/TimeOnly/TimeSpan, dictionary, and file system helpers); improved collection, string, enum, numeric, and exception assertions.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>

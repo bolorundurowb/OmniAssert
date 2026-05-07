@@ -16,9 +16,9 @@ public readonly struct ExceptionAssertions<T> where T : Exception
         _expression = expression;
     }
 
-    /// <summary>Fails when <see cref="Exception.Message"/> is not exactly <paramref name="expectedMessage"/>.</summary>
-    /// <param name="expectedMessage">Exact message text required.</param>
-    /// <param name="expectedMessageExpression">Compiler-supplied expression for <paramref name="expectedMessage"/>.</param>
+    /// <summary>Verifies that <see cref="Exception.Message"/> is exactly <paramref name="expectedMessage"/>.</summary>
+    /// <param name="expectedMessage">The expected exception message.</param>
+    /// <param name="expectedMessageExpression">The expression for the expected message (automatically captured).</param>
     /// <returns><c>this</c> when the message matches.</returns>
     public ExceptionAssertions<T> WithMessage(string expectedMessage, [CallerArgumentExpression(nameof(expectedMessage))] string? expectedMessageExpression = null)
     {
@@ -29,7 +29,22 @@ public readonly struct ExceptionAssertions<T> where T : Exception
         return this;
     }
 
-    /// <summary>Fails when <see cref="Exception.InnerException"/> is not an instance of <typeparamref name="TInner"/>.</summary>
+    /// <summary>Verifies that <see cref="Exception.Message"/> contains <paramref name="expectedSubstring"/>.</summary>
+    /// <param name="expectedSubstring">The substring that must appear in the exception message.</param>
+    /// <param name="expectedSubstringExpression">The expression for the expected substring (automatically captured).</param>
+    /// <returns><c>this</c> when the message contains the substring.</returns>
+    public ExceptionAssertions<T> WithMessageContaining(string expectedSubstring, [CallerArgumentExpression(nameof(expectedSubstring))] string? expectedSubstringExpression = null)
+    {
+        if (Exception.Message.Contains(expectedSubstring, StringComparison.Ordinal))
+            return this;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected exception message to contain {expectedSubstringExpression ?? "substring"} (\"{expectedSubstring}\"), but was \"{Exception.Message}\".",
+            _expression);
+        return this;
+    }
+
+    /// <summary>Verifies that <see cref="Exception.InnerException"/> is an instance of <typeparamref name="TInner"/>.</summary>
     /// <returns><c>this</c> when the inner exception type matches.</returns>
     public ExceptionAssertions<T> WithInnerException<TInner>() where TInner : Exception
     {

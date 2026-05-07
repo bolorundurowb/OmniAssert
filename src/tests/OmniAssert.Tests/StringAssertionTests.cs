@@ -30,6 +30,30 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToBe("xyz", StringComparison.OrdinalIgnoreCase));
     }
 
+    [Fact]
+    public void ToBeIgnoringCase_WhenStringsMatchIgnoringCase_ShouldSucceed()
+    {
+        Verify("HELLO").ToBeIgnoringCase("hello");
+    }
+
+    [Fact]
+    public void ToBeIgnoringCase_WhenStringsDiffer_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToBeIgnoringCase("xyz"));
+    }
+
+    [Fact]
+    public void ToBeOneOf_WhenStringIsInSet_ShouldSucceed()
+    {
+        Verify("pending").ToBeOneOf("active", "pending", "archived");
+    }
+
+    [Fact]
+    public void ToBeOneOf_WhenStringIsNotInSet_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("deleted").ToBeOneOf("active", "pending", "archived"));
+    }
+
     // ── NotToBe ─────────────────────────────────────────────────────────────
 
     [Fact]
@@ -197,6 +221,12 @@ public class StringAssertionTests
     }
 
     [Fact]
+    public void ToContain_WhenSubstringIsEmpty_ShouldSucceed()
+    {
+        Verify("abc").ToContain(string.Empty);
+    }
+
+    [Fact]
     public void ToContain_WithIgnoreCaseComparison_WhenMatch_ShouldSucceed()
     {
         Verify("AbC").ToContain("bc", StringComparison.OrdinalIgnoreCase);
@@ -207,6 +237,12 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             Verify("abc").ToContain("XX", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ToContain_WithEmptySubstringAndComparison_ShouldSucceed()
+    {
+        Verify("abc").ToContain(string.Empty, StringComparison.Ordinal);
     }
 
     // ── ToStartWith ──────────────────────────────────────────────────────────

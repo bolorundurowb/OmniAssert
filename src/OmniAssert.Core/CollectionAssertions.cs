@@ -117,6 +117,12 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection has the expected number of items (alias for <see cref="HasCount"/>).</summary>
+    /// <param name="expectedCount">The expected count.</param>
+    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
+        HasCount(expectedCount, countExpression);
+
     /// <summary>Verifies that the collection count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the collection count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
@@ -177,6 +183,18 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection is in ascending order (non-decreasing) using <see cref="Comparer{T}.Default"/>.</summary>
+    public void ToBeInAscendingOrder()
+    {
+        VerifyOrdering(ascending: true);
+    }
+
+    /// <summary>Verifies that the collection is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
+    public void ToBeInDescendingOrder()
+    {
+        VerifyOrdering(ascending: false);
+    }
+
     /// <summary>Verifies that all elements in the collection satisfy the given <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that every item must meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
@@ -214,19 +232,62 @@ public readonly struct CollectionAssertions<T>
             return;
         }
 
-        var actualMap = actualList.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
-        var expectedMap = expectedList.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+        var actualCounts = GetElementCounts(actualList);
+        var expectedCounts = GetElementCounts(expectedList);
 
-        foreach (var kvp in expectedMap)
+        foreach (var (expectedItem, expectedCount) in expectedCounts)
         {
-            if (!actualMap.TryGetValue(kvp.Key, out var actualCount) || actualCount != kvp.Value)
+            var found = false;
+            foreach (var (actualItem, actualCount) in actualCounts)
             {
+                if (!EqualityComparer<T>.Default.Equals(actualItem, expectedItem))
+                    continue;
+
+                found = true;
+                if (actualCount == expectedCount)
+                    break;
+
                 VerificationFlow.Fail(
-                    $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(kvp.Key)} had {actualCount} occurrences instead of {kvp.Value}.",
+                    $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(expectedItem)} had {actualCount} occurrences instead of {expectedCount}.",
                     _expression);
                 return;
             }
+
+            if (found)
+                continue;
+
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(expectedItem)} had 0 occurrences instead of {expectedCount}.",
+                _expression);
+            return;
         }
+    }
+
+    private static List<(T Item, int Count)> GetElementCounts(IEnumerable<T> source)
+    {
+        var counts = new List<(T Item, int Count)>();
+        foreach (var item in source)
+        {
+            var index = -1;
+            for (var i = 0; i < counts.Count; i++)
+            {
+                if (!EqualityComparer<T>.Default.Equals(counts[i].Item, item))
+                    continue;
+
+                index = i;
+                break;
+            }
+
+            if (index < 0)
+            {
+                counts.Add((item, 1));
+                continue;
+            }
+
+            counts[index] = (counts[index].Item, counts[index].Count + 1);
+        }
+
+        return counts;
     }
 
     private int GetActualCount()
@@ -238,6 +299,46 @@ public readonly struct CollectionAssertions<T>
         foreach (var _ in _actual)
             count++;
         return count;
+    }
+
+    private void VerifyOrdering(bool ascending)
+    {
+        using var enumerator = _actual.GetEnumerator();
+        if (!enumerator.MoveNext())
+            return;
+
+        var comparer = Comparer<T>.Default;
+        var previous = enumerator.Current;
+        var index = 1;
+
+        while (enumerator.MoveNext())
+        {
+            var current = enumerator.Current;
+            int comparison;
+            try
+            {
+                comparison = comparer.Compare(previous, current);
+            }
+            catch (Exception ex)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order, but values of type {typeof(T).Name} could not be compared: {ex.Message}",
+                    _expression);
+                return;
+            }
+
+            var inOrder = ascending ? comparison <= 0 : comparison >= 0;
+            if (!inOrder)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order, but element at index {index - 1} ({FormatItem(previous)}) and index {index} ({FormatItem(current)}) were out of order.",
+                    _expression);
+                return;
+            }
+
+            previous = current;
+            index++;
+        }
     }
 
     private static string FormatItem(T item) => OmniAssertionException.FormatValueForMessage(item!);
