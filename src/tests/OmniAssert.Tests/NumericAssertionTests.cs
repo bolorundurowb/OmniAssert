@@ -101,6 +101,20 @@ public class NumericAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => Verify(7).NotToBe(7));
     }
 
+    // ── ToBeOneOf ────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeOneOf_WhenValueIsInSet_ShouldSucceed()
+    {
+        Verify(2).ToBeOneOf(1, 2, 3);
+    }
+
+    [Fact]
+    public void ToBeOneOf_WhenValueIsNotInSet_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(4).ToBeOneOf(1, 2, 3));
+    }
+
     // ── ToBeGreaterThan ──────────────────────────────────────────────────────
 
     [Fact]

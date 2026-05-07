@@ -29,6 +29,21 @@ public readonly struct ExceptionAssertions<T> where T : Exception
         return this;
     }
 
+    /// <summary>Fails when <see cref="Exception.Message"/> does not contain <paramref name="expectedSubstring"/>.</summary>
+    /// <param name="expectedSubstring">Substring that must appear in the exception message.</param>
+    /// <param name="expectedSubstringExpression">Compiler-supplied expression for <paramref name="expectedSubstring"/>.</param>
+    /// <returns><c>this</c> when the message contains the substring.</returns>
+    public ExceptionAssertions<T> WithMessageContaining(string expectedSubstring, [CallerArgumentExpression(nameof(expectedSubstring))] string? expectedSubstringExpression = null)
+    {
+        if (Exception.Message.Contains(expectedSubstring, StringComparison.Ordinal))
+            return this;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected exception message to contain {expectedSubstringExpression ?? "substring"} (\"{expectedSubstring}\"), but was \"{Exception.Message}\".",
+            _expression);
+        return this;
+    }
+
     /// <summary>Fails when <see cref="Exception.InnerException"/> is not an instance of <typeparamref name="TInner"/>.</summary>
     /// <returns><c>this</c> when the inner exception type matches.</returns>
     public ExceptionAssertions<T> WithInnerException<TInner>() where TInner : Exception

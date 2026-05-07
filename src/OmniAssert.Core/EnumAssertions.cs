@@ -40,6 +40,27 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
         VerificationFlow.Fail(msg, _expression);
     }
 
+    /// <summary>Verifies that the enum value matches one of the provided <paramref name="expected"/> values.</summary>
+    /// <param name="expected">Allowed enum values.</param>
+    public void ToBeOneOf(params T[] expected)
+    {
+        if (expected is not null)
+        {
+            foreach (var candidate in expected)
+            {
+                if (EqualityComparer<T>.Default.Equals(_actual, candidate))
+                    return;
+            }
+        }
+
+        var expectedList = expected is null || expected.Length == 0
+            ? "[]"
+            : $"[{string.Join(", ", expected.Select(v => v.ToString()))}]";
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be one of {expectedList}, but was {_actual}.",
+            _expression);
+    }
+
     private static string FormatPair(T expected, string expectedLabel, T actual, string actualLabel)
     {
         var sb = new StringBuilder();

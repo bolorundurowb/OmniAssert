@@ -41,6 +41,26 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
         VerificationFlow.Fail(msg, _expression);
     }
 
+    /// <summary>Verifies that the numeric value matches one of the provided <paramref name="expected"/> values.</summary>
+    /// <param name="expected">Allowed values.</param>
+    public void ToBeOneOf(params T[] expected)
+    {
+        if (expected is not null)
+        {
+            foreach (var candidate in expected)
+            {
+                if (_actual == candidate)
+                    return;
+            }
+        }
+
+        var expectedList = expected is null || expected.Length == 0
+            ? "[]"
+            : $"[{string.Join(", ", expected.Select(FormatValue))}]";
+        var msg = FormatFailure($"to be one of {expectedList}", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
     /// <summary>Verifies that the numeric value is greater than the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The value to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>

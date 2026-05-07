@@ -112,6 +112,32 @@ public class ExceptionAssertionTests
         Xunit.Assert.Contains("actual", ex.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void WithMessageContaining_WhenSubstringExists_ShouldSucceed()
+    {
+        Throws<ArgumentException>(() => throw new ArgumentException("User 42 not found in /api/users"))
+            .WithMessageContaining("42 not found");
+    }
+
+    [Fact]
+    public void WithMessageContaining_WhenSubstringMissing_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Throws<ArgumentException>(() => throw new ArgumentException("User 42 not found in /api/users"))
+                .WithMessageContaining("99 not found"));
+        Xunit.Assert.Contains("42 not found", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ThrowsAsync_WithMessageContaining_WhenSubstringExists_ShouldSucceed()
+    {
+        (await ThrowsAsync<ArgumentException>(async () =>
+        {
+            await Task.Yield();
+            throw new ArgumentException("Entity id=123 failed validation");
+        })).WithMessageContaining("id=123");
+    }
+
     // ── ExceptionAssertions.WithInnerException ───────────────────────────────
 
     [Fact]

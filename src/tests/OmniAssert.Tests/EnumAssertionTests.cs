@@ -77,4 +77,19 @@ public class EnumAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
+
+    // ── ToBeOneOf ────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void ToBeOneOf_WhenValueIsInSet_ShouldSucceed()
+    {
+        Verify(TestEnum.Second).ToBeOneOf(TestEnum.First, TestEnum.Second);
+    }
+
+    [Fact]
+    public void ToBeOneOf_WhenValueIsNotInSet_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Verify(TestEnum.Third).ToBeOneOf(TestEnum.First, TestEnum.Second));
+    }
 }
