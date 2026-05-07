@@ -117,6 +117,12 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection has the expected number of items.</summary>
+    /// <param name="expectedCount">The expected count.</param>
+    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
+        HasCount(expectedCount, countExpression);
+
     /// <summary>Verifies that the collection count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the collection count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
@@ -175,6 +181,18 @@ public readonly struct CollectionAssertions<T>
         VerificationFlow.Fail(
             $"Verification failed: expected {_expression} to have unique count {expectedUniqueCount} ({countExpression ?? "expectedUniqueCount"}), but had {uniqueCount}.",
             _expression);
+    }
+
+    /// <summary>Verifies that the collection is in ascending order (non-decreasing) using <see cref="Comparer{T}.Default"/>.</summary>
+    public void ToBeInAscendingOrder()
+    {
+        VerifyOrdering(ascending: true);
+    }
+
+    /// <summary>Verifies that the collection is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
+    public void ToBeInDescendingOrder()
+    {
+        VerifyOrdering(ascending: false);
     }
 
     /// <summary>Verifies that all elements in the collection satisfy the given <paramref name="predicate"/>.</summary>
@@ -238,6 +256,46 @@ public readonly struct CollectionAssertions<T>
         foreach (var _ in _actual)
             count++;
         return count;
+    }
+
+    private void VerifyOrdering(bool ascending)
+    {
+        using var enumerator = _actual.GetEnumerator();
+        if (!enumerator.MoveNext())
+            return;
+
+        var comparer = Comparer<T>.Default;
+        var previous = enumerator.Current;
+        var index = 1;
+
+        while (enumerator.MoveNext())
+        {
+            var current = enumerator.Current;
+            int comparison;
+            try
+            {
+                comparison = comparer.Compare(previous, current);
+            }
+            catch (Exception ex)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order, but values of type {typeof(T).Name} could not be compared: {ex.Message}",
+                    _expression);
+                return;
+            }
+
+            var inOrder = ascending ? comparison <= 0 : comparison >= 0;
+            if (!inOrder)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order, but element at index {index - 1} ({FormatItem(previous)}) and index {index} ({FormatItem(current)}) were out of order.",
+                    _expression);
+                return;
+            }
+
+            previous = current;
+            index++;
+        }
     }
 
     private static string FormatItem(T item) => OmniAssertionException.FormatValueForMessage(item!);
