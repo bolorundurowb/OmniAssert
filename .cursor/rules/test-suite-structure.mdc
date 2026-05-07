@@ -1,0 +1,18 @@
+---
+description: Keep assertion tests grouped and consistently named
+globs: src/tests/**/*.cs
+alwaysApply: false
+---
+
+# Test Suite Structure
+
+- Do not create or extend generic catch-all test suites (for example `Extended*`, `Misc*`, `General*`).
+- Put tests in assertion-group suites only (`StringAssertionTests`, `CollectionAssertionTests`, `DictionaryAssertionTests`, etc.).
+- Keep one assertion group per test file, and make the file name match the suite name exactly.
+- When adding a new assertion group, create a dedicated `*AssertionTests.cs` file for it.
+
+# Test Naming Convention
+
+- Test class names must follow: `<Group>AssertionTests`.
+- Test method names must follow: `<MethodUnderTest>_When<Condition>_Should<ExpectedOutcome>`.
+- Keep the same naming style when adding failure and success-path tests for new assertions.
