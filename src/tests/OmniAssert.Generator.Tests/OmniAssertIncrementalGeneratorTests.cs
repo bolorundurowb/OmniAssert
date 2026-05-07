@@ -28,8 +28,8 @@ public static class T
 """;
         var (diagnostics, generatedSources) = RunGenerator(source, enableInterceptors: false);
 
-        Xunit.Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
-        Xunit.Assert.Empty(generatedSources.Where(s => s.HintName.Contains("VerifyInterceptors")));
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Xunit.Assert.DoesNotContain(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
     }
 
     [Fact]
@@ -47,9 +47,8 @@ public static class T
 """;
         var (diagnostics, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
-        Xunit.Assert.Empty(diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error));
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
         var interceptorSource = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptorSource);
     }
 
     [Fact]
@@ -68,7 +67,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
         Xunit.Assert.Contains("VerifyExpression", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
@@ -88,7 +86,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
         Xunit.Assert.Contains("ToBeTrue()", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
@@ -109,7 +106,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
 
         var text = interceptor!.SourceText.ToString();
         Xunit.Assert.Contains("OmniAssertVerifyIntercept_0", text, StringComparison.Ordinal);
@@ -129,7 +125,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
         Xunit.Assert.Contains("InterceptsLocation", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
@@ -146,7 +141,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
         Xunit.Assert.Contains("#nullable enable", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
@@ -161,7 +155,7 @@ public static class T
 """;
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
-        Xunit.Assert.Empty(generatedSources.Where(s => s.HintName.Contains("VerifyInterceptors")));
+        Xunit.Assert.DoesNotContain(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
     }
 
     // ── EscapeCSharpStringLiteral (via reflection) ──────────────────────────
