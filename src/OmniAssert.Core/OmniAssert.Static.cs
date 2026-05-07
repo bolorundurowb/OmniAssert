@@ -139,11 +139,25 @@ public static partial class Assert
     public static NumericAssertions<BigInteger> Verify(BigInteger actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
+    /// <summary>Begins verifying a GUID subject.</summary>
+    /// <param name="actual">The GUID value to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="GuidAssertions"/> object to continue the verification.</returns>
+    public static GuidAssertions Verify(Guid actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
     /// <summary>Begins verifying a string subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="StringAssertions"/> object to continue the verification.</returns>
     public static StringAssertions Verify(string? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a URI subject.</summary>
+    /// <param name="actual">The URI value to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="UriAssertions"/> object to continue the verification.</returns>
+    public static UriAssertions Verify(Uri? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a collection subject.</summary>
@@ -153,6 +167,47 @@ public static partial class Assert
     /// <returns>A <see cref="CollectionAssertions{T}"/> object to continue the verification.</returns>
     public static CollectionAssertions<T> Verify<T>(IEnumerable<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a read-only dictionary subject.</summary>
+    /// <typeparam name="TKey">The dictionary key type.</typeparam>
+    /// <typeparam name="TValue">The dictionary value type.</typeparam>
+    /// <param name="actual">The dictionary to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
+    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Verifies that a file exists at <paramref name="path"/> and returns file assertions.</summary>
+    /// <param name="path">The file path to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="FileAssertions"/> object to continue file verification.</returns>
+    public static FileAssertions FileExists(string path, [CallerArgumentExpression(nameof(path))] string? expression = null)
+    {
+        if (!File.Exists(path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected file {expression ?? "path"} ({StringFormatter.Quote(path)}) to exist, but it does not.",
+                expression ?? "path");
+        }
+
+        return new(path, expression ?? "path");
+    }
+
+    /// <summary>Verifies that a directory exists at <paramref name="path"/> and returns directory assertions.</summary>
+    /// <param name="path">The directory path to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="DirectoryAssertions"/> object to continue directory verification.</returns>
+    public static DirectoryAssertions DirectoryExists(string path, [CallerArgumentExpression(nameof(path))] string? expression = null)
+    {
+        if (!Directory.Exists(path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected directory {expression ?? "path"} ({StringFormatter.Quote(path)}) to exist, but it does not.",
+                expression ?? "path");
+        }
+
+        return new(path, expression ?? "path");
+    }
 
     /// <summary>Begins verifying an enum subject.</summary>
     /// <typeparam name="T">The enum type.</typeparam>
@@ -287,6 +342,27 @@ public static partial class Assert
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DateTimeOffsetAssertions"/> object to continue the verification.</returns>
     public static DateTimeOffsetAssertions Verify(DateTimeOffset actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a TimeSpan subject.</summary>
+    /// <param name="actual">The value to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="TimeSpanAssertions"/> object to continue the verification.</returns>
+    public static TimeSpanAssertions Verify(TimeSpan actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a DateOnly subject.</summary>
+    /// <param name="actual">The value to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="DateOnlyAssertions"/> object to continue the verification.</returns>
+    public static DateOnlyAssertions Verify(DateOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a TimeOnly subject.</summary>
+    /// <param name="actual">The value to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="TimeOnlyAssertions"/> object to continue the verification.</returns>
+    public static TimeOnlyAssertions Verify(TimeOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying an object subject.</summary>
