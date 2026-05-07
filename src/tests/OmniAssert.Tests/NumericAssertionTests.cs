@@ -248,6 +248,12 @@ public class NumericAssertionTests
     }
 
     [Fact]
+    public void ToBeApproximately_WhenPrecisionIsNegative_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(1.0).ToBeApproximately(1.0, -0.1));
+    }
+
+    [Fact]
     public void ToBeInRange_WhenDoubleInBounds_ShouldSucceed()
     {
         Verify(5.0).ToBeInRange(1.0, 10.0);

@@ -221,6 +221,12 @@ public class StringAssertionTests
     }
 
     [Fact]
+    public void ToContain_WhenSubstringIsEmpty_ShouldSucceed()
+    {
+        Verify("abc").ToContain(string.Empty);
+    }
+
+    [Fact]
     public void ToContain_WithIgnoreCaseComparison_WhenMatch_ShouldSucceed()
     {
         Verify("AbC").ToContain("bc", StringComparison.OrdinalIgnoreCase);
@@ -231,6 +237,12 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             Verify("abc").ToContain("XX", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void ToContain_WithEmptySubstringAndComparison_ShouldSucceed()
+    {
+        Verify("abc").ToContain(string.Empty, StringComparison.Ordinal);
     }
 
     // ── ToStartWith ──────────────────────────────────────────────────────────

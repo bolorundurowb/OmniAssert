@@ -15,10 +15,18 @@ public readonly struct FileAssertions
     }
 
     /// <summary>Verifies that the file content matches <paramref name="text"/> exactly.</summary>
-    /// <param name="text">Expected file content.</param>
-    /// <param name="textExpression">The expression for expected content (automatically captured).</param>
+    /// <param name="text">The expected file content.</param>
+    /// <param name="textExpression">The expression for the expected content (automatically captured).</param>
     public void HaveContent(string text, [CallerArgumentExpression(nameof(text))] string? textExpression = null)
     {
+        if (!File.Exists(_path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) to exist, but it does not.",
+                _expression);
+            return;
+        }
+
         var actual = File.ReadAllText(_path);
         if (string.Equals(actual, text, StringComparison.Ordinal))
             return;
@@ -31,6 +39,14 @@ public readonly struct FileAssertions
     /// <summary>Verifies that the file has no content.</summary>
     public void BeEmpty()
     {
+        if (!File.Exists(_path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) to exist, but it does not.",
+                _expression);
+            return;
+        }
+
         var info = new FileInfo(_path);
         if (info.Length == 0)
             return;

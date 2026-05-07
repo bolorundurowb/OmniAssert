@@ -45,7 +45,7 @@ public readonly struct StringAssertions
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
     public void ToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
-        if (_actual is not null && substring.Length > 0 && _actual.Contains(substring, StringComparison.Ordinal))
+        if (_actual is not null && _actual.Contains(substring, StringComparison.Ordinal))
             return;
 
         VerificationFlow.Fail(
@@ -241,7 +241,7 @@ public readonly struct StringAssertions
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
     public void ToContain(string substring, StringComparison comparison, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
-        if (_actual is not null && substring.Length > 0 && _actual.Contains(substring, comparison))
+        if (_actual is not null && _actual.Contains(substring, comparison))
             return;
 
         VerificationFlow.Fail(

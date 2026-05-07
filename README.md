@@ -53,7 +53,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.0.0-alpha.1" />
+  <PackageReference Include="OmniAssert" Version="1.0.0-beta.1" />
 </ItemGroup>
 ```
 
@@ -79,7 +79,7 @@ public void Should_validate_user()
 
 ## Public API
 
-You use **`Assert`** (usually with `using static OmniAssert.Assert`), the fluent assertion structs it returns, **`AssertionScope`**, **`OmniAssertionException`**, and **`AssertionCapture`** (for advanced `VerifyExpression` scenarios). Types such as the diff engine and terminal colour helpers are **internal**—you exercise them through **`Verify(…).ToBeEquivalentTo(…)`** and other public assertions. When interceptors are enabled, generated helpers appear under **`OmniAssert.Generated`**.
+You use **`Assert`** (usually with `using static OmniAssert.Assert`), the fluent assertion structs it returns, **`AssertionScope`**, **`OmniAssertionException`**, and **`AssertionCapture`** (for advanced `VerifyExpression` scenarios). Public entry points include `Verify(...)` overloads for primitives and common framework types, plus `FileExists(path)` and `DirectoryExists(path)` for file-system assertions. Types such as the diff engine and terminal colour helpers are **internal**—you exercise them through **`Verify(…).ToBeEquivalentTo(…)`** and other public assertions. When interceptors are enabled, generated helpers appear under **`OmniAssert.Generated`**.
 
 ## Core usage
 
@@ -99,14 +99,18 @@ public void Example()
 
 | Area | Pattern | Notes |
 |------|---------|--------|
-| **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately` | Numeric types use `INumber<T>`; `BigInteger` is included. |
-| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)`, `HasLength` | Also `ToBeEmpty`, `NotToBeEmpty`, `ToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
-| **Collections** | `Verify(list).ToContain`, `HasCount`, `ToBeUnique`, `HasUniqueCount`, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison. |
-| **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)` | |
+| **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately`, `ToBeOneOf(...)` | Numeric types use `INumber<T>`; `BigInteger` is included. |
+| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)`, `ToBeIgnoringCase`, `ToBeOneOf(...)`, `HasLength` | Also `ToBeEmpty`, `NotToBeEmpty`, `ToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
+| **Collections** | `Verify(list).ToContain`, `HasCount`/`ToHaveCount`, `ToBeUnique`, `HasUniqueCount`, ordering checks, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison; ordering checks use `Comparer<T>.Default`. |
+| **Dictionaries** | `Verify(dict).ContainKey`, `NotContainKey`, `ContainValue`, `HaveValue` | Works with `IReadOnlyDictionary<TKey, TValue>`. |
+| **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)`, `ToBeOneOf(...)` | |
+| **GUIDs** | `Verify(guid).ToBeEmpty`, `NotToBeEmpty`, `ToBeOneOf(...)` | |
+| **URIs** | `Verify(uri).HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery` | Query matching ignores a leading `?`. |
 | **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
 | **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
-| **Dates** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin` | Works for `DateTime` and `DateTimeOffset`. |
-| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithInnerException<TInner>()` on the returned assertion object. |
+| **Dates & Time** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin`, `Verify(dateOnly)...`, `Verify(timeOnly)...`, `Verify(timeSpan)...` | `DateTime` and `DateTimeOffset` support ranges; `TimeSpan` supports sign, comparison, and `ToBeOneOf(...)`. |
+| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithMessageContaining`, `.WithInnerException<TInner>()` on the returned assertion object. |
+| **File system** | `FileExists(path).HaveContent` / `BeEmpty`, `DirectoryExists(path).BeEmpty` | `FileExists`/`DirectoryExists` first verify existence, then return fluent assertions. |
 | **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
 
 ## Common scenarios
@@ -193,22 +197,36 @@ This path is intended for **advanced setups** that use the generator from source
 Verify(42).ToBe(42);
 Verify(10).ToBeGreaterThan(5);
 Verify(3.14159).ToBeApproximately(3.14, 0.01);
+Verify(42).ToBeOneOf(40, 41, 42);
 
 Verify("Hello World").ToContain("Hello");
 Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 Verify(email).HasLengthGreaterThan(5);
+Verify(role).ToBeIgnoringCase("admin");
 
 Verify(users).ToContain(currentUser);
 Verify(results).HasCount(3);
+Verify(results).ToHaveCount(3);
 Verify(results).ToBeUnique();
+Verify(results).ToBeInAscendingOrder();
+
+Verify(headers).ContainKey("Authorization");
+Verify(requestUri).HaveScheme("https");
+Verify(correlationId).NotToBeEmpty();
 
 VerifyNullable(someObject).NotToBeNull();
 Verify(MyEnum.On).ToBe(MyEnum.On);
+Verify(MyEnum.On).ToBeOneOf(MyEnum.Off, MyEnum.On);
 
 Verify(instance).ToBeOfType<MyClass>();
 Verify(actualDto).ToBeEquivalentTo(expectedDto);
 
 Verify(dateTime).ToBeAfter(DateTime.UtcNow.AddDays(-1));
+Verify(TimeSpan.FromMinutes(5)).ToBePositive();
+Verify(DateOnly.FromDateTime(DateTime.UtcNow)).ToBeAfter(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)));
+Verify(TimeOnly.FromDateTime(DateTime.UtcNow)).ToBeBefore(new TimeOnly(23, 59, 59));
+FileExists(pathToOutput).HaveContent(expectedText);
+DirectoryExists(tempFolder).BeEmpty();
 
 using (new AssertionScope())
 {

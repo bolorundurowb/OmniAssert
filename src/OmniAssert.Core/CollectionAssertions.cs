@@ -117,7 +117,7 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
-    /// <summary>Verifies that the collection has the expected number of items.</summary>
+    /// <summary>Verifies that the collection has the expected number of items (alias for <see cref="HasCount"/>).</summary>
     /// <param name="expectedCount">The expected count.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
@@ -232,19 +232,62 @@ public readonly struct CollectionAssertions<T>
             return;
         }
 
-        var actualMap = actualList.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
-        var expectedMap = expectedList.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+        var actualCounts = GetElementCounts(actualList);
+        var expectedCounts = GetElementCounts(expectedList);
 
-        foreach (var kvp in expectedMap)
+        foreach (var (expectedItem, expectedCount) in expectedCounts)
         {
-            if (!actualMap.TryGetValue(kvp.Key, out var actualCount) || actualCount != kvp.Value)
+            var found = false;
+            foreach (var (actualItem, actualCount) in actualCounts)
             {
+                if (!EqualityComparer<T>.Default.Equals(actualItem, expectedItem))
+                    continue;
+
+                found = true;
+                if (actualCount == expectedCount)
+                    break;
+
                 VerificationFlow.Fail(
-                    $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(kvp.Key)} had {actualCount} occurrences instead of {kvp.Value}.",
+                    $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(expectedItem)} had {actualCount} occurrences instead of {expectedCount}.",
                     _expression);
                 return;
             }
+
+            if (found)
+                continue;
+
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but element {FormatItem(expectedItem)} had 0 occurrences instead of {expectedCount}.",
+                _expression);
+            return;
         }
+    }
+
+    private static List<(T Item, int Count)> GetElementCounts(IEnumerable<T> source)
+    {
+        var counts = new List<(T Item, int Count)>();
+        foreach (var item in source)
+        {
+            var index = -1;
+            for (var i = 0; i < counts.Count; i++)
+            {
+                if (!EqualityComparer<T>.Default.Equals(counts[i].Item, item))
+                    continue;
+
+                index = i;
+                break;
+            }
+
+            if (index < 0)
+            {
+                counts.Add((item, 1));
+                continue;
+            }
+
+            counts[index] = (counts[index].Item, counts[index].Count + 1);
+        }
+
+        return counts;
     }
 
     private int GetActualCount()

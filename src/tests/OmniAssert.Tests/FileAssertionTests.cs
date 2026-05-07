@@ -86,6 +86,22 @@ public class FileAssertionTests
         }
     }
 
+    [Fact]
+    public void HaveContent_WhenFileMissingInsideScope_ShouldCollectAssertionFailures()
+    {
+        var path = CreateTempFilePath();
+
+        var ex = Xunit.Assert.Throws<AggregateException>(() =>
+        {
+            using var scope = new AssertionScope();
+            FileExists(path).HaveContent("expected");
+        });
+
+        Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
+        foreach (var inner in ex.InnerExceptions)
+            Xunit.Assert.IsType<OmniAssertionException>(inner);
+    }
+
     private static string CreateTempFilePath() =>
         Path.Combine(Path.GetTempPath(), $"omniassert-{Guid.NewGuid():N}.tmp");
 }

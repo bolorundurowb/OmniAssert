@@ -129,6 +129,14 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <param name="expectedExpr">The expression for the expected value (automatically captured).</param>
     public void ToBeApproximately(T expected, T precision, [CallerArgumentExpression(nameof(expected))] string? expectedExpr = null)
     {
+        if (precision < T.Zero)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected precision to be non-negative, but was {FormatValue(precision)}.",
+                _expression);
+            return;
+        }
+
         if (T.Abs(_actual - expected) <= precision)
             return;
 

@@ -15,6 +15,14 @@ public readonly struct DirectoryAssertions
     /// <summary>Verifies that the directory has no files or subdirectories.</summary>
     public void BeEmpty()
     {
+        if (!Directory.Exists(_path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected directory {_expression} ({StringFormatter.Quote(_path)}) to exist, but it does not.",
+                _expression);
+            return;
+        }
+
         using var entries = Directory.EnumerateFileSystemEntries(_path).GetEnumerator();
         if (!entries.MoveNext())
             return;

@@ -15,6 +15,8 @@ public readonly struct DateOnlyAssertions
     }
 
     /// <summary>Verifies that the date is equal to <paramref name="expected"/>.</summary>
+    /// <param name="expected">The expected date value.</param>
+    /// <param name="expectedExpression">The expression for the expected date (automatically captured).</param>
     public void ToBe(DateOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
@@ -26,6 +28,8 @@ public readonly struct DateOnlyAssertions
     }
 
     /// <summary>Verifies that the date is before <paramref name="expected"/>.</summary>
+    /// <param name="expected">The date that the actual value must be earlier than.</param>
+    /// <param name="expectedExpression">The expression for the expected date (automatically captured).</param>
     public void ToBeBefore(DateOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
@@ -37,6 +41,8 @@ public readonly struct DateOnlyAssertions
     }
 
     /// <summary>Verifies that the date is after <paramref name="expected"/>.</summary>
+    /// <param name="expected">The date that the actual value must be later than.</param>
+    /// <param name="expectedExpression">The expression for the expected date (automatically captured).</param>
     public void ToBeAfter(DateOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
@@ -47,7 +53,9 @@ public readonly struct DateOnlyAssertions
             _expression);
     }
 
-    /// <summary>Verifies that the date year is <paramref name="expectedYear"/>.</summary>
+    /// <summary>Verifies that the date year matches <paramref name="expectedYear"/>.</summary>
+    /// <param name="expectedYear">The expected year component.</param>
+    /// <param name="yearExpression">The expression for the expected year (automatically captured).</param>
     public void HasYear(int expectedYear, [CallerArgumentExpression(nameof(expectedYear))] string? yearExpression = null)
     {
         if (_actual.Year == expectedYear)
@@ -58,7 +66,9 @@ public readonly struct DateOnlyAssertions
             _expression);
     }
 
-    /// <summary>Verifies that the date month is <paramref name="expectedMonth"/>.</summary>
+    /// <summary>Verifies that the date month matches <paramref name="expectedMonth"/>.</summary>
+    /// <param name="expectedMonth">The expected month component.</param>
+    /// <param name="monthExpression">The expression for the expected month (automatically captured).</param>
     public void HasMonth(int expectedMonth, [CallerArgumentExpression(nameof(expectedMonth))] string? monthExpression = null)
     {
         if (_actual.Month == expectedMonth)
@@ -69,7 +79,9 @@ public readonly struct DateOnlyAssertions
             _expression);
     }
 
-    /// <summary>Verifies that the date day is <paramref name="expectedDay"/>.</summary>
+    /// <summary>Verifies that the date day matches <paramref name="expectedDay"/>.</summary>
+    /// <param name="expectedDay">The expected day component.</param>
+    /// <param name="dayExpression">The expression for the expected day (automatically captured).</param>
     public void HasDay(int expectedDay, [CallerArgumentExpression(nameof(expectedDay))] string? dayExpression = null)
     {
         if (_actual.Day == expectedDay)
@@ -96,6 +108,8 @@ public readonly struct TimeOnlyAssertions
     }
 
     /// <summary>Verifies that the time is equal to <paramref name="expected"/>.</summary>
+    /// <param name="expected">The expected time value.</param>
+    /// <param name="expectedExpression">The expression for the expected time (automatically captured).</param>
     public void ToBe(TimeOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
@@ -107,6 +121,8 @@ public readonly struct TimeOnlyAssertions
     }
 
     /// <summary>Verifies that the time is before <paramref name="expected"/>.</summary>
+    /// <param name="expected">The time that the actual value must be earlier than.</param>
+    /// <param name="expectedExpression">The expression for the expected time (automatically captured).</param>
     public void ToBeBefore(TimeOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
@@ -118,6 +134,8 @@ public readonly struct TimeOnlyAssertions
     }
 
     /// <summary>Verifies that the time is after <paramref name="expected"/>.</summary>
+    /// <param name="expected">The time that the actual value must be later than.</param>
+    /// <param name="expectedExpression">The expression for the expected time (automatically captured).</param>
     public void ToBeAfter(TimeOnly expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
