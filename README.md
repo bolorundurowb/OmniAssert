@@ -1,6 +1,21 @@
-# OmniAssert
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/bolorundurowb/OmniAssert/refs/heads/master/assets/omni-assert-logo.svg"
+    alt="omni assert logo"  />
+  <h1 align=center>Omni Assert</h1>
+</p>
 
-[![Build, Test & Coverage](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml) [![codecov](https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA)](https://codecov.io/gh/bolorundurowb/OmniAssert) [![License](https://img.shields.io/badge/license-GPLv3-orange.svg)](./LICENSE)
+<p align="center">
+  <a href="https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml">
+    <img src="https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg" alt="Build, Test & Coverage">
+  </a>
+  <a href="https://codecov.io/gh/bolorundurowb/OmniAssert">
+    <img src="https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA" alt="codecov">
+  </a>
+  <a href="./LICENSE">
+    <img src="https://img.shields.io/badge/license-GPLv3-orange.svg" alt="License">
+  </a>
+</p>
 
 > **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
 
