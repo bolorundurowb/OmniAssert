@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#512BD4"/>
+      <stop offset="100%" stop-color="#7B4FDB"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C4B5FD"/>
+      <stop offset="100%" stop-color="#A78BFA"/>
+    </linearGradient>
+  </defs>
+<!--Shield icon, centered in the square-->
+  <g transform="translate(100, 95)">
+<!--Shield shape-->
+    <path d="M-50,-65 L50,-65 L50,25 C50,55 0,75 0,75 C0,75 -50,55 -50,25 Z" fill="url(#shieldGrad)" stroke="#3B1F9D" stroke-width="3" stroke-linejoin="round"/>
+<!--Checkmark-->
+    <polyline points="-28,0 -12,18 28,-30" fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+<!--Subtle inner glow-->
+    <path d="M-44,-60 L44,-60 L44,23 C44,48 0,66 0,66 C0,66 -44,48 -44,23 Z" fill="none" stroke="url(#accentGrad)" stroke-width="2" opacity="0.3"/>
+  </g>
+</svg>
