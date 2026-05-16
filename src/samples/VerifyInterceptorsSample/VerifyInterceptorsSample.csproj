@@ -6,13 +6,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>14</LangVersion>
     <RootNamespace>VerifyInterceptorsSample</RootNamespace>
-    <OmniAssertEnableRewrite>true</OmniAssertEnableRewrite>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="OmniAssertEnableRewrite" />
-  </ItemGroup>
 
   <!-- Program.cs is supplied to the generator as an AdditionalFile so it can emit the rewritten
        version with full operand capture. The original must not be compiled directly. -->

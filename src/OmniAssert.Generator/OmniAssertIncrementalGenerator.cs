@@ -19,7 +19,6 @@ namespace OmniAssert.Generator;
 public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 {
     private const string DisableProperty = "build_property.OmniAssertDisableVerifyInterceptors";
-    private const string RewriteProperty = "build_property.OmniAssertEnableRewrite";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -94,24 +93,14 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
     private void RegisterRewritePipeline(IncrementalGeneratorInitializationContext context)
     {
-        var rewriteEnabled = context.AnalyzerConfigOptionsProvider.Select(
-            static (options, _) =>
-                options.GlobalOptions.TryGetValue(RewriteProperty, out var v) &&
-                v.Equals("true", StringComparison.OrdinalIgnoreCase));
-
         var rewriteInputs = context.AdditionalTextsProvider
             .Where(static f => f.Path.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
-            .Combine(context.CompilationProvider)
-            .Combine(rewriteEnabled);
+            .Combine(context.CompilationProvider);
 
         context.RegisterSourceOutput(rewriteInputs, (spc, tuple) =>
         {
-            var enabled = tuple.Right;
-            if (!enabled)
-                return;
-
-            var additionalText = tuple.Left.Left;
-            var compilation = tuple.Left.Right;
+            var additionalText = tuple.Left;
+            var compilation = tuple.Right;
             var ct = spc.CancellationToken;
 
             var sourceText = additionalText.GetText(ct);
