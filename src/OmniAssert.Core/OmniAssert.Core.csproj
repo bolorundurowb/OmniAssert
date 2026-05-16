@@ -20,7 +20,7 @@
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageIcon>omni-assert-logo.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,7 +30,7 @@
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\assets\package-icon.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\omni-assert-logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
