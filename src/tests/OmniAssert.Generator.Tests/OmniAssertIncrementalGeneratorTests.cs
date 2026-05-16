@@ -151,6 +151,59 @@ public static class T
         Xunit.Assert.DoesNotContain(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
     }
 
+    [Fact]
+    public void Generator_WhenNoPropertySet_ShouldEnableInterceptorsByDefault()
+    {
+        // When neither enable nor disable property is supplied at all the generator must
+        // treat interceptors as enabled (opt-out semantics).
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M() { true.VerifyExpression(); }
+}
+""";
+        var (diagnostics, generatedSources) = RunGeneratorWithNoOptions(source);
+
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Xunit.Assert.Contains(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
+    }
+
+    [Fact]
+    public void Generator_GeneratedInterceptor_HasThisBoolSignature()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M() { true.VerifyExpression(); }
+}
+""";
+        var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
+
+        var text = generatedSources.First(s => s.HintName.Contains("VerifyInterceptors")).SourceText.ToString();
+        Xunit.Assert.Contains("this bool condition", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Generator_WithStaticCallForm_ShouldProduceInterceptorSource()
+    {
+        // Assert.VerifyExpression(expr) as a fully-qualified static call should also be intercepted.
+        var source = """
+public static class T
+{
+    public static void M(int x, int y)
+    {
+        OmniAssert.Assert.VerifyExpression(x > y);
+    }
+}
+""";
+        var (diagnostics, generatedSources) = RunGenerator(source, enableInterceptors: true);
+
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Xunit.Assert.Contains(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
+    }
+
     [Theory]
     [InlineData("plain", "plain")]
     [InlineData("with\\backslash", "with\\\\backslash")]
@@ -332,6 +385,34 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         var driver = CSharpGeneratorDriver
             .Create(generator)
             .WithUpdatedAnalyzerConfigOptions(optionsProvider)
+            .RunGenerators(compilation);
+
+        var result = driver.GetRunResult();
+        return (result.Diagnostics, result.Results[0].GeneratedSources);
+    }
+
+    /// <summary>
+    /// Runs the generator without supplying any custom <see cref="AnalyzerConfigOptions"/> so that all
+    /// <c>TryGetValue</c> calls return <c>false</c> — the "property not set at all" scenario that should
+    /// leave interceptors enabled by default.
+    /// </summary>
+    private static (IReadOnlyList<Diagnostic> Diagnostics, IReadOnlyList<GeneratedSourceResult> GeneratedSources)
+        RunGeneratorWithNoOptions(string source)
+    {
+        var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
+        var tree = CSharpSyntaxTree.ParseText(source, parseOptions, path: "T.cs");
+        var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "GeneratorDefaultAsm",
+            new[] { tree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new OmniAssertIncrementalGenerator();
+
+        // No WithUpdatedAnalyzerConfigOptions call — the default provider returns false for everything.
+        var driver = CSharpGeneratorDriver
+            .Create(generator)
             .RunGenerators(compilation);
 
         var result = driver.GetRunResult();

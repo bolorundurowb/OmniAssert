@@ -161,6 +161,155 @@ public static class T
         Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void TryExpandVerifyInvocation_WithAndExpression_Compiles()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y, int z)
+    {
+        (x > 0 && y < z).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionAndTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        // AND short-circuit: both operands must be captured
+        var text = block!.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"z\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithNegatedExpression_Compiles()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(bool flag)
+    {
+        (!flag).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionNotTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        var text = block!.NormalizeWhitespace().ToFullString();
+        // Negation should be present in the final expression
+        Xunit.Assert.Contains("!", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"flag\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithStaticCallForm_Compiles()
+    {
+        var source = """
+public static class T
+{
+    public static void M(int x, int y)
+    {
+        OmniAssert.Assert.VerifyExpression(x > y);
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionStaticTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+        Xunit.Assert.NotEmpty(block!.Statements);
+
+        var text = block.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithRepeatedOperand_DisambiguatesKeys()
+    {
+        // When the same sub-expression appears more than once (e.g. x > 0 && x < 10),
+        // the second occurrence of "x" should get a disambiguated key like "x (2)".
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x)
+    {
+        (x > 0 && x < 10).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionDupKeyTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        var text = block!.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"x (2)\"]", text, StringComparison.Ordinal);
+    }
+
     internal static IEnumerable<MetadataReference> MetadataReferencesForOmniAssertConsumer()
     {
         var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
