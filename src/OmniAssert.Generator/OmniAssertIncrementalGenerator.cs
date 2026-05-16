@@ -60,9 +60,11 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 #pragma warning restore RS0030
                         continue;
 
-                    var firstArg = node.ArgumentList.Arguments[0].Expression;
+                    var boolExpr = GetBooleanExpression(node);
+                    if (boolExpr == null)
+                        continue;
                     var engine = new VerifyExpansionEngine(model);
-                    var simple = engine.IsSimpleBooleanIdentifier(firstArg);
+                    var simple = engine.IsSimpleBooleanIdentifier(boolExpr);
 
                     if (!byTree.TryGetValue(tree, out var list))
                     {
@@ -206,7 +208,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
             sb.AppendLine("\")]");
             sb.Append("        internal static void OmniAssertVerifyIntercept_");
             sb.Append(i.ToString(CultureInfo.InvariantCulture));
-            sb.AppendLine("(bool condition, string? expression = null)");
+            sb.AppendLine("(this bool condition, string? expression = null)");
             sb.AppendLine("        {");
             if (candidate.SimpleIdentifierPath)
             {
@@ -230,51 +232,20 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
     private static string EscapeCSharpStringLiteral(string value) =>
         value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
-    /// <summary>One generated stub: compiler location plus whether the condition is a simple identifier.</summary>
-    private readonly struct InterceptorCandidate
+    /// <summary>
+    /// Returns the boolean expression from a <c>VerifyExpression</c> invocation regardless of call form.
+    /// For extension-method calls (<c>expr.VerifyExpression()</c>) the bool is the receiver;
+    /// for static calls (<c>Assert.VerifyExpression(expr)</c>) it is the first argument.
+    /// </summary>
+    private static ExpressionSyntax? GetBooleanExpression(InvocationExpressionSyntax node)
     {
-        public InterceptorCandidate(InterceptableLocation location, bool simpleIdentifierPath)
-        {
-            Location = location;
-            SimpleIdentifierPath = simpleIdentifierPath;
-        }
+        if (node.ArgumentList.Arguments.Count >= 1)
+            return node.ArgumentList.Arguments[0].Expression;
 
-        /// <summary>Interceptable location metadata for <see cref="InterceptsLocationAttribute"/>.</summary>
-        public InterceptableLocation Location { get; }
+        if (node.Expression is MemberAccessExpressionSyntax memberAccess)
+            return memberAccess.Expression;
 
-        /// <summary>
-        /// <c>true</c> when the first argument is a bare identifier (or parenthesized identifier), matching
-        /// <see cref="Rewrite.VerifyExpansionEngine.IsSimpleBooleanIdentifier"/>—emit <c>Verify(...).ToBeTrue()</c>.
-        /// </summary>
-        public bool SimpleIdentifierPath { get; }
+        return null;
     }
-}
 
-/// <summary>Identifies <c>Assert.VerifyExpression(bool, string?)</c> for the incremental generator.</summary>
-internal static class VerifyLoweringFacts
-{
-    /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Assert</c>.</summary>
-    public static bool IsAssertVerifyExpression(IMethodSymbol sym)
-    {
-        if (sym.Name != "VerifyExpression")
-            return false;
-
-        if (sym.ContainingType?.Name != "Assert" || sym.ContainingNamespace?.Name != "OmniAssert")
-            return false;
-
-        if (sym.Parameters.Length < 1 || sym.Parameters.Length > 2)
-            return false;
-
-        if (sym.Parameters[0].Type.SpecialType != SpecialType.System_Boolean)
-            return false;
-
-        if (sym.Parameters.Length == 2)
-        {
-            var t = sym.Parameters[1].Type;
-            if (t.SpecialType != SpecialType.System_String && t.Name != "String" && t.ToDisplayString() != "string?")
-                return false;
-        }
-
-        return true;
-    }
 }
