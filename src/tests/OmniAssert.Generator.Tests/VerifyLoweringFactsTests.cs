@@ -7,8 +7,8 @@ namespace OmniAssert.Generator.Tests;
 public class VerifyLoweringFactsTests
 {
     [Theory]
-    [InlineData("using static OmniAssert.Assert;\npublic static class T { public static void M() { VerifyExpression(true); } }", true)]
-    [InlineData("using static OmniAssert.Assert;\npublic static class T { public static void M() { VerifyExpression(true, \"hint\"); } }", true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(); } }", true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(\"hint\"); } }", true)]
     [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true); } }", true)]
     [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true, null); } }", true)]
     [InlineData("""

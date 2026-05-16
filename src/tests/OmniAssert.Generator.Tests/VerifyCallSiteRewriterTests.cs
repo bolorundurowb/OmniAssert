@@ -11,13 +11,13 @@ public class VerifyCallSiteRewriterTests
     public void VisitBlock_WhenExpressionStatementIsVerifyExpression_ShouldExpandAndSetModified()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
         int x = 1;
-        VerifyExpression(x > 0);
+        (x > 0).VerifyExpression();
     }
 }
 """;

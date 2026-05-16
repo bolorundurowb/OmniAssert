@@ -12,14 +12,14 @@ public class VerifyExpansionEngineCompileTests
     public void TryExpandVerifyInvocation_WhenEmbeddedInMethod_Compiles()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
         int x = 1;
         int y = 0;
-        VerifyExpression(x > y);
+        (x > y).VerifyExpression();
     }
 }
 """;
@@ -39,7 +39,7 @@ public static class T
         var root = syntaxTree.GetRoot();
         var invocation = root.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var engine = new VerifyExpansionEngine(model);
         var block = engine.TryExpandVerifyInvocation(invocation, default);
@@ -51,7 +51,7 @@ public static class T
     public void TryExpandVerifyInvocation_OrWithComparison_Compiles()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
@@ -59,7 +59,7 @@ public static class T
         int x = 2;
         int y = 3;
         int z = 10;
-        VerifyExpression(z >= 10 || x > y);
+        (z >= 10 || x > y).VerifyExpression();
     }
 }
 """;
@@ -79,7 +79,7 @@ public static class T
         var root = syntaxTree.GetRoot();
         var invocation = root.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var engine = new VerifyExpansionEngine(model);
         var block = engine.TryExpandVerifyInvocation(invocation, default);
@@ -124,7 +124,7 @@ public static class Wrapped
     public void TryExpandVerifyInvocation_DoesNotRecordLiteralOperandsInDictionary()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
@@ -132,7 +132,7 @@ public static class T
         int x = 2;
         int y = 3;
         int z = 10;
-        VerifyExpression(z > 10 || x > y);
+        (z > 10 || x > y).VerifyExpression();
     }
 }
 """;
@@ -149,7 +149,7 @@ public static class T
         var model = compilation.GetSemanticModel(syntaxTree);
         var invocation = syntaxTree.GetRoot().DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
         Xunit.Assert.NotNull(block);

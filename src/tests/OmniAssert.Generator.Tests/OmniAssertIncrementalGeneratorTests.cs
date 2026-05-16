@@ -10,12 +10,12 @@ public class OmniAssertIncrementalGeneratorTests
     public void Generator_WhenInterceptorsDisabled_ShouldProduceNoSource()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
-        VerifyExpression(1 > 0);
+        (1 > 0).VerifyExpression();
     }
 }
 """;
@@ -29,12 +29,12 @@ public static class T
     public void Generator_WhenInterceptorsEnabled_WithVerifyExpression_ShouldProduceInterceptorSource()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
-        VerifyExpression(1 > 0);
+        (1 > 0).VerifyExpression();
     }
 }
 """;
@@ -48,12 +48,12 @@ public static class T
     public void Generator_WithComplexExpression_ShouldEmitVerifyExpressionPath()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(int x, int y)
     {
-        VerifyExpression(x > y);
+        (x > y).VerifyExpression();
     }
 }
 """;
@@ -67,12 +67,12 @@ public static class T
     public void Generator_WithSimpleIdentifierExpression_ShouldEmitToBeTruePath()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(bool flag)
     {
-        VerifyExpression(flag);
+        flag.VerifyExpression();
     }
 }
 """;
@@ -86,13 +86,13 @@ public static class T
     public void Generator_WithMultipleCallSites_ShouldEmitOneInterceptorPerCallSite()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(int a, int b, bool flag)
     {
-        VerifyExpression(a > b);
-        VerifyExpression(flag);
+        (a > b).VerifyExpression();
+        flag.VerifyExpression();
     }
 }
 """;
@@ -109,10 +109,10 @@ public static class T
     public void Generator_GeneratedSource_ContainsInterceptsLocationAttribute()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
-    public static void M() { VerifyExpression(true); }
+    public static void M() { true.VerifyExpression(); }
 }
 """;
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
@@ -125,10 +125,10 @@ public static class T
     public void Generator_GeneratedSource_ContainsNullableEnable()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
-    public static void M() { VerifyExpression(true); }
+    public static void M() { true.VerifyExpression(); }
 }
 """;
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
