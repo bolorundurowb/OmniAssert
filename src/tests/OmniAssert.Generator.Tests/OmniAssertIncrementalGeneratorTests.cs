@@ -4,15 +4,8 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace OmniAssert.Generator.Tests;
 
-/// <summary>
-/// Tests for <see cref="OmniAssertIncrementalGenerator"/> covering the incremental source-generation pipeline,
-/// private helper methods (via reflection), and the <see cref="VerifyLoweringFacts"/> discriminator used
-/// during candidate collection.
-/// </summary>
 public class OmniAssertIncrementalGeneratorTests
 {
-    // ── Generator pipeline ─────────────────────────────────────────────────
-
     [Fact]
     public void Generator_WhenInterceptorsDisabled_ShouldProduceNoSource()
     {
@@ -158,8 +151,6 @@ public static class T
         Xunit.Assert.DoesNotContain(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
     }
 
-    // ── EscapeCSharpStringLiteral (via reflection) ──────────────────────────
-
     [Theory]
     [InlineData("plain", "plain")]
     [InlineData("with\\backslash", "with\\\\backslash")]
@@ -175,8 +166,6 @@ public static class T
         var result = (string)method!.Invoke(null, new object[] { input })!;
         Xunit.Assert.Equal(expected, result);
     }
-
-    // ── MakeFileScopedClassName (via reflection) ─────────────────────────────
 
     [Fact]
     public void MakeFileScopedClassName_WithNormalPath_ReturnsSafeIdentifier()
@@ -227,11 +216,8 @@ public static class T
 
         var result = (string)method!.Invoke(null, new object[] { "/path/my-file.name.cs" })!;
 
-        // Name segment is "my-file.name" → "my_file_name"
         Xunit.Assert.StartsWith("OmniAssertVerifyInterceptors_my_file_name_", result, StringComparison.Ordinal);
     }
-
-    // ── SanitizeFileHint (via reflection) ────────────────────────────────────
 
     [Fact]
     public void SanitizeFileHint_SamePath_ReturnsSameHash()
@@ -268,17 +254,13 @@ public static class T
 
         var hint = (string)method!.Invoke(null, new object[] { "/some/path.cs" })!;
 
-        // 8 bytes → 16 hex characters (no dashes)
         Xunit.Assert.Equal(16, hint.Length);
         Xunit.Assert.True(hint.All(c => char.IsAsciiHexDigit(c)), $"Expected hex string, got: {hint}");
     }
 
-    // ── VerifyLoweringFacts ──────────────────────────────────────────────────
-
     [Fact]
     public void IsAssertVerifyExpression_WhenSymbolNameIsNotVerifyExpression_ReturnsFalse()
     {
-        // Build a minimal method symbol whose name is different
         var source = """
 namespace OmniAssert
 {
@@ -332,8 +314,6 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         Xunit.Assert.False(VerifyLoweringFacts.IsAssertVerifyExpression(sym!));
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
     private static (IReadOnlyList<Diagnostic> Diagnostics, IReadOnlyList<GeneratedSourceResult> GeneratedSources)
         RunGenerator(string source, bool enableInterceptors)
     {
@@ -357,8 +337,6 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         var result = driver.GetRunResult();
         return (result.Diagnostics, result.Results[0].GeneratedSources);
     }
-
-    // ── TestAnalyzerConfigOptionsProvider ────────────────────────────────────
 
     private sealed class TestAnalyzerConfigOptionsProvider : Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptionsProvider
     {

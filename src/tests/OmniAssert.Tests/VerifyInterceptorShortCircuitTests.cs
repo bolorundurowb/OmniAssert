@@ -1,5 +1,3 @@
-using OmniAssert;
-
 namespace OmniAssert.Tests;
 
 /// <summary>Boolean short-circuit evaluation with fluent <see cref="Assert.Verify(bool)"/> and expression failures via <see cref="Assert.VerifyExpression"/>.</summary>

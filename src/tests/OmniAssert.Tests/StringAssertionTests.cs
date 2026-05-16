@@ -3,8 +3,6 @@ namespace OmniAssert.Tests;
 
 public class StringAssertionTests
 {
-    // ── ToBe ────────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBe_WhenStringsEqual_ShouldSucceed()
     {
@@ -53,8 +51,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => ("deleted").Verify().ToBeOneOf("active", "pending", "archived"));
     }
 
-    // ── NotToBe ─────────────────────────────────────────────────────────────
-
     [Fact]
     public void NotToBe_WhenStringsDiffer_ShouldSucceed()
     {
@@ -66,8 +62,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("same").Verify().NotToBe("same"));
     }
-
-    // ── ToBeNull / NotToBeNull ───────────────────────────────────────────────
 
     [Fact]
     public void ToBeNull_WhenNull_ShouldSucceed()
@@ -95,8 +89,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (s).Verify().NotToBeNull());
     }
 
-    // ── ToBeEmpty / NotToBeEmpty ─────────────────────────────────────────────
-
     [Fact]
     public void ToBeEmpty_WhenEmpty_ShouldSucceed()
     {
@@ -121,8 +113,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => ("").Verify().NotToBeEmpty());
     }
 
-    // ── ToBeNullOrEmpty ──────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeNullOrEmpty_WhenNull_ShouldSucceed()
     {
@@ -141,8 +131,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToBeNullOrEmpty());
     }
-
-    // ── ToBeNullOrWhiteSpace ─────────────────────────────────────────────────
 
     [Fact]
     public void ToBeNullOrWhiteSpace_WhenNull_ShouldSucceed()
@@ -163,8 +151,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToBeNullOrWhiteSpace());
     }
 
-    // ── HasLength ────────────────────────────────────────────────────────────
-
     [Fact]
     public void HasLength_WhenLengthMatches_ShouldSucceed()
     {
@@ -176,8 +162,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLength(2));
     }
-
-    // ── HasLengthGreaterThan ─────────────────────────────────────────────────
 
     [Fact]
     public void HasLengthGreaterThan_WhenLongEnough_ShouldSucceed()
@@ -191,8 +175,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthGreaterThan(3));
     }
 
-    // ── HasLengthLessThan ────────────────────────────────────────────────────
-
     [Fact]
     public void HasLengthLessThan_WhenShortEnough_ShouldSucceed()
     {
@@ -204,8 +186,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthLessThan(3));
     }
-
-    // ── ToContain ────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToContain_WhenSubstringPresent_ShouldSucceed()
@@ -244,8 +224,6 @@ public class StringAssertionTests
         ("abc").Verify().ToContain(string.Empty, StringComparison.Ordinal);
     }
 
-    // ── ToStartWith ──────────────────────────────────────────────────────────
-
     [Fact]
     public void ToStartWith_WhenMatchesPrefix_ShouldSucceed()
     {
@@ -263,8 +241,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToStartWith("hi"));
     }
-
-    // ── ToEndWith ────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToEndWith_WhenMatchesSuffix_ShouldSucceed()
@@ -284,8 +260,6 @@ public class StringAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToEndWith("bye"));
     }
 
-    // ── ToMatch ──────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToMatch_WhenPatternMatches_ShouldSucceed()
     {
@@ -297,8 +271,6 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("123").Verify().ToMatch(@"^[a-z]+$"));
     }
-
-    // ── Scope ────────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBe_WithinScope_WhenMismatch_ShouldCollectRatherThanThrow()

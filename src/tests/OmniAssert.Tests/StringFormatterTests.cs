@@ -5,8 +5,6 @@ namespace OmniAssert.Tests;
 
 public class StringFormatterTests
 {
-    // ── Quote ────────────────────────────────────────────────────────────────
-
     [Fact]
     public void Quote_WhenNull_ReturnsNullLiteral()
     {
@@ -88,7 +86,6 @@ public class StringFormatterTests
     [Fact]
     public void Quote_EscapesControlCharacter_AsUnicodeEscape()
     {
-        // \u0001 is a control char not handled by a named escape
         Xunit.Assert.Equal("\"\\u0001\"", StringFormatter.Quote("\u0001"));
     }
 
@@ -121,8 +118,6 @@ public class StringFormatterTests
     {
         Xunit.Assert.Equal("\"ab\\ncd\"", StringFormatter.Quote("ab\ncd"));
     }
-
-    // ── AppendVisible ────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData('"', "\\\"")]
@@ -161,8 +156,6 @@ public class StringFormatterTests
         Xunit.Assert.Equal("\\u200B", sb.ToString());
     }
 
-    // ── EscapeChar ───────────────────────────────────────────────────────────
-
     [Theory]
     [InlineData('\'', "\\'")]
     [InlineData('\\', "\\\\")]
@@ -192,8 +185,6 @@ public class StringFormatterTests
     {
         Xunit.Assert.Equal("\\uFEFF", StringFormatter.EscapeChar('\uFEFF'));
     }
-
-    // ── IsZeroWidth ──────────────────────────────────────────────────────────
 
     [Theory]
     [InlineData('\u200B', true)]

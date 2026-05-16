@@ -3,8 +3,6 @@ namespace OmniAssert.Tests;
 
 public class DateTimeAssertionTests
 {
-    // ── DateTime.ToBeAfter ───────────────────────────────────────────────────
-
     [Fact]
     public void ToBeAfter_WhenAfter_ShouldSucceed()
     {
@@ -25,8 +23,6 @@ public class DateTimeAssertionTests
         var now = DateTime.UtcNow;
         Xunit.Assert.Throws<OmniAssertionException>(() => (now).Verify().ToBeAfter(now));
     }
-
-    // ── DateTime.ToBeBefore ──────────────────────────────────────────────────
 
     [Fact]
     public void ToBeBefore_WhenBefore_ShouldSucceed()
@@ -49,8 +45,6 @@ public class DateTimeAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (now).Verify().ToBeBefore(now));
     }
 
-    // ── DateTime.ToBeWithin ──────────────────────────────────────────────────
-
     [Fact]
     public void ToBeWithin_WhenWithinPrecision_ShouldSucceed()
     {
@@ -66,8 +60,6 @@ public class DateTimeAssertionTests
             (now).Verify().ToBeWithin(TimeSpan.FromMilliseconds(100), now.AddSeconds(1)));
     }
 
-    // ── DateTime scope ───────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeAfter_WithinScope_WhenBefore_ShouldCollectRatherThanThrow()
     {
@@ -79,8 +71,6 @@ public class DateTimeAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
-
-    // ── DateTimeOffset.ToBeAfter ─────────────────────────────────────────────
 
     [Fact]
     public void DateTimeOffset_ToBeAfter_WhenAfter_ShouldSucceed()
@@ -96,8 +86,6 @@ public class DateTimeAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (t).Verify().ToBeAfter(t.AddDays(1)));
     }
 
-    // ── DateTimeOffset.ToBeBefore ────────────────────────────────────────────
-
     [Fact]
     public void DateTimeOffset_ToBeBefore_WhenBefore_ShouldSucceed()
     {
@@ -111,8 +99,6 @@ public class DateTimeAssertionTests
         var t = DateTimeOffset.Parse("2020-06-01T00:00:00Z");
         Xunit.Assert.Throws<OmniAssertionException>(() => (t).Verify().ToBeBefore(t.AddDays(-1)));
     }
-
-    // ── DateTimeOffset.ToBeWithin ────────────────────────────────────────────
 
     [Fact]
     public void DateTimeOffset_ToBeWithin_WhenWithinPrecision_ShouldSucceed()
@@ -128,8 +114,6 @@ public class DateTimeAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             (t).Verify().ToBeWithin(TimeSpan.FromSeconds(1), t.AddHours(1)));
     }
-
-    // ── DateTimeOffset scope ─────────────────────────────────────────────────
 
     [Fact]
     public void DateTimeOffset_ToBeAfter_WithinScope_WhenBefore_ShouldCollectRatherThanThrow()

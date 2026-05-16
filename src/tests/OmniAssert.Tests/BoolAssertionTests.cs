@@ -3,7 +3,6 @@ namespace OmniAssert.Tests;
 
 public class BoolAssertionTests
 {
-    // ── ToBeTrue ────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeTrue_WhenTrue_ShouldNotThrow()
@@ -68,8 +67,6 @@ public class BoolAssertionTests
         Xunit.Assert.Contains("expected expression to be true", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // ── ToBeFalse ───────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeFalse_WhenFalse_ShouldNotThrow()
     {
@@ -114,8 +111,6 @@ public class BoolAssertionTests
         });
         Xunit.Assert.Contains("expected expression to be false", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
-
-    // ── Scope aggregation ───────────────────────────────────────────────────
 
     [Fact]
     public void ToBeTrue_WithinScope_MultipleFailures_ShouldThrowAggregate()

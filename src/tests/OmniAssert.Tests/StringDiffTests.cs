@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using OmniAssert;
+
 namespace OmniAssert.Tests;
 
 public class StringDiffTests

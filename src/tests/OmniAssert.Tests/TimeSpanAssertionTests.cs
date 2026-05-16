@@ -1,4 +1,3 @@
-using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class TimeSpanAssertionTests

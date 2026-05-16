@@ -10,8 +10,6 @@ public class EnumAssertionTests
         Third
     }
 
-    // ── ToBe ────────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBe_WhenValuesEqual_ShouldSucceed()
     {
@@ -44,8 +42,6 @@ public class EnumAssertionTests
         Xunit.Assert.Contains("Second", ex.Message, StringComparison.Ordinal);
     }
 
-    // ── NotToBe ─────────────────────────────────────────────────────────────
-
     [Fact]
     public void NotToBe_WhenValuesDiffer_ShouldSucceed()
     {
@@ -76,8 +72,6 @@ public class EnumAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
-
-    // ── ToBeOneOf ────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeOneOf_WhenValueIsInSet_ShouldSucceed()

@@ -4,8 +4,6 @@ namespace OmniAssert.Tests;
 
 public class NumericAssertionTests
 {
-    // ── ToBe ────────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBe_WhenIntValuesEqual_ShouldSucceed()
     {
@@ -86,8 +84,6 @@ public class NumericAssertionTests
         (new BigInteger(999)).Verify().ToBe(new BigInteger(999));
     }
 
-    // ── NotToBe ─────────────────────────────────────────────────────────────
-
     [Fact]
     public void NotToBe_WhenIntValuesDiffer_ShouldSucceed()
     {
@@ -100,8 +96,6 @@ public class NumericAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (7).Verify().NotToBe(7));
     }
 
-    // ── ToBeOneOf ────────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeOneOf_WhenValueIsInSet_ShouldSucceed()
     {
@@ -113,8 +107,6 @@ public class NumericAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => (4).Verify().ToBeOneOf(1, 2, 3));
     }
-
-    // ── ToBeGreaterThan ──────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeGreaterThan_WhenGreater_ShouldSucceed()
@@ -134,8 +126,6 @@ public class NumericAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (5).Verify().ToBeGreaterThan(5));
     }
 
-    // ── ToBeGreaterThanOrEqualTo ─────────────────────────────────────────────
-
     [Fact]
     public void ToBeGreaterThanOrEqualTo_WhenGreater_ShouldSucceed()
     {
@@ -153,8 +143,6 @@ public class NumericAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => (2).Verify().ToBeGreaterThanOrEqualTo(3));
     }
-
-    // ── ToBeLessThan ─────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeLessThan_WhenLess_ShouldSucceed()
@@ -174,8 +162,6 @@ public class NumericAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (4).Verify().ToBeLessThan(4));
     }
 
-    // ── ToBeLessThanOrEqualTo ────────────────────────────────────────────────
-
     [Fact]
     public void ToBeLessThanOrEqualTo_WhenLess_ShouldSucceed()
     {
@@ -193,8 +179,6 @@ public class NumericAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => (6).Verify().ToBeLessThanOrEqualTo(5));
     }
-
-    // ── ToBeInRange ──────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeInRange_WhenInRange_ShouldSucceed()
@@ -226,8 +210,6 @@ public class NumericAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() => (0).Verify().ToBeInRange(1, 10));
     }
 
-    // ── ToBeApproximately ────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeApproximately_WhenWithinTolerance_ShouldSucceed()
     {
@@ -257,8 +239,6 @@ public class NumericAssertionTests
     {
         (5.0).Verify().ToBeInRange(1.0, 10.0);
     }
-
-    // ── Scope ────────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToBe_WithinScope_WhenValuesDiffer_ShouldCollectRatherThanThrow()

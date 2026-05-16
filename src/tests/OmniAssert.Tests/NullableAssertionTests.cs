@@ -3,8 +3,6 @@ namespace OmniAssert.Tests;
 
 public class NullableAssertionTests
 {
-    // ── NullableValueAssertions<T> ───────────────────────────────────────────
-
     [Fact]
     public void NullableValue_ToBeNull_WhenNull_ShouldSucceed()
     {
@@ -84,8 +82,6 @@ public class NullableAssertionTests
         (d).VerifyNullable().NotToBeNull();
         (dt).VerifyNullable().NotToBeNull();
     }
-
-    // ── NullableReferenceAssertions<T> ───────────────────────────────────────
 
     [Fact]
     public void NullableReference_ToBeNull_WhenNull_ShouldSucceed()

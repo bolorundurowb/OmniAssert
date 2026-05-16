@@ -6,8 +6,6 @@ public class ObjectAssertionTests
     private class Animal { }
     private class Dog : Animal { }
 
-    // ── ToBeOfType ───────────────────────────────────────────────────────────
-
     [Fact]
     public void ToBeOfType_WhenExactTypeMatches_ShouldSucceed()
     {
@@ -40,8 +38,6 @@ public class ObjectAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
-
-    // ── ToBeAssignableTo ─────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeAssignableTo_WhenExactTypeMatches_ShouldSucceed()
@@ -82,8 +78,6 @@ public class ObjectAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
-
-    // ── ToBeEquivalentTo ─────────────────────────────────────────────────────
 
     [Fact]
     public void ToBeEquivalentTo_WhenObjectsEquivalent_ShouldSucceed()

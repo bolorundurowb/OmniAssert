@@ -6,7 +6,6 @@ using OmniAssert.Generator.Rewrite;
 
 namespace OmniAssert.Generator.Tests;
 
-/// <summary>Ensures <see cref="OmniAssert.Generator.Rewrite.VerifyExpansionEngine.TryExpandVerifyInvocation"/> emits compilable syntax for a <c>VerifyExpression</c>-shaped call.</summary>
 public class VerifyExpansionEngineCompileTests
 {
     [Fact]
