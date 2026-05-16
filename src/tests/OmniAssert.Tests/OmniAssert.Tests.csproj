@@ -7,13 +7,8 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>OmniAssert.Tests</RootNamespace>
     <LangVersion>14</LangVersion>
-    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />

@@ -7,13 +7,11 @@
     <LangVersion>14</LangVersion>
     <RootNamespace>VerifyInterceptorsSample</RootNamespace>
     <OmniAssertEnableRewrite>true</OmniAssertEnableRewrite>
-    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>
     <CompilerVisibleProperty Include="OmniAssertEnableRewrite" />
-    <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
   </ItemGroup>
 
   <!-- Program.cs is supplied to the generator as an AdditionalFile so it can emit the rewritten

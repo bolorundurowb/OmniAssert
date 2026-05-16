@@ -359,18 +359,18 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
 
     private sealed class TestAnalyzerConfigOptions : Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptions
     {
-        private readonly bool _interceptorsEnabled;
+        private readonly bool _interceptorsDisabled;
 
         public TestAnalyzerConfigOptions(bool interceptorsEnabled)
         {
-            _interceptorsEnabled = interceptorsEnabled;
+            _interceptorsDisabled = !interceptorsEnabled;
         }
 
         public override bool TryGetValue(string key, out string value)
         {
-            if (key == "build_property.OmniAssertEnableVerifyInterceptors")
+            if (key == "build_property.OmniAssertDisableVerifyInterceptors")
             {
-                value = _interceptorsEnabled ? "true" : "false";
+                value = _interceptorsDisabled ? "true" : "false";
                 return true;
             }
 

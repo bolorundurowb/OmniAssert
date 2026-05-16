@@ -10,14 +10,15 @@ using OmniAssert.Generator.Rewrite;
 namespace OmniAssert.Generator;
 
 /// <summary>
-/// When <c>OmniAssertEnableVerifyInterceptors</c> is true, emits interceptors for each interceptable
-/// <c>OmniAssert.Assert.VerifyExpression(bool, string?)</c> call site: bare identifiers redirect to fluent
-/// <c>Verify(...).ToBeTrue()</c>; other boolean shapes call <c>VerifyExpression(bool, string?)</c> with the captured expression text.
+/// Emits interceptors for each interceptable <c>OmniAssert.Assert.VerifyExpression(bool, string?)</c> call site
+/// by default. Bare identifiers redirect to fluent <c>Verify(...).ToBeTrue()</c>; other boolean shapes call
+/// <c>VerifyExpression(bool, string?)</c> with the captured expression text.
+/// Set <c>OmniAssertDisableVerifyInterceptors</c> to <c>true</c> in the project file to opt out.
 /// </summary>
 [Generator]
 public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 {
-    private const string EnableProperty = "build_property.OmniAssertEnableVerifyInterceptors";
+    private const string DisableProperty = "build_property.OmniAssertDisableVerifyInterceptors";
     private const string RewriteProperty = "build_property.OmniAssertEnableRewrite";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -26,8 +27,8 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
         var interceptorsEnabled = context.AnalyzerConfigOptionsProvider.Select(
             static (options, _) =>
-                options.GlobalOptions.TryGetValue(EnableProperty, out var v) &&
-                v.Equals("true", StringComparison.OrdinalIgnoreCase));
+                !options.GlobalOptions.TryGetValue(DisableProperty, out var v) ||
+                !v.Equals("true", StringComparison.OrdinalIgnoreCase));
 
         var compilationAndFlag = context.CompilationProvider.Combine(interceptorsEnabled);
 
