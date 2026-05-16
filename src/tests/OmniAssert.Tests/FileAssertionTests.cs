@@ -1,5 +1,4 @@
-using static OmniAssert.Assert;
-
+using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class FileAssertionTests
@@ -11,7 +10,7 @@ public class FileAssertionTests
         File.WriteAllText(path, "hello");
         try
         {
-            FileExists(path);
+            (path).FileExists();
         }
         finally
         {
@@ -23,7 +22,7 @@ public class FileAssertionTests
     public void FileExists_WhenFileMissing_ShouldThrow()
     {
         var path = CreateTempFilePath();
-        Xunit.Assert.Throws<OmniAssertionException>(() => FileExists(path));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (path).FileExists());
     }
 
     [Fact]
@@ -33,7 +32,7 @@ public class FileAssertionTests
         File.WriteAllText(path, "hello world");
         try
         {
-            FileExists(path).HaveContent("hello world");
+            (path).FileExists().HaveContent("hello world");
         }
         finally
         {
@@ -48,7 +47,7 @@ public class FileAssertionTests
         File.WriteAllText(path, "hello world");
         try
         {
-            Xunit.Assert.Throws<OmniAssertionException>(() => FileExists(path).HaveContent("other"));
+            Xunit.Assert.Throws<OmniAssertionException>(() => (path).FileExists().HaveContent("other"));
         }
         finally
         {
@@ -63,7 +62,7 @@ public class FileAssertionTests
         File.WriteAllText(path, string.Empty);
         try
         {
-            FileExists(path).BeEmpty();
+            (path).FileExists().BeEmpty();
         }
         finally
         {
@@ -78,7 +77,7 @@ public class FileAssertionTests
         File.WriteAllText(path, "x");
         try
         {
-            Xunit.Assert.Throws<OmniAssertionException>(() => FileExists(path).BeEmpty());
+            Xunit.Assert.Throws<OmniAssertionException>(() => (path).FileExists().BeEmpty());
         }
         finally
         {
@@ -94,7 +93,7 @@ public class FileAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            FileExists(path).HaveContent("expected");
+            (path).FileExists().HaveContent("expected");
         });
 
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);

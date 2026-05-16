@@ -81,112 +81,174 @@ If you are building from this repository or a fork (project references instead o
 ## Quick start
 
 1. Reference **`OmniAssert`** (see [Install](#install)).
-2. Add `using static OmniAssert.Assert;` so call sites stay short.
-3. Write `Verify(…)` and `VerifyExpression(…)` as needed.
+2. Write `.Verify(…)` on any value or expression.
+3. For booleans, you can also use `.VerifyExpression()`.
 
 ```csharp
-using static OmniAssert.Assert;
+using OmniAssert;
 
 [Fact]
 public void Should_validate_user()
 {
-    Verify(user.Id).ToBeGreaterThan(0);
-    Verify(user.Email).ToContain("@");
-    Verify(user.IsActive).ToBeTrue();
+    user.Id.Verify().ToBeGreaterThan(0);
+    user.Email.Verify().ToContain("@");
+    user.IsActive.Verify().ToBeTrue();
 }
 ```
 
-## Public API
+## Assertion Types
 
-You use **`Assert`** (usually with `using static OmniAssert.Assert`), the fluent assertion structs it returns, **`AssertionScope`**, **`OmniAssertionException`**, and **`AssertionCapture`** (for advanced `VerifyExpression` scenarios). Public entry points include `Verify(...)` overloads for primitives and common framework types, plus `FileExists(path)` and `DirectoryExists(path)` for file-system assertions. Types such as the diff engine and terminal colour helpers are **internal**—you exercise them through **`Verify(…).ToBeEquivalentTo(…)`** and other public assertions. When interceptors are enabled, generated helpers appear under **`OmniAssert.Generated`**.
+OmniAssert provides a rich set of extension methods for various types. All assertions begin with `.Verify()` or specialized methods like `.VerifyNullable()`.
 
-## Core usage
-
-```csharp
-using static OmniAssert.Assert;
-
-[Fact]
-public void Example()
-{
-    Verify(answer).ToBe(42);
-    Verify(name).ToContain("Acme");
-    Verify(isReady).ToBeTrue();
-}
-```
-
-## API at a glance
-
-| Area | Pattern | Notes |
-|------|---------|--------|
-| **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately`, `ToBeOneOf(...)` | Numeric types use `INumber<T>`; `BigInteger` is included. |
-| **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)`, `ToBeIgnoringCase`, `ToBeOneOf(...)`, `HasLength` | Also `ToBeEmpty`, `NotToBeEmpty`, `ToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
-| **Collections** | `Verify(list).ToBe(…)`, `ToContain`, `HasCount`/`ToHaveCount`, `ToBeUnique`, `HasUniqueCount`, ordering checks, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison; `ToBe` checks reference equality. |
-| **Dictionaries** | `Verify(dict).ToBe(…)`, `ContainKey`, `NotContainKey`, `ContainValue`, `HaveValue` | `ToBe` checks reference equality; works with `IReadOnlyDictionary<TKey, TValue>`. |
-| **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)`, `ToBeOneOf(...)` | |
-| **GUIDs** | `Verify(guid).ToBe(…)`, `ToBeEmpty`, `NotToBeEmpty`, `ToBeOneOf(...)` | |
-| **URIs** | `Verify(uri).ToBe(…)`, `HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery` | Query matching ignores a leading `?`. |
-| **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
-| **Objects** | `Verify(o).ToBe(…)`, `ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
-| **Dates & Time** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin`, `Verify(dateOnly)...`, `Verify(timeOnly)...`, `Verify(timeSpan)...` | `DateTime` and `DateTimeOffset` support ranges; `TimeSpan` supports sign, comparison, and `ToBeOneOf(...)`. |
-| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithMessageIgnoringCase`, `.WithMessageContaining`, `.WithInnerException<TInner>()`. |
-| **File system** | `FileExists(path).HaveContent` / `BeEmpty`, `DirectoryExists(path).BeEmpty` | `FileExists`/`DirectoryExists` first verify existence, then return fluent assertions. |
-| **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
-
-## Common scenarios
-
-### Assert a thrown exception
+### Basic Values & Numeric
+Assertions for all standard numeric types (including `BigInteger`).
 
 ```csharp
-Throws<InvalidOperationException>(() => service.Execute())
-    .WithMessage("Operation is not valid*");
-
-// Or ignoring case
-Throws<UnauthorizedAccessException>(() => loginService.Login())
-    .WithMessageIgnoringCase("access denied");
+answer.Verify().ToBe(42);
+count.Verify().ToBeGreaterThan(0);
+price.Verify().ToBeApproximately(9.99, 0.01);
+score.Verify().ToBeOneOf(10, 20, 30);
 ```
 
-### Assert multiple outcomes in one test run
+- `ToBe(expected)` / `NotToBe(unexpected)`
+- `ToBeGreaterThan(threshold)` / `ToBeGreaterThanOrEqualTo(threshold)`
+- `ToBeLessThan(threshold)` / `ToBeLessThanOrEqualTo(threshold)`
+- `ToBeInRange(min, max)`
+- `ToBeApproximately(expected, precision)`
+- `ToBeOneOf(values...)`
+
+### Strings
+Fluent assertions for text analysis.
+
+```csharp
+name.Verify().ToStartWith("John");
+email.Verify().ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+bio.Verify().HasLengthGreaterThan(10);
+role.Verify().ToBeIgnoringCase("admin");
+```
+
+- `ToContain(substring)` / `NotToContain(substring)`
+- `ToStartWith(prefix)` / `ToEndWith(suffix)`
+- `ToMatch(regex)`
+- `ToBeIgnoringCase(expected)`
+- `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
+- `HasLength(expected)` / `HasLengthGreaterThan(n)`
+
+### Collections & Dictionaries
+Deep verification for sequences and key-value pairs.
+
+```csharp
+users.Verify().HasCount(3);
+items.Verify().ToContain(targetItem);
+results.Verify().ToBeUnique();
+settings.Verify().ContainKey("Theme");
+```
+
+- `HasCount(n)` / `ToHaveCount(n)`
+- `ToBeEmpty()` / `NotToBeEmpty()`
+- `ToContain(item)` / `NotToContain(item)`
+- `ToBeUnique()`
+- `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
+- `AllSatisfy(item => ...)`
+- `ToBeEquivalentTo(other)` (Deep structural comparison)
+- `ContainKey(key)` / `ContainValue(value)`
+
+### Objects & Equivalence
+Verify object identity, types, and structural equality.
+
+```csharp
+instance.Verify().ToBeOfType<MyClass>();
+actualDto.Verify().ToBeEquivalentTo(expectedDto);
+```
+
+- `ToBe(expected)` (Reference equality)
+- `ToBeNull()` / `NotToBeNull()`
+- `ToBeOfType<T>()` / `ToBeAssignableTo<T>()`
+- `ToBeEquivalentTo(expected)` (Recursive property comparison with diff)
+
+### Exceptions & Tasks
+Verify synchronous and asynchronous code behavior.
+
+```csharp
+// Synchronous
+Action act = () => service.DoWork();
+act.Throws<InvalidOperationException>().WithMessage("Failed");
+
+// Asynchronous
+Func<Task> asyncAct = () => service.DoWorkAsync();
+await asyncAct.ThrowsAsync<ArgumentException>();
+
+// Timeouts
+await TimeSpan.FromSeconds(2).CompleteWithin(() => longRunningTask);
+```
+
+- `Throws<T>()` / `ThrowsAsync<T>()`
+- `NotThrow()` / `NotThrowAsync()`
+- `WithMessage(expected)` / `WithMessageContaining(substring)`
+- `WithInnerException<TInner>()`
+- `CompleteWithin(action)`
+
+### Dates, Times & Other Types
+Assertions for temporal types, GUIDs, Enums, and URIs.
+
+```csharp
+dateTime.Verify().ToBeAfter(yesterday);
+timeSpan.Verify().ToBePositive();
+guid.Verify().NotToBeEmpty();
+uri.Verify().HaveHost("github.com");
+```
+
+- `DateTime` / `DateTimeOffset`: `ToBeBefore`, `ToBeAfter`, `ToBeWithin`
+- `DateOnly` / `TimeOnly`: `ToBeBefore`, `ToBeAfter`
+- `TimeSpan`: `ToBePositive`, `ToBeNegative`
+- `Guid`: `ToBeEmpty`, `NotToBeEmpty`
+- `Enum`: `ToBe`, `ToBeOneOf`
+- `Uri`: `HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery`
+
+### File System
+Verify files and directories exist and check their properties.
+
+```csharp
+"config.json".FileExists().HaveContent(expectedJson);
+"temp".DirectoryExists().BeEmpty();
+```
+
+- `FileExists()` -> `HaveContent(text)`, `BeEmpty()`
+- `DirectoryExists()` -> `BeEmpty()`
+
+## Soft Assertions: `AssertionScope`
+
+Use `AssertionScope` to collect multiple failures and report them all at once when the scope is disposed.
 
 ```csharp
 using (new AssertionScope())
 {
-    Verify(user.Name).ToBe("John");
-    Verify(user.Age).ToBeGreaterThan(17);
-    Verify(user.Email).ToContain("@");
+    user.Name.Verify().ToBe("John");
+    user.Age.Verify().ToBe(30);
+    user.Email.Verify().ToContain("@");
 }
 ```
 
-### Assert structural equivalence
+## Booleans: `Verify()` vs `VerifyExpression()`
+
+OmniAssert provides two ways to assert boolean conditions:
+
+1. **Fluent style**: `flag.Verify().ToBeTrue()` - consistent with other assertions.
+2. **Expression style**: `condition.VerifyExpression()` - best for complex logical conditions.
 
 ```csharp
-Verify(actualDto).ToBeEquivalentTo(expectedDto);
+// Fluent
+isValid.Verify().ToBeTrue();
+
+// Expression (with rich diagnostics if interceptors are enabled)
+(x > 0 && count < limit).VerifyExpression();
 ```
-
-## Booleans: `Verify(bool)` vs `VerifyExpression(bool)`
-
-- **`Verify(flag).ToBeTrue()`** or **`.ToBeFalse()`** — `Verify(bool)` returns `BoolAssertions`. This is the main fluent style.
-
-```csharp
-Verify(isValid).ToBeTrue();
-Verify(featureDisabled).ToBeFalse();
-```
-
-- **`VerifyExpression(condition)`** — a single void call that asserts the condition is true, with structured failure text.
-
-```csharp
-VerifyExpression(x > 0 && count < limit);
-```
-
-Use `Verify(…).ToBeTrue()` when you want the same fluent style as other assertions. Use `VerifyExpression(…)` when a one-shot condition reads better, or when you enable interceptors (below).
 
 ## Optional: richer boolean failures with interceptors
 
-Interceptors are **off** by default. When enabled, the bundled Roslyn generator emits stubs under **`OmniAssert.Generated`** so `VerifyExpression(bool, …)` call sites can be rewritten at compile time:
+Interceptors are **off** by default. When enabled, the bundled Roslyn generator emits stubs so `VerifyExpression()` call sites can be rewritten at compile time to capture intermediate values.
 
-- a bare boolean identifier (including parenthesised) becomes `Verify(condition, expression).ToBeTrue()`;
-- any other boolean shape becomes `VerifyExpression(condition, expression)` with the captured expression text (same failure path as the non-intercepted API).
-
-Add the following to your test project **in addition to** the **`OmniAssert`** package reference from [Install](#install):
+Add the following to your test project:
 
 ```xml
 <PropertyGroup>
@@ -200,62 +262,9 @@ Add the following to your test project **in addition to** the **`OmniAssert`** p
 </ItemGroup>
 ```
 
-- **`OmniAssertEnableVerifyInterceptors`**: `true` emits interceptors per syntax tree; `false` (or omitted) keeps `VerifyExpression` on the normal `[CallerArgumentExpression]` path.
-- **`InterceptorsNamespaces`**: must include **`OmniAssert.Generated`** so the compiler applies emitted interceptors.
-
-Only **`VerifyExpression(bool, string?)`** call sites are intercepted (not `Verify(bool).ToBeTrue()` fluent calls). A separate overload, **`VerifyExpression(bool, AssertionCapture)`**, is used by boolean lowering in tooling; it is **not** intercepted.
-
-| Condition at the call site | What the interceptor does |
-|----------------------------|-----------------------------|
-| Bare identifier (including parenthesised) | `Verify(condition, expression).ToBeTrue()` |
-| Operators, literals, `!flag`, compound logical expressions, … | `VerifyExpression(condition, expression)` |
-
-## More examples
-
-```csharp
-Verify(42).ToBe(42);
-Verify(10).ToBeGreaterThan(5);
-Verify(3.14159).ToBeApproximately(3.14, 0.01);
-Verify(42).ToBeOneOf(40, 41, 42);
-
-Verify("Hello World").ToContain("Hello");
-Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-Verify(email).HasLengthGreaterThan(5);
-Verify(role).ToBeIgnoringCase("admin");
-
-Verify(users).ToBe(expectedUsers); // Reference equality
-Verify(users).ToContain(currentUser);
-Verify(results).HasCount(3);
-Verify(results).ToHaveCount(3);
-Verify(results).ToBeUnique();
-Verify(results).ToBeInAscendingOrder();
-
-Verify(headers).ToBe(expectedHeaders); // Reference equality
-Verify(headers).ContainKey("Authorization");
-Verify(requestUri).HaveScheme("https");
-Verify(correlationId).NotToBeEmpty();
-Verify(correlationId).ToBe(expectedId);
-
-VerifyNullable(someObject).NotToBeNull();
-Verify(MyEnum.On).ToBe(MyEnum.On);
-Verify(MyEnum.On).ToBeOneOf(MyEnum.Off, MyEnum.On);
-
-Verify(instance).ToBeOfType<MyClass>();
-Verify(actualDto).ToBeEquivalentTo(expectedDto);
-
-Verify(dateTime).ToBeAfter(DateTime.UtcNow.AddDays(-1));
-Verify(TimeSpan.FromMinutes(5)).ToBePositive();
-Verify(DateOnly.FromDateTime(DateTime.UtcNow)).ToBeAfter(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1)));
-Verify(TimeOnly.FromDateTime(DateTime.UtcNow)).ToBeBefore(new TimeOnly(23, 59, 59));
-FileExists(pathToOutput).HaveContent(expectedText);
-DirectoryExists(tempFolder).BeEmpty();
-
-using (new AssertionScope())
-{
-    Verify(user.Name).ToBe("John");
-    Verify(user.Age).ToBe(30);
-}
-```
+When enabled:
+- `(flag).VerifyExpression()` becomes `flag.Verify(expression).ToBeTrue()`.
+- `(complexExpr).VerifyExpression()` captures all operands for better failure messages.
 
 ---
 

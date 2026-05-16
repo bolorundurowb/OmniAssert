@@ -1,5 +1,4 @@
-using static OmniAssert.Assert;
-
+using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class BoolAssertionTests
@@ -9,13 +8,13 @@ public class BoolAssertionTests
     [Fact]
     public void ToBeTrue_WhenTrue_ShouldNotThrow()
     {
-        Verify(true).ToBeTrue();
+        (true).Verify().ToBeTrue();
     }
 
     [Fact]
     public void ToBeTrue_WhenFalse_ShouldThrow()
     {
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(false).ToBeTrue());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (false).Verify().ToBeTrue());
         Xunit.Assert.Contains("expected expression to be true", ex.Message, StringComparison.OrdinalIgnoreCase);
         Xunit.Assert.Contains("false", ex.Message, StringComparison.Ordinal);
     }
@@ -24,7 +23,7 @@ public class BoolAssertionTests
     public void ToBeTrue_WhenFalse_MessageContainsSubjectExpression()
     {
         bool myFlag = false;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(myFlag).ToBeTrue());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (myFlag).Verify().ToBeTrue());
         Xunit.Assert.Contains("myFlag", ex.Message, StringComparison.Ordinal);
     }
 
@@ -64,7 +63,7 @@ public class BoolAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify(false).ToBeTrue();
+            (false).Verify().ToBeTrue();
         });
         Xunit.Assert.Contains("expected expression to be true", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -74,13 +73,13 @@ public class BoolAssertionTests
     [Fact]
     public void ToBeFalse_WhenFalse_ShouldNotThrow()
     {
-        Verify(false).ToBeFalse();
+        (false).Verify().ToBeFalse();
     }
 
     [Fact]
     public void ToBeFalse_WhenTrue_ShouldThrow()
     {
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(true).ToBeFalse());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (true).Verify().ToBeFalse());
         Xunit.Assert.Contains("expected expression to be false", ex.Message, StringComparison.OrdinalIgnoreCase);
         Xunit.Assert.Contains("true", ex.Message, StringComparison.Ordinal);
     }
@@ -89,7 +88,7 @@ public class BoolAssertionTests
     public void ToBeFalse_WhenTrue_MessageContainsSubjectExpression()
     {
         bool isReady = true;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => Verify(isReady).ToBeFalse());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (isReady).Verify().ToBeFalse());
         Xunit.Assert.Contains("isReady", ex.Message, StringComparison.Ordinal);
     }
 
@@ -111,7 +110,7 @@ public class BoolAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify(true).ToBeFalse();
+            (true).Verify().ToBeFalse();
         });
         Xunit.Assert.Contains("expected expression to be false", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -124,8 +123,8 @@ public class BoolAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify(false).ToBeTrue();
-            Verify(false).ToBeTrue();
+            (false).Verify().ToBeTrue();
+            (false).Verify().ToBeTrue();
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }

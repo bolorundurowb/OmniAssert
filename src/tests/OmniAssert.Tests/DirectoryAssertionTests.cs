@@ -1,5 +1,4 @@
-using static OmniAssert.Assert;
-
+using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class DirectoryAssertionTests
@@ -11,7 +10,7 @@ public class DirectoryAssertionTests
         Directory.CreateDirectory(path);
         try
         {
-            DirectoryExists(path);
+            (path).DirectoryExists();
         }
         finally
         {
@@ -23,7 +22,7 @@ public class DirectoryAssertionTests
     public void DirectoryExists_WhenDirectoryMissing_ShouldThrow()
     {
         var path = CreateTempDirectoryPath();
-        Xunit.Assert.Throws<OmniAssertionException>(() => DirectoryExists(path));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (path).DirectoryExists());
     }
 
     [Fact]
@@ -33,7 +32,7 @@ public class DirectoryAssertionTests
         Directory.CreateDirectory(path);
         try
         {
-            DirectoryExists(path).BeEmpty();
+            (path).DirectoryExists().BeEmpty();
         }
         finally
         {
@@ -49,7 +48,7 @@ public class DirectoryAssertionTests
         File.WriteAllText(Path.Combine(path, "item.txt"), "x");
         try
         {
-            Xunit.Assert.Throws<OmniAssertionException>(() => DirectoryExists(path).BeEmpty());
+            Xunit.Assert.Throws<OmniAssertionException>(() => (path).DirectoryExists().BeEmpty());
         }
         finally
         {
@@ -65,7 +64,7 @@ public class DirectoryAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            DirectoryExists(path).BeEmpty();
+            (path).DirectoryExists().BeEmpty();
         });
 
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);

@@ -1,5 +1,4 @@
-using static OmniAssert.Assert;
-
+using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class StringAssertionTests
@@ -9,49 +8,49 @@ public class StringAssertionTests
     [Fact]
     public void ToBe_WhenStringsEqual_ShouldSucceed()
     {
-        Verify("hello").ToBe("hello");
+        ("hello").Verify().ToBe("hello");
     }
 
     [Fact]
     public void ToBe_WhenStringsDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToBe("xyz"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToBe("xyz"));
     }
 
     [Fact]
     public void ToBe_WithOrdinalIgnoreCaseComparison_WhenMatch_ShouldSucceed()
     {
-        Verify("HELLO").ToBe("hello", StringComparison.OrdinalIgnoreCase);
+        ("HELLO").Verify().ToBe("hello", StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     public void ToBe_WithOrdinalIgnoreCaseComparison_WhenMismatch_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToBe("xyz", StringComparison.OrdinalIgnoreCase));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToBe("xyz", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
     public void ToBeIgnoringCase_WhenStringsMatchIgnoringCase_ShouldSucceed()
     {
-        Verify("HELLO").ToBeIgnoringCase("hello");
+        ("HELLO").Verify().ToBeIgnoringCase("hello");
     }
 
     [Fact]
     public void ToBeIgnoringCase_WhenStringsDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToBeIgnoringCase("xyz"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToBeIgnoringCase("xyz"));
     }
 
     [Fact]
     public void ToBeOneOf_WhenStringIsInSet_ShouldSucceed()
     {
-        Verify("pending").ToBeOneOf("active", "pending", "archived");
+        ("pending").Verify().ToBeOneOf("active", "pending", "archived");
     }
 
     [Fact]
     public void ToBeOneOf_WhenStringIsNotInSet_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("deleted").ToBeOneOf("active", "pending", "archived"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("deleted").Verify().ToBeOneOf("active", "pending", "archived"));
     }
 
     // ── NotToBe ─────────────────────────────────────────────────────────────
@@ -59,13 +58,13 @@ public class StringAssertionTests
     [Fact]
     public void NotToBe_WhenStringsDiffer_ShouldSucceed()
     {
-        Verify("a").NotToBe("b");
+        ("a").Verify().NotToBe("b");
     }
 
     [Fact]
     public void NotToBe_WhenStringsEqual_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("same").NotToBe("same"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("same").Verify().NotToBe("same"));
     }
 
     // ── ToBeNull / NotToBeNull ───────────────────────────────────────────────
@@ -74,26 +73,26 @@ public class StringAssertionTests
     public void ToBeNull_WhenNull_ShouldSucceed()
     {
         string? s = null;
-        Verify(s).ToBeNull();
+        (s).Verify().ToBeNull();
     }
 
     [Fact]
     public void ToBeNull_WhenNotNull_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("x").ToBeNull());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("x").Verify().ToBeNull());
     }
 
     [Fact]
     public void NotToBeNull_WhenNotNull_ShouldSucceed()
     {
-        Verify("ok").NotToBeNull();
+        ("ok").Verify().NotToBeNull();
     }
 
     [Fact]
     public void NotToBeNull_WhenNull_ShouldThrow()
     {
         string? s = null;
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(s).NotToBeNull());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Verify().NotToBeNull());
     }
 
     // ── ToBeEmpty / NotToBeEmpty ─────────────────────────────────────────────
@@ -101,25 +100,25 @@ public class StringAssertionTests
     [Fact]
     public void ToBeEmpty_WhenEmpty_ShouldSucceed()
     {
-        Verify("").ToBeEmpty();
+        ("").Verify().ToBeEmpty();
     }
 
     [Fact]
     public void ToBeEmpty_WhenNotEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("x").ToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("x").Verify().ToBeEmpty());
     }
 
     [Fact]
     public void NotToBeEmpty_WhenNotEmpty_ShouldSucceed()
     {
-        Verify("hello").NotToBeEmpty();
+        ("hello").Verify().NotToBeEmpty();
     }
 
     [Fact]
     public void NotToBeEmpty_WhenEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("").NotToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("").Verify().NotToBeEmpty());
     }
 
     // ── ToBeNullOrEmpty ──────────────────────────────────────────────────────
@@ -128,19 +127,19 @@ public class StringAssertionTests
     public void ToBeNullOrEmpty_WhenNull_ShouldSucceed()
     {
         string? s = null;
-        Verify(s).ToBeNullOrEmpty();
+        (s).Verify().ToBeNullOrEmpty();
     }
 
     [Fact]
     public void ToBeNullOrEmpty_WhenEmpty_ShouldSucceed()
     {
-        Verify("").ToBeNullOrEmpty();
+        ("").Verify().ToBeNullOrEmpty();
     }
 
     [Fact]
     public void ToBeNullOrEmpty_WhenNotEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToBeNullOrEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToBeNullOrEmpty());
     }
 
     // ── ToBeNullOrWhiteSpace ─────────────────────────────────────────────────
@@ -149,19 +148,19 @@ public class StringAssertionTests
     public void ToBeNullOrWhiteSpace_WhenNull_ShouldSucceed()
     {
         string? s = null;
-        Verify(s).ToBeNullOrWhiteSpace();
+        (s).Verify().ToBeNullOrWhiteSpace();
     }
 
     [Fact]
     public void ToBeNullOrWhiteSpace_WhenWhiteSpaceOnly_ShouldSucceed()
     {
-        Verify("   ").ToBeNullOrWhiteSpace();
+        ("   ").Verify().ToBeNullOrWhiteSpace();
     }
 
     [Fact]
     public void ToBeNullOrWhiteSpace_WhenNotWhiteSpace_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToBeNullOrWhiteSpace());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToBeNullOrWhiteSpace());
     }
 
     // ── HasLength ────────────────────────────────────────────────────────────
@@ -169,13 +168,13 @@ public class StringAssertionTests
     [Fact]
     public void HasLength_WhenLengthMatches_ShouldSucceed()
     {
-        Verify("hello").HasLength(5);
+        ("hello").Verify().HasLength(5);
     }
 
     [Fact]
     public void HasLength_WhenLengthDiffers_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLength(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLength(2));
     }
 
     // ── HasLengthGreaterThan ─────────────────────────────────────────────────
@@ -183,13 +182,13 @@ public class StringAssertionTests
     [Fact]
     public void HasLengthGreaterThan_WhenLongEnough_ShouldSucceed()
     {
-        Verify("hello").HasLengthGreaterThan(3);
+        ("hello").Verify().HasLengthGreaterThan(3);
     }
 
     [Fact]
     public void HasLengthGreaterThan_WhenTooShort_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLengthGreaterThan(3));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthGreaterThan(3));
     }
 
     // ── HasLengthLessThan ────────────────────────────────────────────────────
@@ -197,13 +196,13 @@ public class StringAssertionTests
     [Fact]
     public void HasLengthLessThan_WhenShortEnough_ShouldSucceed()
     {
-        Verify("hello").HasLengthLessThan(10);
+        ("hello").Verify().HasLengthLessThan(10);
     }
 
     [Fact]
     public void HasLengthLessThan_WhenTooLong_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").HasLengthLessThan(3));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthLessThan(3));
     }
 
     // ── ToContain ────────────────────────────────────────────────────────────
@@ -211,38 +210,38 @@ public class StringAssertionTests
     [Fact]
     public void ToContain_WhenSubstringPresent_ShouldSucceed()
     {
-        Verify("abc").ToContain("b");
+        ("abc").Verify().ToContain("b");
     }
 
     [Fact]
     public void ToContain_WhenSubstringAbsent_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("abc").ToContain("z"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToContain("z"));
     }
 
     [Fact]
     public void ToContain_WhenSubstringIsEmpty_ShouldSucceed()
     {
-        Verify("abc").ToContain(string.Empty);
+        ("abc").Verify().ToContain(string.Empty);
     }
 
     [Fact]
     public void ToContain_WithIgnoreCaseComparison_WhenMatch_ShouldSucceed()
     {
-        Verify("AbC").ToContain("bc", StringComparison.OrdinalIgnoreCase);
+        ("AbC").Verify().ToContain("bc", StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     public void ToContain_WithOrdinalComparison_WhenMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify("abc").ToContain("XX", StringComparison.Ordinal));
+            ("abc").Verify().ToContain("XX", StringComparison.Ordinal));
     }
 
     [Fact]
     public void ToContain_WithEmptySubstringAndComparison_ShouldSucceed()
     {
-        Verify("abc").ToContain(string.Empty, StringComparison.Ordinal);
+        ("abc").Verify().ToContain(string.Empty, StringComparison.Ordinal);
     }
 
     // ── ToStartWith ──────────────────────────────────────────────────────────
@@ -250,19 +249,19 @@ public class StringAssertionTests
     [Fact]
     public void ToStartWith_WhenMatchesPrefix_ShouldSucceed()
     {
-        Verify("hello world").ToStartWith("hello");
+        ("hello world").Verify().ToStartWith("hello");
     }
 
     [Fact]
     public void ToStartWith_WhenIgnoreCase_ShouldSucceed()
     {
-        Verify("Hello").ToStartWith("hel", StringComparison.OrdinalIgnoreCase);
+        ("Hello").Verify().ToStartWith("hel", StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     public void ToStartWith_WhenMismatch_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToStartWith("hi"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToStartWith("hi"));
     }
 
     // ── ToEndWith ────────────────────────────────────────────────────────────
@@ -270,19 +269,19 @@ public class StringAssertionTests
     [Fact]
     public void ToEndWith_WhenMatchesSuffix_ShouldSucceed()
     {
-        Verify("hello world").ToEndWith("world");
+        ("hello world").Verify().ToEndWith("world");
     }
 
     [Fact]
     public void ToEndWith_WhenIgnoreCase_ShouldSucceed()
     {
-        Verify("Hello").ToEndWith("LO", StringComparison.OrdinalIgnoreCase);
+        ("Hello").Verify().ToEndWith("LO", StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
     public void ToEndWith_WhenMismatch_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("hello").ToEndWith("bye"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToEndWith("bye"));
     }
 
     // ── ToMatch ──────────────────────────────────────────────────────────────
@@ -290,13 +289,13 @@ public class StringAssertionTests
     [Fact]
     public void ToMatch_WhenPatternMatches_ShouldSucceed()
     {
-        Verify("123-456").ToMatch(@"^\d{3}-\d{3}$");
+        ("123-456").Verify().ToMatch(@"^\d{3}-\d{3}$");
     }
 
     [Fact]
     public void ToMatch_WhenPatternDoesNotMatch_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify("123").ToMatch(@"^[a-z]+$"));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("123").Verify().ToMatch(@"^[a-z]+$"));
     }
 
     // ── Scope ────────────────────────────────────────────────────────────────
@@ -307,7 +306,7 @@ public class StringAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify("a").ToBe("b");
+            ("a").Verify().ToBe("b");
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -318,8 +317,8 @@ public class StringAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify("a").ToBe("b");
-            Verify("c").ToBe("d");
+            ("a").Verify().ToBe("b");
+            ("c").Verify().ToBe("d");
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }

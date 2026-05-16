@@ -1,4 +1,4 @@
-using static OmniAssert.Assert;
+using OmniAssert;
 
 namespace VerifyInterceptorsSample;
 
@@ -11,6 +11,6 @@ public static class Program
         var y = 3;
         var z = 10;
         InterceptorSmoke.Run();
-        VerifyExpression(z > 10 || x > y);
+        (z > 10 || x > y).VerifyExpression();
     }
 }

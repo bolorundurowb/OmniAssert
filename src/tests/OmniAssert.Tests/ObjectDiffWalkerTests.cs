@@ -1,5 +1,4 @@
-using static OmniAssert.Assert;
-
+using OmniAssert;
 namespace OmniAssert.Tests;
 
 public class ObjectDiffWalkerTests
@@ -48,19 +47,19 @@ public class ObjectDiffWalkerTests
     {
         var a = new Node { Name = "one" };
         var b = new Node { Name = "two" };
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (a).Verify().ToBeEquivalentTo(b));
     }
 
     [Fact]
     public void Verify_ToBeEquivalentTo_WhenTypesDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(new { A = 1 }).ToBeEquivalentTo(new { B = 1 }));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new { A = 1 }).Verify().ToBeEquivalentTo(new { B = 1 }));
     }
 
     [Fact]
     public void Verify_ToBeEquivalentTo_WhenActualIsNull_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify((object?)null).ToBeEquivalentTo(new { A = 1 }));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Verify().ToBeEquivalentTo(new { A = 1 }));
     }
 
     [Fact]
@@ -68,7 +67,7 @@ public class ObjectDiffWalkerTests
     {
         var a = new[] { 1, 2, 3 };
         var b = new[] { 1, 2, 4 };
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (a).Verify().ToBeEquivalentTo(b));
     }
 
     [Fact]
@@ -76,6 +75,6 @@ public class ObjectDiffWalkerTests
     {
         var a = new[] { 1, 2 };
         var b = new[] { 1, 2, 3 };
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(a).ToBeEquivalentTo(b));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (a).Verify().ToBeEquivalentTo(b));
     }
 }
