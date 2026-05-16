@@ -10,7 +10,7 @@ namespace OmniAssert;
 /// </summary>
 /// <remarks>
 /// <para>Use <see cref="AssertionScope"/> to defer failures until the scope is disposed (soft asserts).</para>
-/// <para><see cref="VerifyExpression(bool, string?)"/> can be rewritten at compile time when the optional OmniAssert Roslyn generator and interceptor MSBuild properties are enabled—see the README.</para>
+/// <para><see cref="VerifyExpression(bool, string?)"/> call sites are enhanced at compile time by the bundled Roslyn generator unless <c>OmniAssertDisableVerifyInterceptors</c> is set to <c>true</c>—see the README.</para>
 /// </remarks>
 public static partial class Assert
 {

@@ -130,9 +130,11 @@ role.Verify().ToBeIgnoringCase("admin");
 - `ToContain(substring)` / `NotToContain(substring)`
 - `ToStartWith(prefix)` / `ToEndWith(suffix)`
 - `ToMatch(regex)`
-- `ToBeIgnoringCase(expected)`
-- `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
-- `HasLength(expected)` / `HasLengthGreaterThan(n)`
+- `ToBeIgnoringCase(expected)` / `ToBeOneOf(values...)`
+- `ToBeNull()` / `NotToBeNull()`
+- `ToBeEmpty()` / `NotToBeEmpty()`
+- `ToBeNullOrEmpty()` / `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
+- `HasLength(expected)` / `HasLengthGreaterThan(n)` / `HasLengthLessThan(n)`
 
 ### Collections & Dictionaries
 Deep verification for sequences and key-value pairs.
@@ -145,12 +147,13 @@ settings.Verify().ContainKey("Theme");
 ```
 
 - `HasCount(n)` / `ToHaveCount(n)`
+- `HasCountGreaterThan(n)` / `HasCountLessThan(n)`
 - `ToBeEmpty()` / `NotToBeEmpty()`
 - `ToContain(item)` / `NotToContain(item)`
-- `ToBeUnique()`
+- `ToBeUnique()` / `HasUniqueCount(n)`
 - `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
 - `AllSatisfy(item => ...)`
-- `ToBeEquivalentTo(other)` (Deep structural comparison)
+- `ToBeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
 - `ContainKey(key)` / `ContainValue(value)`
 
 ### Objects & Equivalence
@@ -240,31 +243,34 @@ OmniAssert provides two ways to assert boolean conditions:
 // Fluent
 isValid.Verify().ToBeTrue();
 
-// Expression (with rich diagnostics if interceptors are enabled)
+// Expression (with rich diagnostics via bundled interceptors)
 (x > 0 && count < limit).VerifyExpression();
 ```
 
-## Optional: richer boolean failures with interceptors
+## Compile-time boolean diagnostics (interceptors)
 
-Interceptors are **off** by default. When enabled, the bundled Roslyn generator emits stubs so `VerifyExpression()` call sites can be rewritten at compile time to capture intermediate values.
+The bundled Roslyn generator is **on by default**. When active, it rewrites `VerifyExpression()` call sites at compile time to capture sub-expression values, so failure messages show the individual operands—not just "condition was false".
 
-Add the following to your test project:
+To opt out, add the following to your test project:
 
 ```xml
 <PropertyGroup>
-  <LangVersion>14</LangVersion>
-  <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
-  <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
+  <OmniAssertDisableVerifyInterceptors>true</OmniAssertDisableVerifyInterceptors>
 </PropertyGroup>
-
-<ItemGroup>
-  <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
-</ItemGroup>
 ```
 
-When enabled:
-- `(flag).VerifyExpression()` becomes `flag.Verify(expression).ToBeTrue()`.
-- `(complexExpr).VerifyExpression()` captures all operands for better failure messages.
+> **C# 14 / .NET 10 requirement**: interceptors require `LangVersion` ≥ 14 and the `InterceptorsNamespaces` property. Both are met automatically when targeting .NET 10 with the default SDK settings, but if you pin an earlier language version you must add:
+>
+> ```xml
+> <PropertyGroup>
+>   <LangVersion>14</LangVersion>
+>   <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
+> </PropertyGroup>
+> ```
+
+When active:
+- `flag.VerifyExpression()` (bare identifier) becomes `flag.Verify(expression).ToBeTrue()`.
+- `(complexExpr).VerifyExpression()` captures all operands so failure messages show each value.
 
 ---
 
