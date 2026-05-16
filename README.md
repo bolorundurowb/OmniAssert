@@ -1,19 +1,19 @@
-<p align="center">
+<div align="center">
   <img
     src="https://raw.githubusercontent.com/bolorundurowb/OmniAssert/refs/heads/master/assets/omni-assert-logo.svg"
     alt="omni assert logo"  />
-  <h1 align=center>Omni Assert</h1>
-</p>
+  <h1 align="center">Omni Assert</h1>
+</div>
 
 <p align="center">
   <a href="https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml">
-    <img src="https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg" alt="Build, Test & Coverage">
+    <img src="https://github.com/bolorundurowb/OmniAssert/actions/workflows/build-and-test.yml/badge.svg" alt="Build, Test & Coverage" />
   </a>
   <a href="https://codecov.io/gh/bolorundurowb/OmniAssert">
-    <img src="https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA" alt="codecov">
+    <img src="https://codecov.io/gh/bolorundurowb/OmniAssert/graph/badge.svg?token=J9ssbN9xYA" alt="codecov" />
   </a>
   <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/license-GPLv3-orange.svg" alt="License">
+    <img src="https://img.shields.io/badge/license-GPLv3-orange.svg" alt="License" />
   </a>
 </p>
 
@@ -201,10 +201,6 @@ Only **`VerifyExpression(bool, string?)`** call sites are intercepted (not `Veri
 |----------------------------|-----------------------------|
 | Bare identifier (including parenthesised) | `Verify(condition, expression).ToBeTrue()` |
 | Operators, literals, `!flag`, compound logical expressions, … | `VerifyExpression(condition, expression)` |
-
-## Optional: operand capture via source rewrite (advanced)
-
-This path is intended for **advanced setups** that use the generator from source with **`OmniAssertEnableRewrite`** set to **`true`**, list a `.cs` file as an **`AdditionalFiles`** item, and exclude that file from **`Compile`**. The generator then emits a rewritten compilation unit that lowers `VerifyExpression` to `VerifyExpression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in the repository; see **[CONTRIBUTING.md](CONTRIBUTING.md)** and **`src/samples/VerifyInterceptorsSample`**.
 
 ## More examples
 

@@ -63,3 +63,9 @@ When wiring **OmniAssert.Core** and **OmniAssert.Generator** from this repositor
 - `src/samples/VerifyInterceptorsSample/VerifyInterceptorsSample.csproj`
 
 Use a `ProjectReference` to the generator with `OutputItemType="Analyzer"` and `ReferenceOutputAssembly="false"`, plus the same MSBuild properties as in the README’s interceptor section.
+
+## Advanced: operand capture via source rewrite
+
+This path is intended for **advanced setups** that use the generator from source with **`OmniAssertEnableRewrite`** set to **`true`**, list a `.cs` file as an **`AdditionalFiles`** item, and exclude that file from **`Compile`**.
+
+The generator then emits a rewritten compilation unit that lowers `VerifyExpression` to `VerifyExpression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in **`src/samples/VerifyInterceptorsSample`**.
