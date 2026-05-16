@@ -1,5 +1,5 @@
 using System.Numerics;
-using OmniAssert;
+
 namespace OmniAssert.Tests;
 
 public class NumericAssertionTests
