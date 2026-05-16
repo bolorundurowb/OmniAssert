@@ -54,6 +54,10 @@ and less frustrating.
   captures the text of your assertion expressions automatically, so failure messages show you exactly what you tested,
   not just that something failed.
 
+- **Rich value formatting**: When assertions fail, OmniAssert provides clear, highlighted output using ANSI colours.
+  Complex types like collections are automatically formatted to show their contents (up to 10 items) rather than just the
+  type name, making it easier to see exactly what caused the mismatch.
+
 Whether you're writing unit tests, integration tests, or behavior-driven scenarios, OmniAssert helps you express intent
 clearly and diagnose failures quickly.
 
@@ -68,7 +72,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.0.0-beta.1" />
+  <PackageReference Include="OmniAssert" Version="1.1.0" />
 </ItemGroup>
 ```
 
@@ -116,15 +120,15 @@ public void Example()
 |------|---------|--------|
 | **Values** | `Verify(x).ToBe(…)`, comparisons, ranges, `ToBeApproximately`, `ToBeOneOf(...)` | Numeric types use `INumber<T>`; `BigInteger` is included. |
 | **Text** | `Verify(s).ToContain`, `ToMatch`, `ToStartWith`, `ToBe(…, StringComparison)`, `ToBeIgnoringCase`, `ToBeOneOf(...)`, `HasLength` | Also `ToBeEmpty`, `NotToBeEmpty`, `ToBeNull`, `ToBeNullOrWhiteSpace`, etc. |
-| **Collections** | `Verify(list).ToContain`, `HasCount`/`ToHaveCount`, `ToBeUnique`, `HasUniqueCount`, ordering checks, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison; ordering checks use `Comparer<T>.Default`. |
-| **Dictionaries** | `Verify(dict).ContainKey`, `NotContainKey`, `ContainValue`, `HaveValue` | Works with `IReadOnlyDictionary<TKey, TValue>`. |
+| **Collections** | `Verify(list).ToBe(…)`, `ToContain`, `HasCount`/`ToHaveCount`, `ToBeUnique`, `HasUniqueCount`, ordering checks, `AllSatisfy`, `ToBeEquivalentTo` | Equivalence is an unordered multiset comparison; `ToBe` checks reference equality. |
+| **Dictionaries** | `Verify(dict).ToBe(…)`, `ContainKey`, `NotContainKey`, `ContainValue`, `HaveValue` | `ToBe` checks reference equality; works with `IReadOnlyDictionary<TKey, TValue>`. |
 | **Enums** | `Verify(e).ToBe(…)`, `NotToBe(…)`, `ToBeOneOf(...)` | |
-| **GUIDs** | `Verify(guid).ToBeEmpty`, `NotToBeEmpty`, `ToBeOneOf(...)` | |
-| **URIs** | `Verify(uri).HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery` | Query matching ignores a leading `?`. |
+| **GUIDs** | `Verify(guid).ToBe(…)`, `ToBeEmpty`, `NotToBeEmpty`, `ToBeOneOf(...)` | |
+| **URIs** | `Verify(uri).ToBe(…)`, `HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery` | Query matching ignores a leading `?`. |
 | **Nullables** | `VerifyNullable(x).ToBeNull()` / `NotToBeNull()` | Separate overloads for class vs struct nullables. |
-| **Objects** | `Verify(o).ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
+| **Objects** | `Verify(o).ToBe(…)`, `ToBeOfType<T>()`, `ToBeAssignableTo<T>()`, `ToBeEquivalentTo(…)` | Deep equivalence walks public properties and sequences and reports a structured diff. |
 | **Dates & Time** | `Verify(dt).ToBeAfter` / `ToBeBefore` / `ToBeWithin`, `Verify(dateOnly)...`, `Verify(timeOnly)...`, `Verify(timeSpan)...` | `DateTime` and `DateTimeOffset` support ranges; `TimeSpan` supports sign, comparison, and `ToBeOneOf(...)`. |
-| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithMessageContaining`, `.WithInnerException<TInner>()` on the returned assertion object. |
+| **Exceptions** | `Throws<T>(() => …)`, `NotThrow`, `ThrowsAsync`, `NotThrowAsync`, `CompleteWithin` | Chain `.WithMessage`, `.WithMessageIgnoringCase`, `.WithMessageContaining`, `.WithInnerException<TInner>()`. |
 | **File system** | `FileExists(path).HaveContent` / `BeEmpty`, `DirectoryExists(path).BeEmpty` | `FileExists`/`DirectoryExists` first verify existence, then return fluent assertions. |
 | **Soft asserts** | `using (new AssertionScope()) { … }` | Failures inside the scope are collected and thrown as one aggregate at scope end. |
 
@@ -135,6 +139,10 @@ public void Example()
 ```csharp
 Throws<InvalidOperationException>(() => service.Execute())
     .WithMessage("Operation is not valid*");
+
+// Or ignoring case
+Throws<UnauthorizedAccessException>(() => loginService.Login())
+    .WithMessageIgnoringCase("access denied");
 ```
 
 ### Assert multiple outcomes in one test run
@@ -215,15 +223,18 @@ Verify(email).ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
 Verify(email).HasLengthGreaterThan(5);
 Verify(role).ToBeIgnoringCase("admin");
 
+Verify(users).ToBe(expectedUsers); // Reference equality
 Verify(users).ToContain(currentUser);
 Verify(results).HasCount(3);
 Verify(results).ToHaveCount(3);
 Verify(results).ToBeUnique();
 Verify(results).ToBeInAscendingOrder();
 
+Verify(headers).ToBe(expectedHeaders); // Reference equality
 Verify(headers).ContainKey("Authorization");
 Verify(requestUri).HaveScheme("https");
 Verify(correlationId).NotToBeEmpty();
+Verify(correlationId).ToBe(expectedId);
 
 VerifyNullable(someObject).NotToBeNull();
 Verify(MyEnum.On).ToBe(MyEnum.On);

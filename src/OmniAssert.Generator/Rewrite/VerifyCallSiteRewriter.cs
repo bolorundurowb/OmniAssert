@@ -67,6 +67,6 @@ internal sealed class VerifyCallSiteRewriter(SemanticModel model, CancellationTo
     private static bool IsLineDirectiveStatement(StatementSyntax s)
     {
         var text = s.ToFullString().Trim();
-        return text is "#line hidden" or "#line default" or "#line hidden;" or "#line default;";
+        return text is "#line hidden" or "#line default";
     }
 }

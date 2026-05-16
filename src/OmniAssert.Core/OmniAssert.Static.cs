@@ -44,15 +44,7 @@ public static partial class Assert
         if (condition)
             return;
 
-        var ex = OmniAssertionException.ForBooleanFailure(in capture);
-        var ctx = AssertionScope.Current;
-        if (ctx is not null)
-        {
-            ctx.Failures.Add(ex);
-            return;
-        }
-
-        throw ex;
+        VerificationFlow.Fail(OmniAssertionException.ForBooleanFailure(in capture));
     }
 
     /// <summary>Begins verifying a double subject.</summary>
@@ -165,8 +157,26 @@ public static partial class Assert
     /// <param name="actual">The collection to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="CollectionAssertions{T}"/> object to continue the verification.</returns>
-    public static CollectionAssertions<T> Verify<T>(IEnumerable<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
-        new(actual, expression ?? "actual");
+    public static CollectionAssertions<T> Verify<T>(IEnumerable<T>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual!, expression ?? "actual");
+
+    /// <summary>Begins verifying a dictionary subject.</summary>
+    /// <typeparam name="TKey">The dictionary key type.</typeparam>
+    /// <typeparam name="TValue">The dictionary value type.</typeparam>
+    /// <param name="actual">The dictionary to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
+    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(Dictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        Verify((IReadOnlyDictionary<TKey, TValue>?)actual, expression);
+
+    /// <summary>Begins verifying a dictionary subject.</summary>
+    /// <typeparam name="TKey">The dictionary key type.</typeparam>
+    /// <typeparam name="TValue">The dictionary value type.</typeparam>
+    /// <param name="actual">The dictionary to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
+    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(IDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual is null ? null : new ReadOnlyDictionaryWrapper<TKey, TValue>(actual), expression ?? "actual");
 
     /// <summary>Begins verifying a read-only dictionary subject.</summary>
     /// <typeparam name="TKey">The dictionary key type.</typeparam>
@@ -174,8 +184,8 @@ public static partial class Assert
     /// <param name="actual">The dictionary to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
-    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
-        new(actual, expression ?? "actual");
+    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(IReadOnlyDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual!, expression ?? "actual");
 
     /// <summary>Verifies that a file exists at <paramref name="path"/> and returns file assertions.</summary>
     /// <param name="path">The file path to verify.</param>
@@ -371,5 +381,17 @@ public static partial class Assert
     /// <returns>An <see cref="ObjectAssertions"/> object to continue the verification.</returns>
     public static ObjectAssertions Verify(object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
+
+    private sealed class ReadOnlyDictionaryWrapper<TKey, TValue>(IDictionary<TKey, TValue> inner) : IReadOnlyDictionary<TKey, TValue>
+    {
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => inner.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => inner.GetEnumerator();
+        public int Count => inner.Count;
+        public bool ContainsKey(TKey key) => inner.ContainsKey(key);
+        public bool TryGetValue(TKey key, out TValue value) => inner.TryGetValue(key, out value!);
+        public TValue this[TKey key] => inner[key];
+        public IEnumerable<TKey> Keys => inner.Keys;
+        public IEnumerable<TValue> Values => inner.Values;
+    }
 }
 

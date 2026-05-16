@@ -14,15 +14,21 @@ public readonly struct TimeSpanAssertions
         _expression = expression;
     }
 
+    public void ToBe(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual == expected)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("to be", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
     /// <summary>Verifies that the timespan is strictly positive.</summary>
     public void ToBePositive()
     {
         if (_actual > TimeSpan.Zero)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be positive, but was {FormatValue(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatSingle("to be positive", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the timespan is strictly negative.</summary>
@@ -31,9 +37,7 @@ public readonly struct TimeSpanAssertions
         if (_actual < TimeSpan.Zero)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be negative, but was {FormatValue(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatSingle("to be negative", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the timespan is greater than <paramref name="expected"/>.</summary>
@@ -44,9 +48,7 @@ public readonly struct TimeSpanAssertions
         if (_actual > expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be greater than {expectedExpression ?? "expected"} ({FormatValue(expected)}), but was {FormatValue(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be greater than", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the timespan is less than <paramref name="expected"/>.</summary>
@@ -57,9 +59,7 @@ public readonly struct TimeSpanAssertions
         if (_actual < expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be less than {expectedExpression ?? "expected"} ({FormatValue(expected)}), but was {FormatValue(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be less than", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the timespan matches one of the provided expected values.</summary>
@@ -84,4 +84,26 @@ public readonly struct TimeSpanAssertions
     }
 
     private static string FormatValue(TimeSpan value) => value.ToString("c", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string FormatFailure(string relation, TimeSpan expected, string expectedLabel, TimeSpan actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
+        sb.AppendLine(AnsiColour.Expected(FormatValue(expected)));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(FormatValue(actual)));
+        return sb.ToString();
+    }
+
+    private static string FormatSingle(string expectedDesc, TimeSpan actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {expectedDesc}."));
+        sb.AppendLine();
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(FormatValue(actual)));
+        return sb.ToString();
+    }
 }

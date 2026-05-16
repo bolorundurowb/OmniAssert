@@ -14,6 +14,19 @@ public readonly struct GuidAssertions
         _expression = expression;
     }
 
+    /// <summary>Verifies that the GUID is equal to <paramref name="expected"/>.</summary>
+    /// <param name="expected">The expected GUID.</param>
+    /// <param name="expectedExpression">The expression for the expected GUID (automatically captured).</param>
+    public void ToBe(Guid expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual == expected)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({FormatGuid(expected)}), but was {FormatGuid(_actual)}.",
+            _expression);
+    }
+
     /// <summary>Verifies that the GUID is <see cref="Guid.Empty"/>.</summary>
     public void ToBeEmpty()
     {

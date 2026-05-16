@@ -9,10 +9,23 @@ public readonly struct CollectionAssertions<T>
     private readonly IEnumerable<T> _actual;
     private readonly string _expression;
 
-    internal CollectionAssertions(IEnumerable<T> actual, string expression)
+    internal CollectionAssertions(IEnumerable<T>? actual, string expression)
     {
-        _actual = actual;
+        _actual = actual!;
         _expression = expression;
+    }
+
+    /// <summary>Verifies that the collection is the same instance as <paramref name="expected"/>.</summary>
+    /// <param name="expected">The expected collection instance.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void ToBe(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (ReferenceEquals(_actual, expected))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} (reference equality), but they were different instances.",
+            _expression);
     }
 
     /// <summary>Verifies that the collection contains the specified <paramref name="item"/>.</summary>
@@ -20,6 +33,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
     public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
+        EnsureActualNotNull();
         if (_actual is ICollection<T> list && list.Contains(item))
             return;
 
@@ -37,6 +51,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection is empty.</summary>
     public void ToBeEmpty()
     {
+        EnsureActualNotNull();
         if (_actual is ICollection<T> c && c.Count == 0)
             return;
 
@@ -52,6 +67,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection is not empty.</summary>
     public void NotToBeEmpty()
     {
+        EnsureActualNotNull();
         if (_actual is ICollection<T> c && c.Count > 0)
             return;
 
@@ -69,6 +85,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
     public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
+        EnsureActualNotNull();
         var found = false;
         if (_actual is ICollection<T> list)
         {
@@ -99,6 +116,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     public void HasCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
     {
+        EnsureActualNotNull();
         var actualCount = 0;
         if (_actual is ICollection<T> c)
         {
@@ -128,6 +146,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
     public void HasCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
     {
+        EnsureActualNotNull();
         var actualCount = GetActualCount();
         if (actualCount > minimumCount)
             return;
@@ -142,6 +161,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
     public void HasCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
     {
+        EnsureActualNotNull();
         var actualCount = GetActualCount();
         if (actualCount < maximumCount)
             return;
@@ -154,6 +174,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that all elements in the collection are unique.</summary>
     public void ToBeUnique()
     {
+        EnsureActualNotNull();
         var seen = new HashSet<T>();
         var index = 0;
         foreach (var item in _actual)
@@ -174,6 +195,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
     public void HasUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
     {
+        EnsureActualNotNull();
         var uniqueCount = new HashSet<T>(_actual).Count;
         if (uniqueCount == expectedUniqueCount)
             return;
@@ -186,12 +208,14 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection is in ascending order (non-decreasing) using <see cref="Comparer{T}.Default"/>.</summary>
     public void ToBeInAscendingOrder()
     {
+        EnsureActualNotNull();
         VerifyOrdering(ascending: true);
     }
 
     /// <summary>Verifies that the collection is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
     public void ToBeInDescendingOrder()
     {
+        EnsureActualNotNull();
         VerifyOrdering(ascending: false);
     }
 
@@ -200,6 +224,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
     public void AllSatisfy(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
+        EnsureActualNotNull();
         var index = 0;
         foreach (var item in _actual)
         {
@@ -221,6 +246,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
     public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
+        EnsureActualNotNull();
         var actualList = _actual.ToList();
         var expectedList = expected.ToList();
 
@@ -342,4 +368,14 @@ public readonly struct CollectionAssertions<T>
     }
 
     private static string FormatItem(T item) => OmniAssertionException.FormatValueForMessage(item!);
+
+    private void EnsureActualNotNull()
+    {
+        if (_actual is not null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be null, but it was.",
+            _expression);
+    }
 }

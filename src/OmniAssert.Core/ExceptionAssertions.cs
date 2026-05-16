@@ -29,6 +29,19 @@ public readonly struct ExceptionAssertions<T> where T : Exception
         return this;
     }
 
+    /// <summary>Verifies that <see cref="Exception.Message"/> is equal to <paramref name="expectedMessage"/> using ordinal case-insensitive comparison.</summary>
+    /// <param name="expectedMessage">The expected exception message.</param>
+    /// <param name="expectedMessageExpression">The expression for the expected message (automatically captured).</param>
+    /// <returns><c>this</c> when the message matches ignoring case.</returns>
+    public ExceptionAssertions<T> WithMessageIgnoringCase(string expectedMessage, [CallerArgumentExpression(nameof(expectedMessage))] string? expectedMessageExpression = null)
+    {
+        if (string.Equals(Exception.Message, expectedMessage, StringComparison.OrdinalIgnoreCase))
+            return this;
+
+        VerificationFlow.Fail($"Verification failed: expected exception message to be {expectedMessageExpression ?? "message"} (\"{expectedMessage}\") ignoring case, but was \"{Exception.Message}\".", _expression);
+        return this;
+    }
+
     /// <summary>Verifies that <see cref="Exception.Message"/> contains <paramref name="expectedSubstring"/>.</summary>
     /// <param name="expectedSubstring">The substring that must appear in the exception message.</param>
     /// <param name="expectedSubstringExpression">The expression for the expected substring (automatically captured).</param>

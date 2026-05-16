@@ -115,7 +115,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                 resultExpr = PrefixUnaryExpression(
                     SyntaxKind.LogicalNotExpression,
                     Token(SyntaxKind.ExclamationToken),
-                    ParenthesizedExpression(inner));
+                    ParenthesizeIfNecessary(inner));
                 return true;
             case BinaryExpressionSyntax b:
                 return TryExpandBinary(b, cancellationToken, dictVar, statements, out resultExpr);
@@ -209,7 +209,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         var negLeft = PrefixUnaryExpression(
             SyntaxKind.LogicalNotExpression,
             Token(SyntaxKind.ExclamationToken),
-            ParenthesizedExpression(left));
+            ParenthesizeIfNecessary(left));
         var inner = Block(rightStmts.Concat([assignRight]).ToArray());
         statements.Add(IfStatement(negLeft, inner));
 
@@ -274,6 +274,13 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
                             SingletonSeparatedList(
                                 Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key)))))),
                 CastExpression(ParseTypeName("object?"), valueExpr)));
+
+    private static ExpressionSyntax ParenthesizeIfNecessary(ExpressionSyntax expr)
+    {
+        if (expr is IdentifierNameSyntax or LiteralExpressionSyntax or MemberAccessExpressionSyntax or InvocationExpressionSyntax or ElementAccessExpressionSyntax)
+            return expr;
+        return ParenthesizedExpression(expr);
+    }
 
     private SyntaxToken NewTempName() => Identifier($"__oa_t_{_tempId++}");
 

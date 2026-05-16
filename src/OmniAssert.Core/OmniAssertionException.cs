@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Text;
 
 namespace OmniAssert;
@@ -26,9 +27,32 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
         null => "null",
         string s => StringFormatter.Quote(s),
         char c => "'" + StringFormatter.EscapeChar(c) + "'",
+        IEnumerable en => FormatCollection(en),
         IFormattable f => f.ToString(null, System.Globalization.CultureInfo.InvariantCulture),
         _ => value.ToString() ?? "null"
     };
+
+    private static string FormatCollection(IEnumerable en)
+    {
+        var sb = new StringBuilder();
+        sb.Append('[');
+        var first = true;
+        var count = 0;
+        foreach (var item in en)
+        {
+            if (count >= 10)
+            {
+                sb.Append(", ...");
+                break;
+            }
+            if (!first) sb.Append(", ");
+            sb.Append(FormatValueForMessage(item));
+            first = false;
+            count++;
+        }
+        sb.Append(']');
+        return sb.ToString();
+    }
 
     /// <summary>Builds an exception for a failed <see cref="Assert.VerifyExpression"/> path.</summary>
     internal static OmniAssertionException ForBooleanFailure(in AssertionCapture capture)

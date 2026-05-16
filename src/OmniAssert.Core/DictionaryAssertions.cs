@@ -10,10 +10,23 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     private readonly IReadOnlyDictionary<TKey, TValue> _actual;
     private readonly string _expression;
 
-    internal DictionaryAssertions(IReadOnlyDictionary<TKey, TValue> actual, string expression)
+    internal DictionaryAssertions(IReadOnlyDictionary<TKey, TValue>? actual, string expression)
     {
-        _actual = actual;
+        _actual = actual!;
         _expression = expression;
+    }
+
+    /// <summary>Verifies that the dictionary is the same instance as <paramref name="expected"/>.</summary>
+    /// <param name="expected">The expected dictionary instance.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void ToBe(IReadOnlyDictionary<TKey, TValue>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (ReferenceEquals(_actual, expected))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} (reference equality), but they were different instances.",
+            _expression);
     }
 
     /// <summary>Verifies that the dictionary contains <paramref name="key"/>.</summary>
@@ -21,6 +34,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     /// <param name="keyExpression">The expression for the key (automatically captured).</param>
     public void ContainKey(TKey key, [CallerArgumentExpression(nameof(key))] string? keyExpression = null)
     {
+        EnsureActualNotNull();
         if (_actual.ContainsKey(key))
             return;
 
@@ -34,6 +48,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     /// <param name="keyExpression">The expression for the key (automatically captured).</param>
     public void NotContainKey(TKey key, [CallerArgumentExpression(nameof(key))] string? keyExpression = null)
     {
+        EnsureActualNotNull();
         if (!_actual.ContainsKey(key))
             return;
 
@@ -47,6 +62,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     /// <param name="valueExpression">The expression for the value (automatically captured).</param>
     public void ContainValue(TValue value, [CallerArgumentExpression(nameof(value))] string? valueExpression = null)
     {
+        EnsureActualNotNull();
         foreach (var item in _actual.Values)
         {
             if (EqualityComparer<TValue>.Default.Equals(item, value))
@@ -69,6 +85,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
         [CallerArgumentExpression(nameof(key))] string? keyExpression = null,
         [CallerArgumentExpression(nameof(value))] string? valueExpression = null)
     {
+        EnsureActualNotNull();
         if (!_actual.TryGetValue(key, out var actualValue))
         {
             VerificationFlow.Fail(
@@ -86,4 +103,14 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     }
 
     private static string FormatItem<T>(T item) => OmniAssertionException.FormatValueForMessage(item!);
+
+    private void EnsureActualNotNull()
+    {
+        if (_actual is not null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be null, but it was.",
+            _expression);
+    }
 }

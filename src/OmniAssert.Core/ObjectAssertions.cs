@@ -14,6 +14,19 @@ public readonly struct ObjectAssertions
         _expression = expression;
     }
 
+    /// <summary>Verifies that the object is equal to the <paramref name="expected"/> object using <see cref="object.Equals(object?, object?)"/>.</summary>
+    /// <param name="expected">The expected object.</param>
+    /// <param name="expectedExpression">The expression for the expected object (automatically captured).</param>
+    public void ToBe(object? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (Equals(_actual, expected))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({OmniAssertionException.FormatValueForMessage(expected)}), but was {OmniAssertionException.FormatValueForMessage(_actual)}.",
+            _expression);
+    }
+
     /// <summary>Asserts the runtime type is exactly <typeparamref name="T"/> (not a derived type).</summary>
     public void ToBeOfType<T>()
     {

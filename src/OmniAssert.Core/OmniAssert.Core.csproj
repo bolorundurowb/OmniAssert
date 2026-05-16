@@ -14,7 +14,13 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- Expanded assertion surface (Guid, Uri, DateOnly/TimeOnly/TimeSpan, dictionary, and file system helpers); improved collection, string, enum, numeric, and exception assertions.</PackageReleaseNotes>
+    <PackageReleaseNotes>- Added ToBe(expected) for identity/reference equality checks to Collection, Dictionary, Guid, Uri, and Object assertions.
+    - Enhanced null safety in CollectionAssertions and DictionaryAssertions to provide descriptive failures instead of NullReferenceException.
+    - Added WithMessageIgnoringCase to ExceptionAssertions for flexible message verification.
+    - Improved failure diagnostics with recursive collection content formatting (up to 10 items) in OmniAssertionException.
+    - Standardized ANSI color highlighting across all numeric, date, and time assertions for consistent terminal output.
+    - Unified VerifyExpression failure path with fluent assertions via VerificationFlow.Fail.
+    - Optimized source generator by removing unreachable code and reducing redundant parentheses in rewritten expressions.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>

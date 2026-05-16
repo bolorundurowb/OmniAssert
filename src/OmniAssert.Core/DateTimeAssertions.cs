@@ -22,7 +22,7 @@ public readonly struct DateTimeAssertions
         if (_actual > expected)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be after {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure("to be after", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date/time is before the <paramref name="expected"/> date/time.</summary>
@@ -33,7 +33,7 @@ public readonly struct DateTimeAssertions
         if (_actual < expected)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be before {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure("to be before", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date/time is within the specified <paramref name="precision"/> of the <paramref name="expected"/> date/time.</summary>
@@ -45,7 +45,18 @@ public readonly struct DateTimeAssertions
         if (Math.Abs((_actual - expected).Ticks) <= precision.Ticks)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be within {precision} of {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure($"to be within {precision} of", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
+    private static string FormatFailure(string relation, DateTime expected, string expectedLabel, DateTime actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
+        sb.AppendLine(AnsiColour.Expected(expected.ToString("O")));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(actual.ToString("O")));
+        return sb.ToString();
     }
 }
 
@@ -69,7 +80,7 @@ public readonly struct DateTimeOffsetAssertions
         if (_actual > expected)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be after {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure("to be after", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date/time offset is before the <paramref name="expected"/> date/time offset.</summary>
@@ -80,7 +91,7 @@ public readonly struct DateTimeOffsetAssertions
         if (_actual < expected)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be before {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure("to be before", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date/time offset is within the specified <paramref name="precision"/> of the <paramref name="expected"/> date/time offset.</summary>
@@ -92,6 +103,17 @@ public readonly struct DateTimeOffsetAssertions
         if (Math.Abs((_actual - expected).Ticks) <= precision.Ticks)
             return;
 
-        VerificationFlow.Fail($"Verification failed: expected {_expression} to be within {precision} of {expectedExpression ?? "expected"} ({expected:O}), but was {_actual:O}.", _expression);
+        VerificationFlow.Fail(FormatFailure($"to be within {precision} of", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
+    private static string FormatFailure(string relation, DateTimeOffset expected, string expectedLabel, DateTimeOffset actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
+        sb.AppendLine(AnsiColour.Expected(expected.ToString("O")));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(actual.ToString("O")));
+        return sb.ToString();
     }
 }

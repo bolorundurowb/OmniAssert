@@ -14,6 +14,19 @@ public readonly struct UriAssertions
         _expression = expression;
     }
 
+    /// <summary>Verifies that the URI is equal to the <paramref name="expected"/> URI.</summary>
+    /// <param name="expected">The expected URI.</param>
+    /// <param name="expectedExpression">The expression for the expected URI (automatically captured).</param>
+    public void ToBe(Uri? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (Equals(_actual, expected))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({StringFormatter.Quote(expected?.ToString())}), but was {StringFormatter.Quote(_actual?.ToString())}.",
+            _expression);
+    }
+
     /// <summary>Verifies that the URI scheme matches <paramref name="expectedScheme"/>.</summary>
     /// <param name="expectedScheme">The expected URI scheme, such as "https".</param>
     /// <param name="schemeExpression">The expression for the expected scheme (automatically captured).</param>

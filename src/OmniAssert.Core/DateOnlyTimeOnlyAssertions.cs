@@ -22,9 +22,7 @@ public readonly struct DateOnlyAssertions
         if (_actual == expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({FormatDate(expected)}), but was {FormatDate(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date is before <paramref name="expected"/>.</summary>
@@ -35,9 +33,7 @@ public readonly struct DateOnlyAssertions
         if (_actual < expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be before {expectedExpression ?? "expected"} ({FormatDate(expected)}), but was {FormatDate(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be before", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date is after <paramref name="expected"/>.</summary>
@@ -48,9 +44,7 @@ public readonly struct DateOnlyAssertions
         if (_actual > expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be after {expectedExpression ?? "expected"} ({FormatDate(expected)}), but was {FormatDate(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be after", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the date year matches <paramref name="expectedYear"/>.</summary>
@@ -93,6 +87,17 @@ public readonly struct DateOnlyAssertions
     }
 
     private static string FormatDate(DateOnly value) => value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string FormatFailure(string relation, DateOnly expected, string expectedLabel, DateOnly actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
+        sb.AppendLine(AnsiColour.Expected(FormatDate(expected)));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(FormatDate(actual)));
+        return sb.ToString();
+    }
 }
 
 /// <summary>Assertions for <see cref="TimeOnly"/> subjects from <see cref="Assert.Verify(TimeOnly, string?)"/>.</summary>
@@ -115,9 +120,7 @@ public readonly struct TimeOnlyAssertions
         if (_actual == expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({FormatTime(expected)}), but was {FormatTime(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the time is before <paramref name="expected"/>.</summary>
@@ -128,9 +131,7 @@ public readonly struct TimeOnlyAssertions
         if (_actual < expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be before {expectedExpression ?? "expected"} ({FormatTime(expected)}), but was {FormatTime(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be before", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     /// <summary>Verifies that the time is after <paramref name="expected"/>.</summary>
@@ -141,10 +142,19 @@ public readonly struct TimeOnlyAssertions
         if (_actual > expected)
             return;
 
-        VerificationFlow.Fail(
-            $"Verification failed: expected {_expression} to be after {expectedExpression ?? "expected"} ({FormatTime(expected)}), but was {FormatTime(_actual)}.",
-            _expression);
+        VerificationFlow.Fail(FormatFailure("to be after", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
     private static string FormatTime(TimeOnly value) => value.ToString("HH:mm:ss.fffffff", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string FormatFailure(string relation, TimeOnly expected, string expectedLabel, TimeOnly actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
+        sb.AppendLine(AnsiColour.Expected(FormatTime(expected)));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(FormatTime(actual)));
+        return sb.ToString();
+    }
 }
