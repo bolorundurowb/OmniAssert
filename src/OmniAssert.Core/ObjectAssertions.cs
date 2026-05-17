@@ -47,6 +47,43 @@ public readonly struct ObjectAssertions
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be assignable to {typeof(T).Name}, but was {actualType}.", _expression);
     }
 
+    /// <summary>Asserts the runtime type is not exactly <typeparamref name="T"/>.</summary>
+    public void NotToBeOfType<T>()
+    {
+        if (_actual is not T || _actual.GetType() != typeof(T))
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} not to be of type {typeof(T).Name}, but it was.", _expression);
+    }
+
+    /// <summary>Asserts the subject is not assignable to <typeparamref name="T"/>.</summary>
+    public void NotToBeAssignableTo<T>()
+    {
+        if (_actual is not T)
+            return;
+
+        var actualType = _actual.GetType().Name;
+        VerificationFlow.Fail($"Verification failed: expected {_expression} not to be assignable to {typeof(T).Name}, but was {actualType}.", _expression);
+    }
+
+    /// <summary>Asserts the object is <c>null</c>; fails when it has a value.</summary>
+    public void ToBeNull()
+    {
+        if (_actual is null)
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} to be null, but was {OmniAssertionException.FormatValueForMessage(_actual)}.", _expression);
+    }
+
+    /// <summary>Asserts the object is not <c>null</c>; fails when it is null.</summary>
+    public void NotToBeNull()
+    {
+        if (_actual is not null)
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} not to be null.", _expression);
+    }
+
     /// <summary>
     /// Deep structural comparison: walks public instance properties and sequences, then reports a coloured diff on mismatch.
     /// </summary>

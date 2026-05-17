@@ -166,7 +166,8 @@ actualDto.Verify().ToBeEquivalentTo(expectedDto);
 
 - `ToBe(expected)` (Reference equality)
 - `ToBeNull()` / `NotToBeNull()`
-- `ToBeOfType<T>()` / `ToBeAssignableTo<T>()`
+- `ToBeOfType<T>()` / `NotToBeOfType<T>()`
+- `ToBeAssignableTo<T>()` / `NotToBeAssignableTo<T>()`
 - `ToBeEquivalentTo(expected)` (Recursive property comparison with diff)
 
 ### Exceptions & Tasks

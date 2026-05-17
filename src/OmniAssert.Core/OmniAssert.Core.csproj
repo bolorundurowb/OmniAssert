@@ -14,7 +14,12 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>- Added ToBe(expected) for identity/reference equality checks to Collection, Dictionary, Guid, Uri, and Object assertions.
+    <PackageReleaseNotes>v1.1.0
+    - Added ToBeNull() and NotToBeNull() assertions to ObjectAssertions.
+    - Added NotToBeOfType&lt;T&gt;() and NotToBeAssignableTo&lt;T&gt;() assertions to ObjectAssertions.
+
+    v1.0.1
+    - Added ToBe(expected) for identity/reference equality checks to Collection, Dictionary, Guid, Uri, and Object assertions.
     - Enhanced null safety in CollectionAssertions and DictionaryAssertions to provide descriptive failures instead of NullReferenceException.
     - Added WithMessageIgnoringCase to ExceptionAssertions for flexible message verification.
     - Improved failure diagnostics with recursive collection content formatting (up to 10 items) in OmniAssertionException.

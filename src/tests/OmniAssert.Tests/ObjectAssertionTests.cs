@@ -6,6 +6,55 @@ public class ObjectAssertionTests
     private class Dog : Animal { }
 
     [Fact]
+    public void ToBeNull_WhenObjectIsNull_ShouldSucceed()
+    {
+        ((object?)null).Verify().ToBeNull();
+    }
+
+    [Fact]
+    public void ToBeNull_WhenObjectIsNotNull_ShouldThrow()
+    {
+        object obj = "hello";
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().ToBeNull());
+    }
+
+    [Fact]
+    public void ToBeNull_WithinScope_WhenObjectIsNotNull_ShouldCollectRatherThanThrow()
+    {
+        object obj = "hello";
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+        {
+            using var scope = new AssertionScope();
+            obj.Verify().ToBeNull();
+        });
+        Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public void NotToBeNull_WhenObjectIsNotNull_ShouldSucceed()
+    {
+        object obj = "hello";
+        obj.Verify().NotToBeNull();
+    }
+
+    [Fact]
+    public void NotToBeNull_WhenObjectIsNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Verify().NotToBeNull());
+    }
+
+    [Fact]
+    public void NotToBeNull_WithinScope_WhenObjectIsNull_ShouldCollectRatherThanThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+        {
+            using var scope = new AssertionScope();
+            ((object?)null).Verify().NotToBeNull();
+        });
+        Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
     public void ToBeOfType_WhenExactTypeMatches_ShouldSucceed()
     {
         object obj = "hello";
@@ -74,6 +123,72 @@ public class ObjectAssertionTests
         {
             using var scope = new AssertionScope();
             (obj).Verify().ToBeAssignableTo<string>();
+        });
+        Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public void NotToBeOfType_WhenTypeDiffers_ShouldSucceed()
+    {
+        object obj = 42;
+        obj.Verify().NotToBeOfType<string>();
+    }
+
+    [Fact]
+    public void NotToBeOfType_WhenExactTypeMatches_ShouldThrow()
+    {
+        object obj = "hello";
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeOfType<string>());
+    }
+
+    [Fact]
+    public void NotToBeOfType_WhenSubtypeProvided_ShouldSucceed()
+    {
+        object obj = new Dog();
+        obj.Verify().NotToBeOfType<Animal>();
+    }
+
+    [Fact]
+    public void NotToBeOfType_WithinScope_WhenExactTypeMatches_ShouldCollectRatherThanThrow()
+    {
+        object obj = "hello";
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+        {
+            using var scope = new AssertionScope();
+            obj.Verify().NotToBeOfType<string>();
+        });
+        Xunit.Assert.NotNull(ex);
+    }
+
+    [Fact]
+    public void NotToBeAssignableTo_WhenNotAssignable_ShouldSucceed()
+    {
+        object obj = 42;
+        obj.Verify().NotToBeAssignableTo<string>();
+    }
+
+    [Fact]
+    public void NotToBeAssignableTo_WhenExactTypeMatches_ShouldThrow()
+    {
+        object obj = "hello";
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeAssignableTo<string>());
+    }
+
+    [Fact]
+    public void NotToBeAssignableTo_WhenSubtypeMatches_ShouldThrow()
+    {
+        object obj = new Dog();
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeAssignableTo<Animal>());
+    }
+
+    [Fact]
+    public void NotToBeAssignableTo_WithinScope_WhenAssignable_ShouldCollectRatherThanThrow()
+    {
+        object obj = "hello";
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+        {
+            using var scope = new AssertionScope();
+            obj.Verify().NotToBeAssignableTo<string>();
         });
         Xunit.Assert.NotNull(ex);
     }
