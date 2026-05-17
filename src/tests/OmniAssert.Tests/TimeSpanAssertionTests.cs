@@ -39,6 +39,19 @@ public class TimeSpanAssertionTests
     }
 
     [Fact]
+    public void NotToBe_WhenDifferent_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(1)).Verify().NotToBe(TimeSpan.FromSeconds(2));
+    }
+
+    [Fact]
+    public void NotToBe_WhenEqual_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (TimeSpan.FromSeconds(1)).Verify().NotToBe(TimeSpan.FromSeconds(1)));
+    }
+
+    [Fact]
     public void ToBeGreaterThan_WhenGreater_ShouldSucceed()
     {
         (TimeSpan.FromSeconds(2)).Verify().ToBeGreaterThan(TimeSpan.FromSeconds(1));
@@ -89,6 +102,76 @@ public class TimeSpanAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             (TimeSpan.FromSeconds(3)).Verify().ToBeOneOf(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2)));
+    }
+
+    [Fact]
+    public void ToBeGreaterThanOrEqualTo_WhenGreater_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(2)).Verify().ToBeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void ToBeGreaterThanOrEqualTo_WhenEqual_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(1)).Verify().ToBeGreaterThanOrEqualTo(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void ToBeGreaterThanOrEqualTo_WhenLess_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (TimeSpan.FromSeconds(1)).Verify().ToBeGreaterThanOrEqualTo(TimeSpan.FromSeconds(2)));
+    }
+
+    [Fact]
+    public void ToBeLessThanOrEqualTo_WhenLess_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(1)).Verify().ToBeLessThanOrEqualTo(TimeSpan.FromSeconds(2));
+    }
+
+    [Fact]
+    public void ToBeLessThanOrEqualTo_WhenEqual_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(1)).Verify().ToBeLessThanOrEqualTo(TimeSpan.FromSeconds(1));
+    }
+
+    [Fact]
+    public void ToBeLessThanOrEqualTo_WhenGreater_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (TimeSpan.FromSeconds(2)).Verify().ToBeLessThanOrEqualTo(TimeSpan.FromSeconds(1)));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenInsideRange_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(3)).Verify().ToBeInRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenAtLowerBound_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(1)).Verify().ToBeInRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenAtUpperBound_ShouldSucceed()
+    {
+        (TimeSpan.FromSeconds(5)).Verify().ToBeInRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenBelowRange_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (TimeSpan.FromMilliseconds(500)).Verify().ToBeInRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenAboveRange_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (TimeSpan.FromSeconds(6)).Verify().ToBeInRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)));
     }
 
     [Fact]

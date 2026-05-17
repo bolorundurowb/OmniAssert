@@ -48,6 +48,23 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection contains at least one element satisfying <paramref name="predicate"/>.</summary>
+    /// <param name="predicate">The condition that at least one item must meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void ToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        foreach (var item in _actual)
+        {
+            if (predicate(item))
+                return;
+        }
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to contain an element matching {predicateExpression ?? "predicate"}, but no such element was found.",
+            _expression);
+    }
+
     /// <summary>Verifies that the collection is empty.</summary>
     public void ToBeEmpty()
     {
@@ -109,6 +126,26 @@ public readonly struct CollectionAssertions<T>
         VerificationFlow.Fail(
             $"Verification failed: expected {_expression} not to contain {itemExpression ?? "item"} ({FormatItem(item)}), but it did.",
             _expression);
+    }
+
+    /// <summary>Verifies that the collection contains no elements satisfying <paramref name="predicate"/>.</summary>
+    /// <param name="predicate">The condition that no item should meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void NotToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        var index = 0;
+        foreach (var item in _actual)
+        {
+            if (predicate(item))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to contain no element matching {predicateExpression ?? "predicate"}, but element at index {index} ({FormatItem(item)}) matched.",
+                    _expression);
+                return;
+            }
+            index++;
+        }
     }
 
     /// <summary>Verifies that the collection has the expected number of items.</summary>
@@ -212,11 +249,33 @@ public readonly struct CollectionAssertions<T>
         VerifyOrdering(ascending: true);
     }
 
+    /// <summary>Verifies that the collection is in ascending order (non-decreasing) by the key returned by <paramref name="keySelector"/>.</summary>
+    /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
+    /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
+    /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
+    public void ToBeInAscendingOrder<TKey>(Func<T, TKey> keySelector,
+        [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null)
+    {
+        EnsureActualNotNull();
+        VerifyOrderingByKey(keySelector, ascending: true, keySelectorExpression ?? "keySelector");
+    }
+
     /// <summary>Verifies that the collection is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
     public void ToBeInDescendingOrder()
     {
         EnsureActualNotNull();
         VerifyOrdering(ascending: false);
+    }
+
+    /// <summary>Verifies that the collection is in descending order (non-increasing) by the key returned by <paramref name="keySelector"/>.</summary>
+    /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
+    /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
+    /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
+    public void ToBeInDescendingOrder<TKey>(Func<T, TKey> keySelector,
+        [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null)
+    {
+        EnsureActualNotNull();
+        VerifyOrderingByKey(keySelector, ascending: false, keySelectorExpression ?? "keySelector");
     }
 
     /// <summary>Verifies that all elements in the collection satisfy the given <paramref name="predicate"/>.</summary>
@@ -237,6 +296,68 @@ public readonly struct CollectionAssertions<T>
             }
             index++;
         }
+    }
+
+    /// <summary>Verifies that at least one element in the collection satisfies the given <paramref name="predicate"/>.</summary>
+    /// <param name="predicate">The condition that at least one item must meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void AnySatisfy(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        foreach (var item in _actual)
+        {
+            if (predicate(item))
+                return;
+        }
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected at least one element in {_expression} to satisfy {predicateExpression ?? "predicate"}, but none did.",
+            _expression);
+    }
+
+    /// <summary>Verifies that no element in the collection satisfies the given <paramref name="predicate"/>.</summary>
+    /// <param name="predicate">The condition that no item should meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void NoneSatisfy(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        var index = 0;
+        foreach (var item in _actual)
+        {
+            if (predicate(item))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected no element in {_expression} to satisfy {predicateExpression ?? "predicate"}, but element at index {index} ({FormatItem(item)}) did.",
+                    _expression);
+                return;
+            }
+            index++;
+        }
+    }
+
+    /// <summary>Verifies that exactly <paramref name="expectedCount"/> elements satisfy the given <paramref name="predicate"/>.</summary>
+    /// <param name="expectedCount">The expected number of matching elements.</param>
+    /// <param name="predicate">The condition to test each item against.</param>
+    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void HasCountMatching(int expectedCount, Func<T, bool> predicate,
+        [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
+        [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualCount = 0;
+        foreach (var item in _actual)
+        {
+            if (predicate(item))
+                actualCount++;
+        }
+
+        if (actualCount == expectedCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have {expectedCount} ({countExpression ?? "expectedCount"}) elements matching {predicateExpression ?? "predicate"}, but found {actualCount}.",
+            _expression);
     }
 
     /// <summary>
@@ -363,6 +484,49 @@ public readonly struct CollectionAssertions<T>
             }
 
             previous = current;
+            index++;
+        }
+    }
+
+    private void VerifyOrderingByKey<TKey>(Func<T, TKey> keySelector, bool ascending, string keySelectorLabel)
+    {
+        using var enumerator = _actual.GetEnumerator();
+        if (!enumerator.MoveNext())
+            return;
+
+        var comparer = Comparer<TKey>.Default;
+        var previous = enumerator.Current;
+        var previousKey = keySelector(previous);
+        var index = 1;
+
+        while (enumerator.MoveNext())
+        {
+            var current = enumerator.Current;
+            var currentKey = keySelector(current);
+            int comparison;
+            try
+            {
+                comparison = comparer.Compare(previousKey, currentKey);
+            }
+            catch (Exception ex)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order by {keySelectorLabel}, but keys of type {typeof(TKey).Name} could not be compared: {ex.Message}",
+                    _expression);
+                return;
+            }
+
+            var inOrder = ascending ? comparison <= 0 : comparison >= 0;
+            if (!inOrder)
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be in {(ascending ? "ascending" : "descending")} order by {keySelectorLabel}, but element at index {index - 1} ({FormatItem(previous)}) and index {index} ({FormatItem(current)}) were out of order.",
+                    _expression);
+                return;
+            }
+
+            previous = current;
+            previousKey = currentKey;
             index++;
         }
     }
