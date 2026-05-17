@@ -249,6 +249,127 @@ public class CollectionAssertionTests
             (new[] { 1, 1, 2 }).Verify().ToBeEquivalentTo(new[] { 1, 2, 2 }));
     }
 
+    // ── ToContain (predicate) ─────────────────────────────────────────────────
+
+    [Fact]
+    public void ToContain_WithPredicate_WhenMatchExists_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().ToContain(x => x > 2);
+    }
+
+    [Fact]
+    public void ToContain_WithPredicate_WhenNoMatch_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().ToContain(x => x > 10));
+    }
+
+    // ── NotToContain (predicate) ──────────────────────────────────────────────
+
+    [Fact]
+    public void NotToContain_WithPredicate_WhenNoMatchExists_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().NotToContain(x => x > 10);
+    }
+
+    [Fact]
+    public void NotToContain_WithPredicate_WhenMatchExists_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NotToContain(x => x > 2));
+    }
+
+    // ── AnySatisfy ────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void AnySatisfy_WhenOneElementSatisfies_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x == 2);
+    }
+
+    [Fact]
+    public void AnySatisfy_WhenNoElementSatisfies_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x > 10));
+    }
+
+    [Fact]
+    public void AnySatisfy_WhenAllElementsSatisfy_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x > 0);
+    }
+
+    // ── NoneSatisfy ───────────────────────────────────────────────────────────
+
+    [Fact]
+    public void NoneSatisfy_WhenNoElementSatisfies_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x > 10);
+    }
+
+    [Fact]
+    public void NoneSatisfy_WhenOneElementSatisfies_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x == 2));
+    }
+
+    [Fact]
+    public void NoneSatisfy_WhenAllElementsSatisfy_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x > 0));
+    }
+
+    // ── HasCountMatching ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasCountMatching_WhenCountIsCorrect_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3, 4, 5 }).Verify().HasCountMatching(3, x => x > 2);
+    }
+
+    [Fact]
+    public void HasCountMatching_WhenCountIsWrong_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 2, 3, 4, 5 }).Verify().HasCountMatching(2, x => x > 2));
+    }
+
+    [Fact]
+    public void HasCountMatching_WhenNoElementsMatch_ShouldSucceedForZero()
+    {
+        (new[] { 1, 2, 3 }).Verify().HasCountMatching(0, x => x > 10);
+    }
+
+    // ── ToBeInAscendingOrder (key selector) ───────────────────────────────────
+
+    [Fact]
+    public void ToBeInAscendingOrder_WithKeySelector_WhenSorted_ShouldSucceed()
+    {
+        var items = new[] { new { Name = "Alice", Age = 20 }, new { Name = "Bob", Age = 25 }, new { Name = "Carol", Age = 30 } };
+        items.Verify().ToBeInAscendingOrder(x => x.Age);
+    }
+
+    [Fact]
+    public void ToBeInAscendingOrder_WithKeySelector_WhenUnsorted_ShouldThrow()
+    {
+        var items = new[] { new { Name = "Bob", Age = 25 }, new { Name = "Alice", Age = 20 } };
+        Xunit.Assert.Throws<OmniAssertionException>(() => items.Verify().ToBeInAscendingOrder(x => x.Age));
+    }
+
+    // ── ToBeInDescendingOrder (key selector) ──────────────────────────────────
+
+    [Fact]
+    public void ToBeInDescendingOrder_WithKeySelector_WhenSorted_ShouldSucceed()
+    {
+        var items = new[] { new { Name = "Carol", Age = 30 }, new { Name = "Bob", Age = 25 }, new { Name = "Alice", Age = 20 } };
+        items.Verify().ToBeInDescendingOrder(x => x.Age);
+    }
+
+    [Fact]
+    public void ToBeInDescendingOrder_WithKeySelector_WhenUnsorted_ShouldThrow()
+    {
+        var items = new[] { new { Name = "Alice", Age = 20 }, new { Name = "Bob", Age = 25 } };
+        Xunit.Assert.Throws<OmniAssertionException>(() => items.Verify().ToBeInDescendingOrder(x => x.Age));
+    }
+
     // ── Scope ────────────────────────────────────────────────────────────────
 
     [Fact]
