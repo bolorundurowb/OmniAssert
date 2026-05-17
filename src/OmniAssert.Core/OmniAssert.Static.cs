@@ -374,6 +374,38 @@ public static partial class Assert
     public static TimeOnlyAssertions Verify(this TimeOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
+    /// <summary>Begins verifying a <see cref="ReadOnlySpan{T}"/> subject without any allocation.</summary>
+    /// <typeparam name="T">The element type.</typeparam>
+    /// <param name="actual">The span to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
+    public static SpanAssertions<T> Verify<T>(this ReadOnlySpan<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a <see cref="Span{T}"/> subject without any allocation.</summary>
+    /// <typeparam name="T">The element type.</typeparam>
+    /// <param name="actual">The span to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
+    public static SpanAssertions<T> Verify<T>(this Span<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual, expression ?? "actual");
+
+    /// <summary>Begins verifying a <see cref="ReadOnlyMemory{T}"/> subject.</summary>
+    /// <typeparam name="T">The element type.</typeparam>
+    /// <param name="actual">The memory to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
+    public static SpanAssertions<T> Verify<T>(this ReadOnlyMemory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual.Span, expression ?? "actual");
+
+    /// <summary>Begins verifying a <see cref="Memory{T}"/> subject.</summary>
+    /// <typeparam name="T">The element type.</typeparam>
+    /// <param name="actual">The memory to verify.</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
+    public static SpanAssertions<T> Verify<T>(this Memory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        new(actual.Span, expression ?? "actual");
+
     /// <summary>Begins verifying an object subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
