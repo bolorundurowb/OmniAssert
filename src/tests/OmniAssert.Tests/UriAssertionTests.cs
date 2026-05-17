@@ -66,4 +66,47 @@ public class UriAssertionTests
         Uri? uri = null;
         Xunit.Assert.Throws<OmniAssertionException>(() => (uri).Verify().HaveHost("api.example.com"));
     }
+
+    [Fact]
+    public void HaveHost_WithSubdomain_ShouldSucceed()
+    {
+        (new Uri("https://sub.example.com/path")).Verify().HaveHost("sub.example.com");
+    }
+
+    [Fact]
+    public void HavePath_WithMultipleLevels_ShouldSucceed()
+    {
+        (new Uri("https://example.com/v1/users/123/profile")).Verify().HavePath("/v1/users/123/profile");
+    }
+
+    [Fact]
+    public void HavePath_WithEmptyPath_ShouldSucceed()
+    {
+        (new Uri("https://example.com")).Verify().HavePath("/");
+    }
+
+    [Fact]
+    public void HaveQuery_WhenEmpty_ShouldSucceed()
+    {
+        (new Uri("https://api.example.com/v1/users")).Verify().HaveQuery("");
+    }
+
+    [Fact]
+    public void HaveQuery_WithMultipleParameters_ShouldSucceed()
+    {
+        (new Uri("https://api.example.com/search?q=test&limit=10&sort=name")).Verify()
+            .HaveQuery("q=test&limit=10&sort=name");
+    }
+
+    [Fact]
+    public void HaveScheme_CaseSensitive_ShouldSucceed()
+    {
+        (new Uri("https://example.com")).Verify().HaveScheme("https");
+    }
+
+    [Fact]
+    public void HaveScheme_WithFileScheme_ShouldSucceed()
+    {
+        (new Uri("file:///C:/temp/file.txt")).Verify().HaveScheme("file");
+    }
 }

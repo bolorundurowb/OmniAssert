@@ -74,6 +74,24 @@ public readonly struct DictionaryAssertions<TKey, TValue>
             _expression);
     }
 
+    /// <summary>Verifies that the dictionary does not contain <paramref name="value"/>.</summary>
+    /// <param name="value">The value expected to be absent.</param>
+    /// <param name="valueExpression">The expression for the value (automatically captured).</param>
+    public void NotContainValue(TValue value, [CallerArgumentExpression(nameof(value))] string? valueExpression = null)
+    {
+        EnsureActualNotNull();
+        foreach (var item in _actual.Values)
+        {
+            if (EqualityComparer<TValue>.Default.Equals(item, value))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} not to contain value {valueExpression ?? "value"} ({FormatItem(value)}), but it did.",
+                    _expression);
+                return;
+            }
+        }
+    }
+
     /// <summary>Verifies that <paramref name="key"/> exists and maps to <paramref name="value"/>.</summary>
     /// <param name="key">The key to lookup.</param>
     /// <param name="value">The expected value for the key.</param>

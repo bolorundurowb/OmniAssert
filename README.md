@@ -58,7 +58,7 @@ and less frustrating.
   Complex types like collections are automatically formatted to show their contents (up to 10 items) rather than just the
   type name, making it easier to see exactly what caused the mismatch.
 
-Whether you're writing unit tests, integration tests, or behavior-driven scenarios, OmniAssert helps you express intent
+Whether you're writing unit tests, integration tests, or behaviour-driven scenarios, OmniAssert helps you express intent
 clearly and diagnose failures quickly.
 
 ## Requirements
@@ -72,7 +72,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.1.0" />
+  <PackageReference Include="OmniAssert" Version="1.0.1" />
 </ItemGroup>
 ```
 
@@ -148,13 +148,14 @@ settings.Verify().ContainKey("Theme");
 
 - `HasCount(n)` / `ToHaveCount(n)`
 - `HasCountGreaterThan(n)` / `HasCountLessThan(n)`
+- `HasCountMatching(n, predicate)`
 - `ToBeEmpty()` / `NotToBeEmpty()`
 - `ToContain(item)` / `NotToContain(item)`
+- `ToContain(predicate)` / `AllSatisfy(predicate)` / `AnySatisfy(predicate)` / `NoneSatisfy(predicate)`
 - `ToBeUnique()` / `HasUniqueCount(n)`
 - `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
-- `AllSatisfy(item => ...)`
 - `ToBeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
-- `ContainKey(key)` / `ContainValue(value)`
+- `ContainKey(key)` / `NotContainKey(key)` / `ContainValue(value)` / `NotContainValue(value)` / `HaveValue(key, value)`
 
 ### Objects & Equivalence
 Verify object identity, types, and structural equality.

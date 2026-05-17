@@ -2,8 +2,6 @@ namespace OmniAssert.Tests;
 
 public class ExceptionAssertionTests
 {
-    // ── Throws ───────────────────────────────────────────────────────────────
-
     [Fact]
     public void Throws_WhenCorrectExceptionType_ShouldSucceed()
     {
@@ -26,8 +24,6 @@ public class ExceptionAssertionTests
             ((Action)(() => { })).Throws<ArgumentException>());
         Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
-
-    // ── ThrowsAsync ──────────────────────────────────────────────────────────
 
     [Fact]
     public async Task ThrowsAsync_WhenCorrectExceptionType_ShouldSucceed()
@@ -60,8 +56,6 @@ public class ExceptionAssertionTests
         Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    // ── NotThrow ─────────────────────────────────────────────────────────────
-
     [Fact]
     public void NotThrow_WhenNoException_ShouldSucceed()
     {
@@ -73,8 +67,6 @@ public class ExceptionAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ((Action)(() => throw new Exception("fail"))).NotThrow());
     }
-
-    // ── NotThrowAsync ─────────────────────────────────────────────────────────
 
     [Fact]
     public async Task NotThrowAsync_WhenNoException_ShouldSucceed()
@@ -92,8 +84,6 @@ public class ExceptionAssertionTests
         })).NotThrowAsync());
     }
 
-    // ── ExceptionAssertions.WithMessage ──────────────────────────────────────
-
     [Fact]
     public void WithMessage_WhenMessageMatches_ShouldSucceed()
     {
@@ -108,6 +98,43 @@ public class ExceptionAssertionTests
             ((Action)(() => throw new ArgumentException("actual"))).Throws<ArgumentException>()
                 .WithMessage("expected"));
         Xunit.Assert.Contains("actual", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WithMessage_WhenMessageIsEmpty_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException(""))).Throws<ArgumentException>()
+            .WithMessage("");
+    }
+
+    [Fact]
+    public void WithMessage_WhenMultilineMessage_ShouldSucceed()
+    {
+        var multiline = "Line 1\r\nLine 2\r\nLine 3";
+        ((Action)(() => throw new ArgumentException(multiline))).Throws<ArgumentException>()
+            .WithMessage(multiline);
+    }
+
+    [Fact]
+    public void WithMessageIgnoringCase_WhenMessageMatchesIgnoringCase_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("ERROR"))).Throws<ArgumentException>()
+            .WithMessageIgnoringCase("error");
+    }
+
+    [Fact]
+    public void WithMessageIgnoringCase_WhenMessageMismatchIgnoringCase_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((Action)(() => throw new ArgumentException("actual"))).Throws<ArgumentException>()
+                .WithMessageIgnoringCase("different"));
+    }
+
+    [Fact]
+    public void WithMessageIgnoringCase_WhenMessageIsEmpty_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException(""))).Throws<ArgumentException>()
+            .WithMessageIgnoringCase("");
     }
 
     [Fact]
@@ -129,6 +156,13 @@ public class ExceptionAssertionTests
     }
 
     [Fact]
+    public void WithMessageContaining_WhenEmptySubstring_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("error"))).Throws<ArgumentException>()
+            .WithMessageContaining("");
+    }
+
+    [Fact]
     public async Task ThrowsAsync_WithMessageContaining_WhenSubstringExists_ShouldSucceed()
     {
         (await ((Func<Task>)(async () =>
@@ -137,8 +171,6 @@ public class ExceptionAssertionTests
             throw new ArgumentException("Entity id=123 failed validation");
         })).ThrowsAsync<ArgumentException>()).WithMessageContaining("id=123");
     }
-
-    // ── ExceptionAssertions.WithInnerException ───────────────────────────────
 
     [Fact]
     public void WithInnerException_WhenInnerExceptionPresent_ShouldSucceed()
@@ -157,6 +189,24 @@ public class ExceptionAssertionTests
     }
 
     [Fact]
+    public void WithInnerException_WithNullInnerException_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((Action)(() => throw new Exception("outer", null))).Throws<Exception>()
+                .WithInnerException<InvalidOperationException>());
+        Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void WithInnerException_WithNestedExceptions_ShouldSucceed()
+    {
+        var inner = new InvalidOperationException("inner", new ArgumentException("deep"));
+        ((Action)(() => throw new Exception("outer", inner)))
+            .Throws<Exception>()
+            .WithInnerException<InvalidOperationException>();
+    }
+
+    [Fact]
     public void WithMessage_AndWithInnerException_CanBeChained()
     {
         var inner = new InvalidOperationException("inner");
@@ -165,7 +215,15 @@ public class ExceptionAssertionTests
             .WithInnerException<InvalidOperationException>();
     }
 
-    // ── CompleteWithin ───────────────────────────────────────────────────────
+    [Fact]
+    public void WithMessage_WithInnerException_AndWithMessageContaining_CanBeChained()
+    {
+        var inner = new InvalidOperationException("inner");
+        ((Action)(() => throw new Exception("outer error", inner)))
+            .Throws<Exception>()
+            .WithMessage("outer error")
+            .WithInnerException<InvalidOperationException>();
+    }
 
     [Fact]
     public async Task CompleteWithin_WhenTaskCompletesInTime_ShouldSucceed()

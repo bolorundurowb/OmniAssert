@@ -137,6 +137,9 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
             return;
         }
 
+        if (_actual == expected)
+            return;
+
         if (T.Abs(_actual - expected) <= precision)
             return;
 

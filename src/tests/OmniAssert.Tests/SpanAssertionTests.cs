@@ -11,8 +11,6 @@ namespace OmniAssert.Tests;
 /// </remarks>
 public class SpanAssertionTests
 {
-    // ── Entry points ──────────────────────────────────────────────────────────
-
     [Fact]
     public void Verify_ReadOnlySpan_CanBeChained()
     {
@@ -37,8 +35,6 @@ public class SpanAssertionTests
     {
         new ReadOnlyMemory<int>(new int[] { 1, 2, 3 }).Verify().HasLength(3);
     }
-
-    // ── ToEqual ───────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToEqual_WhenSequencesMatch_ShouldSucceed()
@@ -71,8 +67,6 @@ public class SpanAssertionTests
             .ToEqual(new byte[] { 0x01, 0x02, 0x03 }.AsSpan());
     }
 
-    // ── NotToEqual ────────────────────────────────────────────────────────────
-
     [Fact]
     public void NotToEqual_WhenSequencesDiffer_ShouldSucceed()
     {
@@ -87,8 +81,6 @@ public class SpanAssertionTests
         catch (OmniAssertionException) { threw = true; }
         Xunit.Assert.True(threw);
     }
-
-    // ── ToBeEmpty / NotToBeEmpty ──────────────────────────────────────────────
 
     [Fact]
     public void ToBeEmpty_WhenEmpty_ShouldSucceed()
@@ -120,8 +112,6 @@ public class SpanAssertionTests
         Xunit.Assert.True(threw);
     }
 
-    // ── HasLength ─────────────────────────────────────────────────────────────
-
     [Fact]
     public void HasLength_WhenCorrect_ShouldSucceed()
     {
@@ -136,8 +126,6 @@ public class SpanAssertionTests
         catch (OmniAssertionException) { threw = true; }
         Xunit.Assert.True(threw);
     }
-
-    // ── ToContain ─────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToContain_WhenItemPresent_ShouldSucceed()
@@ -160,8 +148,6 @@ public class SpanAssertionTests
         new byte[] { 0xAA, 0xBB, 0xCC }.AsSpan().Verify().ToContain(0xBB);
     }
 
-    // ── NotToContain ──────────────────────────────────────────────────────────
-
     [Fact]
     public void NotToContain_WhenItemAbsent_ShouldSucceed()
     {
@@ -176,8 +162,6 @@ public class SpanAssertionTests
         catch (OmniAssertionException) { threw = true; }
         Xunit.Assert.True(threw);
     }
-
-    // ── ToStartWith ───────────────────────────────────────────────────────────
 
     [Fact]
     public void ToStartWith_WhenPrefixMatches_ShouldSucceed()
@@ -208,8 +192,6 @@ public class SpanAssertionTests
     {
         new int[] { 1, 2, 3 }.AsSpan().Verify().ToStartWith(new int[] { 1, 2, 3 }.AsSpan());
     }
-
-    // ── ToEndWith ─────────────────────────────────────────────────────────────
 
     [Fact]
     public void ToEndWith_WhenSuffixMatches_ShouldSucceed()

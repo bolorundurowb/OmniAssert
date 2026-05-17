@@ -272,6 +272,99 @@ public class StringAssertionTests
     }
 
     [Fact]
+    public void ToMatch_WithRegexOptions_IgnoreCase_ShouldSucceed()
+    {
+        ("HELLO123").Verify().ToMatch(@"^hello\d+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+    }
+
+    [Fact]
+    public void ToMatch_WithRegexOptions_Multiline_ShouldSucceed()
+    {
+        ("line1\nline2\nline3").Verify().ToMatch(@"^line2$", System.Text.RegularExpressions.RegexOptions.Multiline);
+    }
+
+    [Fact]
+    public void ToMatch_WithRegexOptions_IgnoreCase_WhenMismatch_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ("ABC").Verify().ToMatch(@"^\d+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase));
+    }
+
+    [Fact]
+    public void ToBe_WithDifferentStringComparisons_OrdinalCase_ShouldSucceed()
+    {
+        ("hello").Verify().ToBe("hello", StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToBe_WithDifferentStringComparisons_CurrentCultureIgnoreCase_ShouldSucceed()
+    {
+        ("HELLO").Verify().ToBe("hello", StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    [Fact]
+    public void ToBe_WithDifferentStringComparisons_InvariantCulture_ShouldSucceed()
+    {
+        ("hello").Verify().ToBe("hello", StringComparison.InvariantCulture);
+    }
+
+    [Fact]
+    public void ToContain_WithUnicodeCharacters_ShouldSucceed()
+    {
+        ("café 123 naïve").Verify().ToContain("café");
+    }
+
+    [Fact]
+    public void ToContain_WithSpecialCharacters_ShouldSucceed()
+    {
+        ("user@example.com").Verify().ToContain("@");
+    }
+
+    [Fact]
+    public void ToContain_WithEmojiCharacters_ShouldSucceed()
+    {
+        ("Hello 👋 World").Verify().ToContain("👋");
+    }
+
+    [Fact]
+    public void ToMatch_WithUnicodePattern_ShouldSucceed()
+    {
+        ("café").Verify().ToMatch("café");
+    }
+
+    [Fact]
+    public void HasLength_WithVeryLongString_ShouldSucceed()
+    {
+        var longStr = new string('x', 10000);
+        longStr.Verify().HasLength(10000);
+    }
+
+    [Fact]
+    public void ToContain_WithVeryLongString_ShouldSucceed()
+    {
+        var longStr = new string('x', 10000) + "needle" + new string('y', 10000);
+        longStr.Verify().ToContain("needle");
+    }
+
+    [Fact]
+    public void ToContain_WithWhitespaceOnlyString_ShouldSucceed()
+    {
+        ("   ").Verify().ToContain("   ");
+    }
+
+    [Fact]
+    public void ToStartWith_WithEmptyPrefix_ShouldSucceed()
+    {
+        ("hello").Verify().ToStartWith("");
+    }
+
+    [Fact]
+    public void ToEndWith_WithEmptySuffix_ShouldSucceed()
+    {
+        ("hello").Verify().ToEndWith("");
+    }
+
+    [Fact]
     public void ToBe_WithinScope_WhenMismatch_ShouldCollectRatherThanThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>

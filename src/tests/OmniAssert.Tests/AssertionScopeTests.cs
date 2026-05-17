@@ -2,8 +2,6 @@ namespace OmniAssert.Tests;
 
 public class AssertionScopeTests
 {
-    // ── Basic scope behavior ─────────────────────────────────────────────────
-
     [Fact]
     public void Dispose_WhenNoFailures_ShouldNotThrow()
     {
@@ -54,8 +52,6 @@ public class AssertionScopeTests
         Xunit.Assert.All(ex.InnerExceptions, e => Xunit.Assert.IsType<OmniAssertionException>(e));
     }
 
-    // ── VerifyExpression with scope ──────────────────────────────────────────
-
     [Fact]
     public void VerifyExpression_WithinScope_WhenFalse_ShouldCollectRatherThanThrow()
     {
@@ -75,8 +71,6 @@ public class AssertionScopeTests
             (true).VerifyExpression();
         }
     }
-
-    // ── Scope isolation ──────────────────────────────────────────────────────
 
     [Fact]
     public void Scope_WhenDisposed_ShouldNotAffectSubsequentAssertions()

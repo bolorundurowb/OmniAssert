@@ -387,7 +387,7 @@ public readonly struct CollectionAssertions<T>
             var found = false;
             foreach (var (actualItem, actualCount) in actualCounts)
             {
-                if (!EqualityComparer<T>.Default.Equals(actualItem, expectedItem))
+                if (!AreEquivalent(actualItem, expectedItem))
                     continue;
 
                 found = true;
@@ -410,6 +410,17 @@ public readonly struct CollectionAssertions<T>
         }
     }
 
+    private static bool AreEquivalent(T a, T b)
+    {
+        if (EqualityComparer<T>.Default.Equals(a, b))
+            return true;
+
+        if (a is null || b is null)
+            return false;
+
+        return ObjectDiffWalker.Diff(a, b, "") == null;
+    }
+
     private static List<(T Item, int Count)> GetElementCounts(IEnumerable<T> source)
     {
         var counts = new List<(T Item, int Count)>();
@@ -418,7 +429,7 @@ public readonly struct CollectionAssertions<T>
             var index = -1;
             for (var i = 0; i < counts.Count; i++)
             {
-                if (!EqualityComparer<T>.Default.Equals(counts[i].Item, item))
+                if (!AreEquivalent(counts[i].Item, item))
                     continue;
 
                 index = i;

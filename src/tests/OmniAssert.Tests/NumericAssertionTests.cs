@@ -241,6 +241,93 @@ public class NumericAssertionTests
     }
 
     [Fact]
+    public void ToBeApproximately_WithFloatingPointNaN_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => 
+            double.NaN.Verify().ToBeApproximately(1.0, 0.1));
+    }
+
+    [Fact]
+    public void ToBeApproximately_WhenBothNaN_ShouldFail()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => 
+            double.NaN.Verify().ToBeApproximately(double.NaN, 0.1));
+    }
+
+    [Fact]
+    public void ToBeApproximately_WithFloatingPointPositiveInfinity_ShouldSucceed()
+    {
+        double.PositiveInfinity.Verify().ToBeApproximately(double.PositiveInfinity, 0.1);
+    }
+
+    [Fact]
+    public void ToBeApproximately_WithFloatingPointNegativeInfinity_ShouldSucceed()
+    {
+        double.NegativeInfinity.Verify().ToBeApproximately(double.NegativeInfinity, 0.1);
+    }
+
+    [Fact]
+    public void ToBeInRange_WithVeryLargeNumbers_ShouldSucceed()
+    {
+        long.MaxValue.Verify().ToBeInRange(long.MinValue, long.MaxValue);
+    }
+
+    [Fact]
+    public void ToBeInRange_WithVerySmallNumbers_ShouldSucceed()
+    {
+        long.MinValue.Verify().ToBeInRange(long.MinValue, long.MaxValue);
+    }
+
+    [Fact]
+    public void ToBeGreaterThan_WithZero_ShouldSucceed()
+    {
+        (1).Verify().ToBeGreaterThan(0);
+    }
+
+    [Fact]
+    public void ToBeGreaterThan_WithNegative_ShouldSucceed()
+    {
+        (0).Verify().ToBeGreaterThan(-1);
+    }
+
+    [Fact]
+    public void ToBeLessThan_WithZero_ShouldSucceed()
+    {
+        (-1).Verify().ToBeLessThan(0);
+    }
+
+    [Fact]
+    public void ToBeLessThan_WithNegative_ShouldSucceed()
+    {
+        (-100).Verify().ToBeLessThan(-1);
+    }
+
+    [Fact]
+    public void ToBeApproximately_WithZeroPrecision_ShouldSucceed()
+    {
+        (5.0).Verify().ToBeApproximately(5.0, 0.0);
+    }
+
+    [Fact]
+    public void ToBeApproximately_WithZeroPrecision_AndMismatch_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (5.0).Verify().ToBeApproximately(5.1, 0.0));
+    }
+
+    [Fact]
+    public void ToBeInRange_WhenMinEqualsMax_ShouldSucceed()
+    {
+        (5).Verify().ToBeInRange(5, 5);
+    }
+
+    [Fact]
+    public void ToBeInRange_WithInvertedRange_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (5).Verify().ToBeInRange(10, 1));
+    }
+
+    [Fact]
     public void ToBe_WithinScope_WhenValuesDiffer_ShouldCollectRatherThanThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>

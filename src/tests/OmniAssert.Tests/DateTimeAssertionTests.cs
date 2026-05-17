@@ -115,6 +115,37 @@ public class DateTimeAssertionTests
     }
 
     [Fact]
+    public void DateTime_ToBeAfter_WithMinDateTime_ShouldSucceed()
+    {
+        DateTime.MinValue.AddSeconds(1).Verify().ToBeAfter(DateTime.MinValue);
+    }
+
+    [Fact]
+    public void DateTime_ToBeBefore_WithMaxDateTime_ShouldSucceed()
+    {
+        DateTime.MaxValue.AddSeconds(-1).Verify().ToBeBefore(DateTime.MaxValue);
+    }
+
+    [Fact]
+    public void DateTime_ToBeWithin_WithLargeTimespan_ShouldSucceed()
+    {
+        var t = DateTime.Parse("2020-01-01");
+        t.Verify().ToBeWithin(TimeSpan.FromDays(365), t.AddDays(180));
+    }
+
+    [Fact]
+    public void DateTimeOffset_ToBeAfter_WithMinValue_ShouldSucceed()
+    {
+        DateTimeOffset.MinValue.AddSeconds(1).Verify().ToBeAfter(DateTimeOffset.MinValue);
+    }
+
+    [Fact]
+    public void DateTimeOffset_ToBeBefore_WithMaxValue_ShouldSucceed()
+    {
+        DateTimeOffset.MaxValue.AddSeconds(-1).Verify().ToBeBefore(DateTimeOffset.MaxValue);
+    }
+
+    [Fact]
     public void DateTimeOffset_ToBeAfter_WithinScope_WhenBefore_ShouldCollectRatherThanThrow()
     {
         var t = DateTimeOffset.UtcNow;
