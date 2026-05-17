@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
@@ -7,15 +6,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>14</LangVersion>
     <RootNamespace>VerifyInterceptorsSample</RootNamespace>
-    <OmniAssertEnableRewrite>true</OmniAssertEnableRewrite>
-    <OmniAssertEnableVerifyInterceptors>true</OmniAssertEnableVerifyInterceptors>
     <InterceptorsNamespaces>$(InterceptorsNamespaces);OmniAssert.Generated</InterceptorsNamespaces>
   </PropertyGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="OmniAssertEnableRewrite" />
-    <CompilerVisibleProperty Include="OmniAssertEnableVerifyInterceptors" />
-  </ItemGroup>
 
   <!-- Program.cs is supplied to the generator as an AdditionalFile so it can emit the rewritten
        version with full operand capture. The original must not be compiled directly. -->
@@ -28,5 +20,4 @@
     <ProjectReference Include="..\..\OmniAssert.Core\OmniAssert.Core.csproj" />
     <ProjectReference Include="..\..\OmniAssert.Generator\OmniAssert.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-
 </Project>

@@ -1,5 +1,3 @@
-using static OmniAssert.Assert;
-
 namespace OmniAssert.Tests;
 
 public class AssertionCaptureWithOperandsTests
@@ -10,7 +8,7 @@ public class AssertionCaptureWithOperandsTests
         var x = 2;
         var y = 3;
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            VerifyExpression(x > y, AssertionCapture.WithOperands("x > y", ("x", x), ("y", y))));
+            (x > y).VerifyExpression(AssertionCapture.WithOperands("x > y", ("x", x), ("y", y))));
 
         Xunit.Assert.Contains("x > y", ex.Message, StringComparison.Ordinal);
         Xunit.Assert.Contains("Captured values:", ex.Message, StringComparison.Ordinal);

@@ -11,13 +11,13 @@ public class VerifyCallSiteRewriterTests
     public void VisitBlock_WhenExpressionStatementIsVerifyExpression_ShouldExpandAndSetModified()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
         int x = 1;
-        VerifyExpression(x > 0);
+        (x > 0).VerifyExpression();
     }
 }
 """;
@@ -76,5 +76,80 @@ public static class T
 
         Xunit.Assert.False(rewriter.Modified);
         Xunit.Assert.Equal(body.Statements.Count, rewritten.Statements.Count);
+    }
+
+    [Fact]
+    public void VisitBlock_WithMultipleVerifyExpressionCalls_ShouldExpandAll()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y, bool flag)
+    {
+        (x > y).VerifyExpression();
+        flag.VerifyExpression();
+    }
+}
+""";
+        var tree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "RewriterMultiAsm",
+            new[] { tree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(tree);
+        var method = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
+            .Single(m => m.Identifier.Text == "M");
+        var body = method.Body!;
+
+        var rewriter = new VerifyCallSiteRewriter(model, default);
+        var rewritten = (BlockSyntax)rewriter.Visit(body)!;
+
+        Xunit.Assert.True(rewriter.Modified);
+        // Both original VerifyExpression statements should each expand into multiple statements
+        Xunit.Assert.True(rewritten.Statements.Count > body.Statements.Count);
+        Xunit.Assert.Contains("AssertionCapture", rewritten.ToFullString(), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void VisitBlock_WhenExpanded_OutputShouldNotContainLineDirectives()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M()
+    {
+        int x = 1;
+        (x > 0).VerifyExpression();
+    }
+}
+""";
+        var tree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "RewriterLineDirectiveAsm",
+            new[] { tree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(tree);
+        var method = tree.GetRoot().DescendantNodes().OfType<MethodDeclarationSyntax>()
+            .Single(m => m.Identifier.Text == "M");
+        var body = method.Body!;
+
+        var rewriter = new VerifyCallSiteRewriter(model, default);
+        var rewritten = (BlockSyntax)rewriter.Visit(body)!;
+
+        var lowered = rewritten.ToFullString();
+        Xunit.Assert.DoesNotContain("#line hidden", lowered, StringComparison.Ordinal);
+        Xunit.Assert.DoesNotContain("#line default", lowered, StringComparison.Ordinal);
     }
 }

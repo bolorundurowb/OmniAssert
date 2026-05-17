@@ -4,25 +4,18 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace OmniAssert.Generator.Tests;
 
-/// <summary>
-/// Tests for <see cref="OmniAssertIncrementalGenerator"/> covering the incremental source-generation pipeline,
-/// private helper methods (via reflection), and the <see cref="VerifyLoweringFacts"/> discriminator used
-/// during candidate collection.
-/// </summary>
 public class OmniAssertIncrementalGeneratorTests
 {
-    // ── Generator pipeline ─────────────────────────────────────────────────
-
     [Fact]
     public void Generator_WhenInterceptorsDisabled_ShouldProduceNoSource()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
-        VerifyExpression(1 > 0);
+        (1 > 0).VerifyExpression();
     }
 }
 """;
@@ -36,12 +29,12 @@ public static class T
     public void Generator_WhenInterceptorsEnabled_WithVerifyExpression_ShouldProduceInterceptorSource()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
-        VerifyExpression(1 > 0);
+        (1 > 0).VerifyExpression();
     }
 }
 """;
@@ -55,12 +48,12 @@ public static class T
     public void Generator_WithComplexExpression_ShouldEmitVerifyExpressionPath()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(int x, int y)
     {
-        VerifyExpression(x > y);
+        (x > y).VerifyExpression();
     }
 }
 """;
@@ -74,12 +67,12 @@ public static class T
     public void Generator_WithSimpleIdentifierExpression_ShouldEmitToBeTruePath()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(bool flag)
     {
-        VerifyExpression(flag);
+        flag.VerifyExpression();
     }
 }
 """;
@@ -93,13 +86,13 @@ public static class T
     public void Generator_WithMultipleCallSites_ShouldEmitOneInterceptorPerCallSite()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M(int a, int b, bool flag)
     {
-        VerifyExpression(a > b);
-        VerifyExpression(flag);
+        (a > b).VerifyExpression();
+        flag.VerifyExpression();
     }
 }
 """;
@@ -116,10 +109,10 @@ public static class T
     public void Generator_GeneratedSource_ContainsInterceptsLocationAttribute()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
-    public static void M() { VerifyExpression(true); }
+    public static void M() { true.VerifyExpression(); }
 }
 """;
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
@@ -132,10 +125,10 @@ public static class T
     public void Generator_GeneratedSource_ContainsNullableEnable()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
-    public static void M() { VerifyExpression(true); }
+    public static void M() { true.VerifyExpression(); }
 }
 """;
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
@@ -158,7 +151,58 @@ public static class T
         Xunit.Assert.DoesNotContain(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
     }
 
-    // ── EscapeCSharpStringLiteral (via reflection) ──────────────────────────
+    [Fact]
+    public void Generator_WhenNoPropertySet_ShouldEnableInterceptorsByDefault()
+    {
+        // When neither enable nor disable property is supplied at all the generator must
+        // treat interceptors as enabled (opt-out semantics).
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M() { true.VerifyExpression(); }
+}
+""";
+        var (diagnostics, generatedSources) = RunGeneratorWithNoOptions(source);
+
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Xunit.Assert.Contains(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
+    }
+
+    [Fact]
+    public void Generator_GeneratedInterceptor_HasThisBoolSignature()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M() { true.VerifyExpression(); }
+}
+""";
+        var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
+
+        var text = generatedSources.First(s => s.HintName.Contains("VerifyInterceptors")).SourceText.ToString();
+        Xunit.Assert.Contains("this bool condition", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Generator_WithStaticCallForm_ShouldProduceInterceptorSource()
+    {
+        // Assert.VerifyExpression(expr) as a fully-qualified static call should also be intercepted.
+        var source = """
+public static class T
+{
+    public static void M(int x, int y)
+    {
+        OmniAssert.Assert.VerifyExpression(x > y);
+    }
+}
+""";
+        var (diagnostics, generatedSources) = RunGenerator(source, enableInterceptors: true);
+
+        Xunit.Assert.DoesNotContain(diagnostics, d => d.Severity == DiagnosticSeverity.Error);
+        Xunit.Assert.Contains(generatedSources, s => s.HintName.Contains("VerifyInterceptors"));
+    }
 
     [Theory]
     [InlineData("plain", "plain")]
@@ -175,8 +219,6 @@ public static class T
         var result = (string)method!.Invoke(null, new object[] { input })!;
         Xunit.Assert.Equal(expected, result);
     }
-
-    // ── MakeFileScopedClassName (via reflection) ─────────────────────────────
 
     [Fact]
     public void MakeFileScopedClassName_WithNormalPath_ReturnsSafeIdentifier()
@@ -227,11 +269,8 @@ public static class T
 
         var result = (string)method!.Invoke(null, new object[] { "/path/my-file.name.cs" })!;
 
-        // Name segment is "my-file.name" → "my_file_name"
         Xunit.Assert.StartsWith("OmniAssertVerifyInterceptors_my_file_name_", result, StringComparison.Ordinal);
     }
-
-    // ── SanitizeFileHint (via reflection) ────────────────────────────────────
 
     [Fact]
     public void SanitizeFileHint_SamePath_ReturnsSameHash()
@@ -268,17 +307,13 @@ public static class T
 
         var hint = (string)method!.Invoke(null, new object[] { "/some/path.cs" })!;
 
-        // 8 bytes → 16 hex characters (no dashes)
         Xunit.Assert.Equal(16, hint.Length);
         Xunit.Assert.True(hint.All(c => char.IsAsciiHexDigit(c)), $"Expected hex string, got: {hint}");
     }
 
-    // ── VerifyLoweringFacts ──────────────────────────────────────────────────
-
     [Fact]
     public void IsAssertVerifyExpression_WhenSymbolNameIsNotVerifyExpression_ReturnsFalse()
     {
-        // Build a minimal method symbol whose name is different
         var source = """
 namespace OmniAssert
 {
@@ -332,8 +367,6 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         Xunit.Assert.False(VerifyLoweringFacts.IsAssertVerifyExpression(sym!));
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
     private static (IReadOnlyList<Diagnostic> Diagnostics, IReadOnlyList<GeneratedSourceResult> GeneratedSources)
         RunGenerator(string source, bool enableInterceptors)
     {
@@ -358,7 +391,33 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         return (result.Diagnostics, result.Results[0].GeneratedSources);
     }
 
-    // ── TestAnalyzerConfigOptionsProvider ────────────────────────────────────
+    /// <summary>
+    /// Runs the generator without supplying any custom <see cref="AnalyzerConfigOptions"/> so that all
+    /// <c>TryGetValue</c> calls return <c>false</c> — the "property not set at all" scenario that should
+    /// leave interceptors enabled by default.
+    /// </summary>
+    private static (IReadOnlyList<Diagnostic> Diagnostics, IReadOnlyList<GeneratedSourceResult> GeneratedSources)
+        RunGeneratorWithNoOptions(string source)
+    {
+        var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
+        var tree = CSharpSyntaxTree.ParseText(source, parseOptions, path: "T.cs");
+        var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "GeneratorDefaultAsm",
+            new[] { tree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var generator = new OmniAssertIncrementalGenerator();
+
+        // No WithUpdatedAnalyzerConfigOptions call — the default provider returns false for everything.
+        var driver = CSharpGeneratorDriver
+            .Create(generator)
+            .RunGenerators(compilation);
+
+        var result = driver.GetRunResult();
+        return (result.Diagnostics, result.Results[0].GeneratedSources);
+    }
 
     private sealed class TestAnalyzerConfigOptionsProvider : Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptionsProvider
     {
@@ -381,18 +440,18 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
 
     private sealed class TestAnalyzerConfigOptions : Microsoft.CodeAnalysis.Diagnostics.AnalyzerConfigOptions
     {
-        private readonly bool _interceptorsEnabled;
+        private readonly bool _interceptorsDisabled;
 
         public TestAnalyzerConfigOptions(bool interceptorsEnabled)
         {
-            _interceptorsEnabled = interceptorsEnabled;
+            _interceptorsDisabled = !interceptorsEnabled;
         }
 
         public override bool TryGetValue(string key, out string value)
         {
-            if (key == "build_property.OmniAssertEnableVerifyInterceptors")
+            if (key == "build_property.OmniAssertDisableVerifyInterceptors")
             {
-                value = _interceptorsEnabled ? "true" : "false";
+                value = _interceptorsDisabled ? "true" : "false";
                 return true;
             }
 

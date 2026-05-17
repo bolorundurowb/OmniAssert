@@ -6,21 +6,20 @@ using OmniAssert.Generator.Rewrite;
 
 namespace OmniAssert.Generator.Tests;
 
-/// <summary>Ensures <see cref="OmniAssert.Generator.Rewrite.VerifyExpansionEngine.TryExpandVerifyInvocation"/> emits compilable syntax for a <c>VerifyExpression</c>-shaped call.</summary>
 public class VerifyExpansionEngineCompileTests
 {
     [Fact]
     public void TryExpandVerifyInvocation_WhenEmbeddedInMethod_Compiles()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
     {
         int x = 1;
         int y = 0;
-        VerifyExpression(x > y);
+        (x > y).VerifyExpression();
     }
 }
 """;
@@ -40,7 +39,7 @@ public static class T
         var root = syntaxTree.GetRoot();
         var invocation = root.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var engine = new VerifyExpansionEngine(model);
         var block = engine.TryExpandVerifyInvocation(invocation, default);
@@ -52,7 +51,7 @@ public static class T
     public void TryExpandVerifyInvocation_OrWithComparison_Compiles()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
@@ -60,7 +59,7 @@ public static class T
         int x = 2;
         int y = 3;
         int z = 10;
-        VerifyExpression(z >= 10 || x > y);
+        (z >= 10 || x > y).VerifyExpression();
     }
 }
 """;
@@ -80,7 +79,7 @@ public static class T
         var root = syntaxTree.GetRoot();
         var invocation = root.DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var engine = new VerifyExpansionEngine(model);
         var block = engine.TryExpandVerifyInvocation(invocation, default);
@@ -125,7 +124,7 @@ public static class Wrapped
     public void TryExpandVerifyInvocation_DoesNotRecordLiteralOperandsInDictionary()
     {
         var source = """
-using static OmniAssert.Assert;
+using OmniAssert;
 public static class T
 {
     public static void M()
@@ -133,7 +132,7 @@ public static class T
         int x = 2;
         int y = 3;
         int z = 10;
-        VerifyExpression(z > 10 || x > y);
+        (z > 10 || x > y).VerifyExpression();
     }
 }
 """;
@@ -150,7 +149,7 @@ public static class T
         var model = compilation.GetSemanticModel(syntaxTree);
         var invocation = syntaxTree.GetRoot().DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Single(i => i.Expression is IdentifierNameSyntax { Identifier.Text: "VerifyExpression" });
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
 
         var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
         Xunit.Assert.NotNull(block);
@@ -160,6 +159,155 @@ public static class T
         Xunit.Assert.Contains("[\"z\"]", text, StringComparison.Ordinal);
         Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
         Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithAndExpression_Compiles()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y, int z)
+    {
+        (x > 0 && y < z).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionAndTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        // AND short-circuit: both operands must be captured
+        var text = block!.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"z\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithNegatedExpression_Compiles()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(bool flag)
+    {
+        (!flag).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionNotTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        var text = block!.NormalizeWhitespace().ToFullString();
+        // Negation should be present in the final expression
+        Xunit.Assert.Contains("!", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"flag\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithStaticCallForm_Compiles()
+    {
+        var source = """
+public static class T
+{
+    public static void M(int x, int y)
+    {
+        OmniAssert.Assert.VerifyExpression(x > y);
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionStaticTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+        Xunit.Assert.NotEmpty(block!.Statements);
+
+        var text = block.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"y\"]", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void TryExpandVerifyInvocation_WithRepeatedOperand_DisambiguatesKeys()
+    {
+        // When the same sub-expression appears more than once (e.g. x > 0 && x < 10),
+        // the second occurrence of "x" should get a disambiguated key like "x (2)".
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x)
+    {
+        (x > 0 && x < 10).VerifyExpression();
+    }
+}
+""";
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "VerifyExpansionDupKeyTest",
+            new[] { syntaxTree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        Xunit.Assert.Empty(compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error));
+
+        var model = compilation.GetSemanticModel(syntaxTree);
+        var invocation = syntaxTree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var block = new VerifyExpansionEngine(model).TryExpandVerifyInvocation(invocation, default);
+        Xunit.Assert.NotNull(block);
+
+        var text = block!.NormalizeWhitespace().ToFullString();
+        Xunit.Assert.Contains("[\"x\"]", text, StringComparison.Ordinal);
+        Xunit.Assert.Contains("[\"x (2)\"]", text, StringComparison.Ordinal);
     }
 
     internal static IEnumerable<MetadataReference> MetadataReferencesForOmniAssertConsumer()

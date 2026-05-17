@@ -1,23 +1,19 @@
-using static OmniAssert.Assert;
-
 namespace OmniAssert.Tests;
 
 public class NullableAssertionTests
 {
-    // ── NullableValueAssertions<T> ───────────────────────────────────────────
-
     [Fact]
     public void NullableValue_ToBeNull_WhenNull_ShouldSucceed()
     {
         int? value = null;
-        VerifyNullable(value).ToBeNull();
+        (value).VerifyNullable().ToBeNull();
     }
 
     [Fact]
     public void NullableValue_ToBeNull_WhenHasValue_ShouldThrow()
     {
         int? value = 42;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).ToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().ToBeNull());
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -25,7 +21,7 @@ public class NullableAssertionTests
     public void NullableValue_ToBeNull_WhenHasValue_MessageContainsActualValue()
     {
         int? value = 99;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).ToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().ToBeNull());
         Xunit.Assert.Contains("99", ex.Message, StringComparison.Ordinal);
     }
 
@@ -33,14 +29,14 @@ public class NullableAssertionTests
     public void NullableValue_NotToBeNull_WhenHasValue_ShouldSucceed()
     {
         int? value = 7;
-        VerifyNullable(value).NotToBeNull();
+        (value).VerifyNullable().NotToBeNull();
     }
 
     [Fact]
     public void NullableValue_NotToBeNull_WhenNull_ShouldThrow()
     {
         int? value = null;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).NotToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().NotToBeNull());
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -51,7 +47,7 @@ public class NullableAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            VerifyNullable(value).ToBeNull();
+            (value).VerifyNullable().ToBeNull();
         });
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -63,7 +59,7 @@ public class NullableAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            VerifyNullable(value).NotToBeNull();
+            (value).VerifyNullable().NotToBeNull();
         });
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -73,8 +69,8 @@ public class NullableAssertionTests
     {
         double? d = null;
         DateTime? dt = null;
-        VerifyNullable(d).ToBeNull();
-        VerifyNullable(dt).ToBeNull();
+        (d).VerifyNullable().ToBeNull();
+        (dt).VerifyNullable().ToBeNull();
     }
 
     [Fact]
@@ -82,24 +78,22 @@ public class NullableAssertionTests
     {
         double? d = 3.14;
         DateTime? dt = DateTime.UtcNow;
-        VerifyNullable(d).NotToBeNull();
-        VerifyNullable(dt).NotToBeNull();
+        (d).VerifyNullable().NotToBeNull();
+        (dt).VerifyNullable().NotToBeNull();
     }
-
-    // ── NullableReferenceAssertions<T> ───────────────────────────────────────
 
     [Fact]
     public void NullableReference_ToBeNull_WhenNull_ShouldSucceed()
     {
         string? value = null;
-        VerifyNullable(value).ToBeNull();
+        (value).VerifyNullable().ToBeNull();
     }
 
     [Fact]
     public void NullableReference_ToBeNull_WhenNotNull_ShouldThrow()
     {
         string? value = "hello";
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).ToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().ToBeNull());
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -107,7 +101,7 @@ public class NullableAssertionTests
     public void NullableReference_ToBeNull_WhenNotNull_MessageContainsActualValue()
     {
         string? value = "world";
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).ToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().ToBeNull());
         Xunit.Assert.Contains("world", ex.Message, StringComparison.Ordinal);
     }
 
@@ -115,14 +109,14 @@ public class NullableAssertionTests
     public void NullableReference_NotToBeNull_WhenNotNull_ShouldSucceed()
     {
         string? value = "present";
-        VerifyNullable(value).NotToBeNull();
+        (value).VerifyNullable().NotToBeNull();
     }
 
     [Fact]
     public void NullableReference_NotToBeNull_WhenNull_ShouldThrow()
     {
         string? value = null;
-        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => VerifyNullable(value).NotToBeNull());
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (value).VerifyNullable().NotToBeNull());
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -133,7 +127,7 @@ public class NullableAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            VerifyNullable(value).ToBeNull();
+            (value).VerifyNullable().ToBeNull();
         });
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -145,7 +139,7 @@ public class NullableAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            VerifyNullable(value).NotToBeNull();
+            (value).VerifyNullable().NotToBeNull();
         });
         Xunit.Assert.Contains("null", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -154,13 +148,13 @@ public class NullableAssertionTests
     public void NullableReference_ClassType_ToBeNull_WhenNull_ShouldSucceed()
     {
         List<int>? list = null;
-        VerifyNullable(list).ToBeNull();
+        (list).VerifyNullable().ToBeNull();
     }
 
     [Fact]
     public void NullableReference_ClassType_NotToBeNull_WhenNotNull_ShouldSucceed()
     {
         List<int>? list = new List<int>();
-        VerifyNullable(list).NotToBeNull();
+        (list).VerifyNullable().NotToBeNull();
     }
 }

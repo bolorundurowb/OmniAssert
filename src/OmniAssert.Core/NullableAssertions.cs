@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace OmniAssert;
 
 /// <summary>Assertions for <see cref="Nullable{T}"/> value types from the nullable value <see cref="Assert"/> entry points.</summary>

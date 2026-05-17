@@ -1,4 +1,4 @@
-using static OmniAssert.Assert;
+using OmniAssert;
 
 namespace VerifyInterceptorsSample;
 
@@ -8,6 +8,6 @@ internal static class InterceptorSmoke
     internal static void Run()
     {
         var flag = true;
-        VerifyExpression(flag);
+        flag.VerifyExpression();
     }
 }

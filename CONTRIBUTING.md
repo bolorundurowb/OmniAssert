@@ -16,7 +16,7 @@ The codebase was bootstrapped with **significant AI assistance**; treat contribu
 | Path | Role |
 |------|------|
 | `src/OmniAssert.Core` | Runtime: `Assert`, fluent assertion structs, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`, plus internal diff and colour helpers. |
-| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors when `OmniAssertEnableVerifyInterceptors` is `true`; optional rewrite when `OmniAssertEnableRewrite` is `true`. |
+| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors (on by default, opt out with `OmniAssertDisableVerifyInterceptors`); optional operand-capture rewrite via `AdditionalFiles`. |
 | `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `VerifyExpression(bool, AssertionCapture)` for tests and tooling. |
 | `src/tests/OmniAssert.Tests` | Main tests (interceptors enabled). |
 | `src/tests/OmniAssert.Generator.Tests` | Generator and lowering compile tests. |
@@ -40,7 +40,7 @@ CI (`.github/workflows/build-and-test.yml`) runs restore, a Release build, tests
 
 **High value**
 
-- **`OmniAssertIncrementalGenerator`**: interceptor discovery, `GetInterceptableLocation`, generated `[InterceptsLocation]` stubs, and the **rewrite** path driven by `OmniAssertEnableRewrite` and additional files are only exercised indirectly (sample app and manual builds), not by focused unit tests.
+- **`OmniAssertIncrementalGenerator`**: interceptor discovery, `GetInterceptableLocation`, generated `[InterceptsLocation]` stubs, and the **operand-capture rewrite** path via `AdditionalFiles` are only exercised indirectly (sample app and manual builds), not by focused unit tests.
 - **`VerifyExpansionEngine`**: more boolean shapes (short-circuit edge cases, additional binary operators, parenthesised and nested forms) than the current compile tests cover.
 
 **Medium**
@@ -66,6 +66,6 @@ Use a `ProjectReference` to the generator with `OutputItemType="Analyzer"` and `
 
 ## Advanced: operand capture via source rewrite
 
-This path is intended for **advanced setups** that use the generator from source with **`OmniAssertEnableRewrite`** set to **`true`**, list a `.cs` file as an **`AdditionalFiles`** item, and exclude that file from **`Compile`**.
+This path is intended for **advanced setups** that supply a `.cs` file as an **`AdditionalFiles`** item and exclude that file from **`Compile`**.
 
-The generator then emits a rewritten compilation unit that lowers `VerifyExpression` to `VerifyExpression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in **`src/samples/VerifyInterceptorsSample`**.
+The generator detects the `AdditionalFiles` entry automatically (no extra MSBuild property required) and emits a rewritten compilation unit that lowers `VerifyExpression` to `VerifyExpression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in **`src/samples/VerifyInterceptorsSample`**.

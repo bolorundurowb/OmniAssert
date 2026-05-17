@@ -10,15 +10,15 @@ using OmniAssert.Generator.Rewrite;
 namespace OmniAssert.Generator;
 
 /// <summary>
-/// When <c>OmniAssertEnableVerifyInterceptors</c> is true, emits interceptors for each interceptable
-/// <c>OmniAssert.Assert.VerifyExpression(bool, string?)</c> call site: bare identifiers redirect to fluent
-/// <c>Verify(...).ToBeTrue()</c>; other boolean shapes call <c>VerifyExpression(bool, string?)</c> with the captured expression text.
+/// Emits interceptors for each interceptable <c>OmniAssert.Assert.VerifyExpression(bool, string?)</c> call site
+/// by default. Bare identifiers redirect to fluent <c>Verify(...).ToBeTrue()</c>; other boolean shapes call
+/// <c>VerifyExpression(bool, string?)</c> with the captured expression text.
+/// Set <c>OmniAssertDisableVerifyInterceptors</c> to <c>true</c> in the project file to opt out.
 /// </summary>
 [Generator]
 public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 {
-    private const string EnableProperty = "build_property.OmniAssertEnableVerifyInterceptors";
-    private const string RewriteProperty = "build_property.OmniAssertEnableRewrite";
+    private const string DisableProperty = "build_property.OmniAssertDisableVerifyInterceptors";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -26,8 +26,8 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
         var interceptorsEnabled = context.AnalyzerConfigOptionsProvider.Select(
             static (options, _) =>
-                options.GlobalOptions.TryGetValue(EnableProperty, out var v) &&
-                v.Equals("true", StringComparison.OrdinalIgnoreCase));
+                !options.GlobalOptions.TryGetValue(DisableProperty, out var v) ||
+                !v.Equals("true", StringComparison.OrdinalIgnoreCase));
 
         var compilationAndFlag = context.CompilationProvider.Combine(interceptorsEnabled);
 
@@ -60,9 +60,11 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 #pragma warning restore RS0030
                         continue;
 
-                    var firstArg = node.ArgumentList.Arguments[0].Expression;
+                    var boolExpr = GetBooleanExpression(node);
+                    if (boolExpr == null)
+                        continue;
                     var engine = new VerifyExpansionEngine(model);
-                    var simple = engine.IsSimpleBooleanIdentifier(firstArg);
+                    var simple = engine.IsSimpleBooleanIdentifier(boolExpr);
 
                     if (!byTree.TryGetValue(tree, out var list))
                     {
@@ -91,24 +93,14 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
     private void RegisterRewritePipeline(IncrementalGeneratorInitializationContext context)
     {
-        var rewriteEnabled = context.AnalyzerConfigOptionsProvider.Select(
-            static (options, _) =>
-                options.GlobalOptions.TryGetValue(RewriteProperty, out var v) &&
-                v.Equals("true", StringComparison.OrdinalIgnoreCase));
-
         var rewriteInputs = context.AdditionalTextsProvider
             .Where(static f => f.Path.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
-            .Combine(context.CompilationProvider)
-            .Combine(rewriteEnabled);
+            .Combine(context.CompilationProvider);
 
         context.RegisterSourceOutput(rewriteInputs, (spc, tuple) =>
         {
-            var enabled = tuple.Right;
-            if (!enabled)
-                return;
-
-            var additionalText = tuple.Left.Left;
-            var compilation = tuple.Left.Right;
+            var additionalText = tuple.Left;
+            var compilation = tuple.Right;
             var ct = spc.CancellationToken;
 
             var sourceText = additionalText.GetText(ct);
@@ -206,7 +198,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
             sb.AppendLine("\")]");
             sb.Append("        internal static void OmniAssertVerifyIntercept_");
             sb.Append(i.ToString(CultureInfo.InvariantCulture));
-            sb.AppendLine("(bool condition, string? expression = null)");
+            sb.AppendLine("(this bool condition, string? expression = null)");
             sb.AppendLine("        {");
             if (candidate.SimpleIdentifierPath)
             {
@@ -230,51 +222,20 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
     private static string EscapeCSharpStringLiteral(string value) =>
         value.Replace("\\", "\\\\").Replace("\"", "\\\"");
 
-    /// <summary>One generated stub: compiler location plus whether the condition is a simple identifier.</summary>
-    private readonly struct InterceptorCandidate
+    /// <summary>
+    /// Returns the boolean expression from a <c>VerifyExpression</c> invocation regardless of call form.
+    /// For extension-method calls (<c>expr.VerifyExpression()</c>) the bool is the receiver;
+    /// for static calls (<c>Assert.VerifyExpression(expr)</c>) it is the first argument.
+    /// </summary>
+    private static ExpressionSyntax? GetBooleanExpression(InvocationExpressionSyntax node)
     {
-        public InterceptorCandidate(InterceptableLocation location, bool simpleIdentifierPath)
-        {
-            Location = location;
-            SimpleIdentifierPath = simpleIdentifierPath;
-        }
+        if (node.ArgumentList.Arguments.Count >= 1)
+            return node.ArgumentList.Arguments[0].Expression;
 
-        /// <summary>Interceptable location metadata for <see cref="InterceptsLocationAttribute"/>.</summary>
-        public InterceptableLocation Location { get; }
+        if (node.Expression is MemberAccessExpressionSyntax memberAccess)
+            return memberAccess.Expression;
 
-        /// <summary>
-        /// <c>true</c> when the first argument is a bare identifier (or parenthesized identifier), matching
-        /// <see cref="Rewrite.VerifyExpansionEngine.IsSimpleBooleanIdentifier"/>—emit <c>Verify(...).ToBeTrue()</c>.
-        /// </summary>
-        public bool SimpleIdentifierPath { get; }
+        return null;
     }
-}
 
-/// <summary>Identifies <c>Assert.VerifyExpression(bool, string?)</c> for the incremental generator.</summary>
-internal static class VerifyLoweringFacts
-{
-    /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Assert</c>.</summary>
-    public static bool IsAssertVerifyExpression(IMethodSymbol sym)
-    {
-        if (sym.Name != "VerifyExpression")
-            return false;
-
-        if (sym.ContainingType?.Name != "Assert" || sym.ContainingNamespace?.Name != "OmniAssert")
-            return false;
-
-        if (sym.Parameters.Length < 1 || sym.Parameters.Length > 2)
-            return false;
-
-        if (sym.Parameters[0].Type.SpecialType != SpecialType.System_Boolean)
-            return false;
-
-        if (sym.Parameters.Length == 2)
-        {
-            var t = sym.Parameters[1].Type;
-            if (t.SpecialType != SpecialType.System_String && t.Name != "String" && t.ToDisplayString() != "string?")
-                return false;
-        }
-
-        return true;
-    }
 }

@@ -27,10 +27,21 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
     /// <returns>A block of statements, or <c>null</c> if the expression cannot be lowered.</returns>
     public BlockSyntax? TryExpandVerifyInvocation(InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
     {
-        if (invocation.ArgumentList.Arguments.Count < 1)
+        // For static calls (Assert.VerifyExpression(expr)) the bool is the first argument.
+        // For extension-method calls (expr.VerifyExpression()) the bool is the receiver.
+        ExpressionSyntax firstArg;
+        if (invocation.ArgumentList.Arguments.Count >= 1)
+        {
+            firstArg = invocation.ArgumentList.Arguments[0].Expression;
+        }
+        else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            firstArg = memberAccess.Expression;
+        }
+        else
+        {
             return null;
-
-        var firstArg = invocation.ArgumentList.Arguments[0].Expression;
+        }
         var typeInfo = model.GetTypeInfo(firstArg, cancellationToken);
         if (typeInfo.Type?.SpecialType != SpecialType.System_Boolean)
             return null;

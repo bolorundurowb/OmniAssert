@@ -1,5 +1,3 @@
-using static OmniAssert.Assert;
-
 namespace OmniAssert.Tests;
 
 public class ExceptionAssertionTests
@@ -9,7 +7,7 @@ public class ExceptionAssertionTests
     [Fact]
     public void Throws_WhenCorrectExceptionType_ShouldSucceed()
     {
-        var result = Throws<ArgumentException>(() => throw new ArgumentException("bad"));
+        var result = ((Action)(() => throw new ArgumentException("bad"))).Throws<ArgumentException>();
         Xunit.Assert.IsType<ArgumentException>(result.Exception);
     }
 
@@ -17,7 +15,7 @@ public class ExceptionAssertionTests
     public void Throws_WhenWrongExceptionType_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Throws<ArgumentException>(() => throw new InvalidOperationException("x")));
+            ((Action)(() => throw new InvalidOperationException("x"))).Throws<ArgumentException>());
         Xunit.Assert.Contains("InvalidOperationException", ex.Message, StringComparison.Ordinal);
     }
 
@@ -25,7 +23,7 @@ public class ExceptionAssertionTests
     public void Throws_WhenNoExceptionThrown_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Throws<ArgumentException>(() => { }));
+            ((Action)(() => { })).Throws<ArgumentException>());
         Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -34,11 +32,11 @@ public class ExceptionAssertionTests
     [Fact]
     public async Task ThrowsAsync_WhenCorrectExceptionType_ShouldSucceed()
     {
-        var result = await ThrowsAsync<ArgumentException>(async () =>
+        var result = await ((Func<Task>)(async () =>
         {
             await Task.Yield();
             throw new ArgumentException("bad");
-        });
+        })).ThrowsAsync<ArgumentException>();
         Xunit.Assert.IsType<ArgumentException>(result.Exception);
     }
 
@@ -46,11 +44,11 @@ public class ExceptionAssertionTests
     public async Task ThrowsAsync_WhenWrongExceptionType_ShouldThrow()
     {
         var ex = await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
-            await ThrowsAsync<ArgumentException>(async () =>
+            await ((Func<Task>)(async () =>
             {
                 await Task.Yield();
                 throw new InvalidOperationException();
-            }));
+            })).ThrowsAsync<ArgumentException>());
         Xunit.Assert.Contains("InvalidOperationException", ex.Message, StringComparison.Ordinal);
     }
 
@@ -58,7 +56,7 @@ public class ExceptionAssertionTests
     public async Task ThrowsAsync_WhenNoExceptionThrown_ShouldThrow()
     {
         var ex = await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
-            await ThrowsAsync<ArgumentException>(async () => await Task.Yield()));
+            await ((Func<Task>)(async () => await Task.Yield())).ThrowsAsync<ArgumentException>());
         Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -67,13 +65,13 @@ public class ExceptionAssertionTests
     [Fact]
     public void NotThrow_WhenNoException_ShouldSucceed()
     {
-        NotThrow(() => { });
+        ((Action)(() => { })).NotThrow();
     }
 
     [Fact]
     public void NotThrow_WhenExceptionThrown_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => NotThrow(() => throw new Exception("fail")));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((Action)(() => throw new Exception("fail"))).NotThrow());
     }
 
     // ── NotThrowAsync ─────────────────────────────────────────────────────────
@@ -81,17 +79,17 @@ public class ExceptionAssertionTests
     [Fact]
     public async Task NotThrowAsync_WhenNoException_ShouldSucceed()
     {
-        await NotThrowAsync(async () => await Task.Yield());
+        await ((Func<Task>)(async () => await Task.Yield())).NotThrowAsync();
     }
 
     [Fact]
     public async Task NotThrowAsync_WhenExceptionThrown_ShouldThrow()
     {
-        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => await NotThrowAsync(async () =>
+        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () => await ((Func<Task>)(async () =>
         {
             await Task.Yield();
             throw new Exception("fail");
-        }));
+        })).NotThrowAsync());
     }
 
     // ── ExceptionAssertions.WithMessage ──────────────────────────────────────
@@ -99,7 +97,7 @@ public class ExceptionAssertionTests
     [Fact]
     public void WithMessage_WhenMessageMatches_ShouldSucceed()
     {
-        Throws<ArgumentException>(() => throw new ArgumentException("bad"))
+        ((Action)(() => throw new ArgumentException("bad"))).Throws<ArgumentException>()
             .WithMessage("bad");
     }
 
@@ -107,7 +105,7 @@ public class ExceptionAssertionTests
     public void WithMessage_WhenMessageMismatch_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Throws<ArgumentException>(() => throw new ArgumentException("actual"))
+            ((Action)(() => throw new ArgumentException("actual"))).Throws<ArgumentException>()
                 .WithMessage("expected"));
         Xunit.Assert.Contains("actual", ex.Message, StringComparison.Ordinal);
     }
@@ -115,7 +113,8 @@ public class ExceptionAssertionTests
     [Fact]
     public void WithMessageContaining_WhenSubstringExists_ShouldSucceed()
     {
-        Throws<ArgumentException>(() => throw new ArgumentException("User 42 not found in /api/users"))
+        ((Action)(() => throw new ArgumentException("User 42 not found in /api/users")))
+            .Throws<ArgumentException>()
             .WithMessageContaining("42 not found");
     }
 
@@ -123,7 +122,8 @@ public class ExceptionAssertionTests
     public void WithMessageContaining_WhenSubstringMissing_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Throws<ArgumentException>(() => throw new ArgumentException("User 42 not found in /api/users"))
+            ((Action)(() => throw new ArgumentException("User 42 not found in /api/users")))
+                .Throws<ArgumentException>()
                 .WithMessageContaining("99 not found"));
         Xunit.Assert.Contains("42 not found", ex.Message, StringComparison.Ordinal);
     }
@@ -131,11 +131,11 @@ public class ExceptionAssertionTests
     [Fact]
     public async Task ThrowsAsync_WithMessageContaining_WhenSubstringExists_ShouldSucceed()
     {
-        (await ThrowsAsync<ArgumentException>(async () =>
+        (await ((Func<Task>)(async () =>
         {
             await Task.Yield();
             throw new ArgumentException("Entity id=123 failed validation");
-        })).WithMessageContaining("id=123");
+        })).ThrowsAsync<ArgumentException>()).WithMessageContaining("id=123");
     }
 
     // ── ExceptionAssertions.WithInnerException ───────────────────────────────
@@ -143,7 +143,8 @@ public class ExceptionAssertionTests
     [Fact]
     public void WithInnerException_WhenInnerExceptionPresent_ShouldSucceed()
     {
-        Throws<Exception>(() => throw new Exception("outer", new InvalidOperationException("inner")))
+        ((Action)(() => throw new Exception("outer", new InvalidOperationException("inner"))))
+            .Throws<Exception>()
             .WithInnerException<InvalidOperationException>();
     }
 
@@ -151,7 +152,7 @@ public class ExceptionAssertionTests
     public void WithInnerException_WhenInnerExceptionMissing_ShouldThrow()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Throws<Exception>(() => throw new Exception("outer")).WithInnerException<InvalidOperationException>());
+            ((Action)(() => throw new Exception("outer"))).Throws<Exception>().WithInnerException<InvalidOperationException>());
         Xunit.Assert.Contains("inner exception", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -159,7 +160,8 @@ public class ExceptionAssertionTests
     public void WithMessage_AndWithInnerException_CanBeChained()
     {
         var inner = new InvalidOperationException("inner");
-        Throws<Exception>(() => throw new Exception("outer", inner))
+        ((Action)(() => throw new Exception("outer", inner)))
+            .Throws<Exception>()
             .WithInnerException<InvalidOperationException>();
     }
 
@@ -168,21 +170,21 @@ public class ExceptionAssertionTests
     [Fact]
     public async Task CompleteWithin_WhenTaskCompletesInTime_ShouldSucceed()
     {
-        await CompleteWithin(TimeSpan.FromSeconds(1), async () => await Task.Delay(10));
+        await TimeSpan.FromSeconds(1).CompleteWithin(async () => await Task.Delay(10));
     }
 
     [Fact]
     public async Task CompleteWithin_WhenTaskTimesOut_ShouldThrow()
     {
         await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
-            await CompleteWithin(TimeSpan.FromMilliseconds(10), async () => await Task.Delay(500)));
+            await TimeSpan.FromMilliseconds(10).CompleteWithin(async () => await Task.Delay(500)));
     }
 
     [Fact]
     public async Task CompleteWithin_WhenTaskThrowsException_ShouldPropagate()
     {
         await Xunit.Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await CompleteWithin(TimeSpan.FromSeconds(2), async () =>
+            await TimeSpan.FromSeconds(2).CompleteWithin(async () =>
             {
                 await Task.Yield();
                 throw new InvalidOperationException("boom");

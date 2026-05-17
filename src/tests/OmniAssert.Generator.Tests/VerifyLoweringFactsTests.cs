@@ -1,15 +1,14 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using OmniAssert.Generator;
 
 namespace OmniAssert.Generator.Tests;
 
 public class VerifyLoweringFactsTests
 {
     [Theory]
-    [InlineData("using static OmniAssert.Assert;\npublic static class T { public static void M() { VerifyExpression(true); } }", true)]
-    [InlineData("using static OmniAssert.Assert;\npublic static class T { public static void M() { VerifyExpression(true, \"hint\"); } }", true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(); } }", true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(\"hint\"); } }", true)]
     [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true); } }", true)]
     [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true, null); } }", true)]
     [InlineData("""
@@ -58,5 +57,42 @@ public static class T
         var sym = model.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
         Xunit.Assert.NotNull(sym);
         Xunit.Assert.Equal(expected, VerifyLoweringFacts.IsAssertVerifyExpression(sym!));
+    }
+
+    [Fact]
+    public void IsAssertVerifyExpression_WhenZeroParameters_ReturnsFalse()
+    {
+        // Build a minimal compilation without the real OmniAssert assembly so we can define a
+        // zero-parameter OmniAssert.Assert.VerifyExpression() decoy without type conflicts.
+        var source = """
+namespace OmniAssert
+{
+    public static class Assert { public static void VerifyExpression() { } }
+}
+public static class T
+{
+    public static void M() { OmniAssert.Assert.VerifyExpression(); }
+}
+""";
+        var tree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        // Use only mscorlib / System.Runtime — no OmniAssert.Core.
+        var refs = new[]
+        {
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location)
+        };
+        var compilation = CSharpCompilation.Create(
+            "ZeroParamAsm",
+            new[] { tree },
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var model = compilation.GetSemanticModel(tree);
+        var invocation = tree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "VerifyExpression" });
+
+        var sym = model.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
+        Xunit.Assert.NotNull(sym);
+        Xunit.Assert.False(VerifyLoweringFacts.IsAssertVerifyExpression(sym!));
     }
 }

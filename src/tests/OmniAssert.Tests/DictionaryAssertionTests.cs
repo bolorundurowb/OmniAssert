@@ -1,5 +1,3 @@
-using static OmniAssert.Assert;
-
 namespace OmniAssert.Tests;
 
 public class DictionaryAssertionTests
@@ -7,67 +5,67 @@ public class DictionaryAssertionTests
     [Fact]
     public void ContainKey_WhenPresent_ShouldSucceed()
     {
-        Verify(new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).ContainKey("a");
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ContainKey("a");
     }
 
     [Fact]
     public void ContainKey_WhenMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(new Dictionary<string, int> { ["a"] = 1 }).ContainKey("b"));
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainKey("b"));
     }
 
     [Fact]
     public void NotContainKey_WhenMissing_ShouldSucceed()
     {
-        Verify(new Dictionary<string, int> { ["a"] = 1 }).NotContainKey("b");
+        (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainKey("b");
     }
 
     [Fact]
     public void NotContainKey_WhenPresent_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(new Dictionary<string, int> { ["a"] = 1 }).NotContainKey("a"));
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainKey("a"));
     }
 
     [Fact]
     public void ContainValue_WhenPresent_ShouldSucceed()
     {
-        Verify(new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).ContainValue(2);
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ContainValue(2);
     }
 
     [Fact]
     public void ContainValue_WhenMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(new Dictionary<string, int> { ["a"] = 1 }).ContainValue(2));
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainValue(2));
     }
 
     [Fact]
     public void HaveValue_WhenKeyAndValueMatch_ShouldSucceed()
     {
-        Verify(new Dictionary<string, int> { ["a"] = 1 }).HaveValue("a", 1);
+        (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("a", 1);
     }
 
     [Fact]
     public void HaveValue_WhenKeyMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(new Dictionary<string, int> { ["a"] = 1 }).HaveValue("b", 1));
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("b", 1));
     }
 
     [Fact]
     public void HaveValue_WhenValueDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(new Dictionary<string, int> { ["a"] = 1 }).HaveValue("a", 2));
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("a", 2));
     }
 
     [Fact]
     public void DictionaryAssertions_WhenTypedAsIReadOnlyDictionary_ShouldUseDictionaryAssertions()
     {
         IReadOnlyDictionary<string, int> actual = new Dictionary<string, int> { ["x"] = 10 };
-        Verify(actual).ContainKey("x");
-        Verify(actual).ContainValue(10);
+        (actual).Verify().ContainKey("x");
+        (actual).Verify().ContainValue(10);
     }
 }

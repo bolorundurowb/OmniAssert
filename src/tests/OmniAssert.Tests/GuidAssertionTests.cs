@@ -1,5 +1,3 @@
-using static OmniAssert.Assert;
-
 namespace OmniAssert.Tests;
 
 public class GuidAssertionTests
@@ -7,39 +5,39 @@ public class GuidAssertionTests
     [Fact]
     public void ToBeEmpty_WhenGuidIsEmpty_ShouldSucceed()
     {
-        Verify(Guid.Empty).ToBeEmpty();
+        (Guid.Empty).Verify().ToBeEmpty();
     }
 
     [Fact]
     public void ToBeEmpty_WhenGuidIsNotEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(Guid.NewGuid()).ToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.NewGuid()).Verify().ToBeEmpty());
     }
 
     [Fact]
     public void NotToBeEmpty_WhenGuidIsNotEmpty_ShouldSucceed()
     {
-        Verify(Guid.NewGuid()).NotToBeEmpty();
+        (Guid.NewGuid()).Verify().NotToBeEmpty();
     }
 
     [Fact]
     public void NotToBeEmpty_WhenGuidIsEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => Verify(Guid.Empty).NotToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.Empty).Verify().NotToBeEmpty());
     }
 
     [Fact]
     public void ToBeOneOf_WhenGuidIsInSet_ShouldSucceed()
     {
         var expected = Guid.NewGuid();
-        Verify(expected).ToBeOneOf(Guid.NewGuid(), expected);
+        (expected).Verify().ToBeOneOf(Guid.NewGuid(), expected);
     }
 
     [Fact]
     public void ToBeOneOf_WhenGuidIsNotInSet_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Verify(Guid.NewGuid()).ToBeOneOf(Guid.NewGuid(), Guid.NewGuid()));
+            (Guid.NewGuid()).Verify().ToBeOneOf(Guid.NewGuid(), Guid.NewGuid()));
     }
 
     [Fact]
@@ -48,7 +46,7 @@ public class GuidAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify(Guid.NewGuid()).ToBeEmpty();
+            (Guid.NewGuid()).Verify().ToBeEmpty();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -59,8 +57,8 @@ public class GuidAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            Verify(Guid.Empty).NotToBeEmpty();
-            Verify(Guid.Empty).NotToBeEmpty();
+            (Guid.Empty).Verify().NotToBeEmpty();
+            (Guid.Empty).Verify().NotToBeEmpty();
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
