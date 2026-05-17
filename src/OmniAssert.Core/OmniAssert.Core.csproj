@@ -14,7 +14,11 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>v1.1.0
+    <PackageReleaseNotes>v1.1.1
+    - Added NotContainValue to the Dictionary assertions
+    - Fix float numeric comparisons
+
+    v1.1.0
     - Added ToBeNull() and NotToBeNull() assertions to ObjectAssertions.
     - Added NotToBeOfType&lt;T&gt;() and NotToBeAssignableTo&lt;T&gt;() assertions to ObjectAssertions.
 
