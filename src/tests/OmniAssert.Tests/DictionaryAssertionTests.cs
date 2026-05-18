@@ -164,4 +164,50 @@ public class DictionaryAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
+
+    [Fact]
+    public void ToBeNull_WhenNull_ShouldSucceed()
+    {
+        ((IReadOnlyDictionary<string, int>?)null).Verify().ToBeNull();
+    }
+
+    [Fact]
+    public void ToBeNull_WhenNotNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ToBeNull());
+    }
+
+    [Fact]
+    public void NotToBeNull_WhenNotNull_ShouldSucceed()
+    {
+        (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotToBeNull();
+    }
+
+    [Fact]
+    public void NotToBeNull_WhenNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((IReadOnlyDictionary<string, int>?)null).Verify().NotToBeNull());
+    }
+
+    [Fact]
+    public void ToHaveCount_WhenCountMatches_ShouldSucceed()
+    {
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ToHaveCount(2);
+    }
+
+    [Fact]
+    public void ToHaveCount_WhenCountDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ToHaveCount(3));
+    }
+
+    [Fact]
+    public void ToHaveCount_WhenNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((IReadOnlyDictionary<string, int>?)null).Verify().ToHaveCount(0));
+    }
 }

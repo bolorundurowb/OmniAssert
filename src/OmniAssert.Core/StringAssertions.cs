@@ -78,7 +78,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string has exactly <paramref name="expectedLength"/> characters.</summary>
     /// <param name="expectedLength">The expected string length.</param>
     /// <param name="lengthExpression">The expression for the expected length (automatically captured).</param>
-    public void HasLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
+    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length == expectedLength)
             return;
@@ -92,7 +92,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string length is greater than <paramref name="minimumLength"/>.</summary>
     /// <param name="minimumLength">The exclusive lower bound for the string length.</param>
     /// <param name="lengthExpression">The expression for the minimum length (automatically captured).</param>
-    public void HasLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null)
+    public void ToHaveLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length > minimumLength)
             return;
@@ -106,7 +106,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string length is less than <paramref name="maximumLength"/>.</summary>
     /// <param name="maximumLength">The exclusive upper bound for the string length.</param>
     /// <param name="lengthExpression">The expression for the maximum length (automatically captured).</param>
-    public void HasLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null)
+    public void ToHaveLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length < maximumLength)
             return;

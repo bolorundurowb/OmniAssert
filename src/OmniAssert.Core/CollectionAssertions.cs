@@ -151,7 +151,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection has the expected number of items.</summary>
     /// <param name="expectedCount">The expected count.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void HasCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = 0;
@@ -172,16 +172,10 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
-    /// <summary>Verifies that the collection has the expected number of items (alias for <see cref="HasCount"/>).</summary>
-    /// <param name="expectedCount">The expected count.</param>
-    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
-        HasCount(expectedCount, countExpression);
-
     /// <summary>Verifies that the collection count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the collection count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
-    public void HasCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
+    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = GetActualCount();
@@ -196,7 +190,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection count is less than <paramref name="maximumCount"/>.</summary>
     /// <param name="maximumCount">The exclusive upper bound for the collection count.</param>
     /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
-    public void HasCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
+    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = GetActualCount();
@@ -230,7 +224,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection contains exactly <paramref name="expectedUniqueCount"/> distinct elements.</summary>
     /// <param name="expectedUniqueCount">The expected number of distinct elements.</param>
     /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
-    public void HasUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
+    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var uniqueCount = new HashSet<T>(_actual).Count;
@@ -340,7 +334,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="predicate">The condition to test each item against.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void HasCountMatching(int expectedCount, Func<T, bool> predicate,
+    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
         [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
         [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {

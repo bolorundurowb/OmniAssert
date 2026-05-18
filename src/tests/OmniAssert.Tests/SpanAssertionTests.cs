@@ -15,25 +15,25 @@ public class SpanAssertionTests
     public void Verify_ReadOnlySpan_CanBeChained()
     {
         ReadOnlySpan<int> span = new int[] { 1, 2, 3 }.AsSpan();
-        span.Verify().HasLength(3);
+        span.Verify().ToHaveLength(3);
     }
 
     [Fact]
     public void Verify_Span_CanBeChained()
     {
-        new int[] { 1, 2, 3 }.AsSpan().Verify().HasLength(3);
+        new int[] { 1, 2, 3 }.AsSpan().Verify().ToHaveLength(3);
     }
 
     [Fact]
     public void Verify_Memory_CanBeChained()
     {
-        new Memory<int>(new int[] { 1, 2, 3 }).Verify().HasLength(3);
+        new Memory<int>(new int[] { 1, 2, 3 }).Verify().ToHaveLength(3);
     }
 
     [Fact]
     public void Verify_ReadOnlyMemory_CanBeChained()
     {
-        new ReadOnlyMemory<int>(new int[] { 1, 2, 3 }).Verify().HasLength(3);
+        new ReadOnlyMemory<int>(new int[] { 1, 2, 3 }).Verify().ToHaveLength(3);
     }
 
     [Fact]
@@ -113,16 +113,16 @@ public class SpanAssertionTests
     }
 
     [Fact]
-    public void HasLength_WhenCorrect_ShouldSucceed()
+    public void ToHaveLength_WhenCorrect_ShouldSucceed()
     {
-        new int[] { 1, 2, 3 }.AsSpan().Verify().HasLength(3);
+        new int[] { 1, 2, 3 }.AsSpan().Verify().ToHaveLength(3);
     }
 
     [Fact]
-    public void HasLength_WhenIncorrect_ShouldThrow()
+    public void ToHaveLength_WhenIncorrect_ShouldThrow()
     {
         var threw = false;
-        try { new int[] { 1, 2, 3 }.AsSpan().Verify().HasLength(5); }
+        try { new int[] { 1, 2, 3 }.AsSpan().Verify().ToHaveLength(5); }
         catch (OmniAssertionException) { threw = true; }
         Xunit.Assert.True(threw);
     }

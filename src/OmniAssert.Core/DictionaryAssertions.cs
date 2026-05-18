@@ -120,6 +120,44 @@ public readonly struct DictionaryAssertions<TKey, TValue>
             _expression);
     }
 
+    /// <summary>Verifies that the dictionary is <c>null</c>.</summary>
+    public void ToBeNull()
+    {
+        if (_actual is null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be null, but was {OmniAssertionException.FormatValueForMessage(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the dictionary is not <c>null</c>.</summary>
+    public void NotToBeNull()
+    {
+        if (_actual is not null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be null, but it was.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the dictionary has exactly <paramref name="expectedCount"/> entries.</summary>
+    /// <param name="expectedCount">The expected number of entries.</param>
+    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualCount = _actual.Count;
+
+        if (actualCount == expectedCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count {expectedCount} ({countExpression ?? "expected"}), but had {actualCount}.",
+            _expression);
+    }
+
     private static string FormatItem<T>(T item) => OmniAssertionException.FormatValueForMessage(item!);
 
     private void EnsureActualNotNull()

@@ -243,14 +243,14 @@ public class NumericAssertionTests
     [Fact]
     public void ToBeApproximately_WithFloatingPointNaN_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
             double.NaN.Verify().ToBeApproximately(1.0, 0.1));
     }
 
     [Fact]
     public void ToBeApproximately_WhenBothNaN_ShouldFail()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
             double.NaN.Verify().ToBeApproximately(double.NaN, 0.1));
     }
 

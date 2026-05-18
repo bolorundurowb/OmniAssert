@@ -42,41 +42,41 @@ public class DateOnlyAssertionTests
     }
 
     [Fact]
-    public void HasYear_WhenYearMatches_ShouldSucceed()
+    public void ToHaveYear_WhenYearMatches_ShouldSucceed()
     {
-        (new DateOnly(2026, 5, 7)).Verify().HasYear(2026);
+        (new DateOnly(2026, 5, 7)).Verify().ToHaveYear(2026);
     }
 
     [Fact]
-    public void HasYear_WhenYearDiffers_ShouldThrow()
+    public void ToHaveYear_WhenYearDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new DateOnly(2026, 5, 7)).Verify().HasYear(2025));
+            (new DateOnly(2026, 5, 7)).Verify().ToHaveYear(2025));
     }
 
     [Fact]
-    public void HasMonth_WhenMonthMatches_ShouldSucceed()
+    public void ToHaveMonth_WhenMonthMatches_ShouldSucceed()
     {
-        (new DateOnly(2026, 5, 7)).Verify().HasMonth(5);
+        (new DateOnly(2026, 5, 7)).Verify().ToHaveMonth(5);
     }
 
     [Fact]
-    public void HasMonth_WhenMonthDiffers_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new DateOnly(2026, 5, 7)).Verify().HasMonth(6));
-    }
-
-    [Fact]
-    public void HasDay_WhenDayMatches_ShouldSucceed()
-    {
-        (new DateOnly(2026, 5, 7)).Verify().HasDay(7);
-    }
-
-    [Fact]
-    public void HasDay_WhenDayDiffers_ShouldThrow()
+    public void ToHaveMonth_WhenMonthDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new DateOnly(2026, 5, 7)).Verify().HasDay(8));
+            (new DateOnly(2026, 5, 7)).Verify().ToHaveMonth(6));
+    }
+
+    [Fact]
+    public void ToHaveDay_WhenDayMatches_ShouldSucceed()
+    {
+        (new DateOnly(2026, 5, 7)).Verify().ToHaveDay(7);
+    }
+
+    [Fact]
+    public void ToHaveDay_WhenDayDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new DateOnly(2026, 5, 7)).Verify().ToHaveDay(8));
     }
 }

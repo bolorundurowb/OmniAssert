@@ -151,39 +151,39 @@ public class StringAssertionTests
     }
 
     [Fact]
-    public void HasLength_WhenLengthMatches_ShouldSucceed()
+    public void ToHaveLength_WhenLengthMatches_ShouldSucceed()
     {
-        ("hello").Verify().HasLength(5);
+        ("hello").Verify().ToHaveLength(5);
     }
 
     [Fact]
-    public void HasLength_WhenLengthDiffers_ShouldThrow()
+    public void ToHaveLength_WhenLengthDiffers_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLength(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToHaveLength(2));
     }
 
     [Fact]
-    public void HasLengthGreaterThan_WhenLongEnough_ShouldSucceed()
+    public void ToHaveLengthGreaterThan_WhenLongEnough_ShouldSucceed()
     {
-        ("hello").Verify().HasLengthGreaterThan(3);
+        ("hello").Verify().ToHaveLengthGreaterThan(3);
     }
 
     [Fact]
-    public void HasLengthGreaterThan_WhenTooShort_ShouldThrow()
+    public void ToHaveLengthGreaterThan_WhenTooShort_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthGreaterThan(3));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToHaveLengthGreaterThan(3));
     }
 
     [Fact]
-    public void HasLengthLessThan_WhenShortEnough_ShouldSucceed()
+    public void ToHaveLengthLessThan_WhenShortEnough_ShouldSucceed()
     {
-        ("hello").Verify().HasLengthLessThan(10);
+        ("hello").Verify().ToHaveLengthLessThan(10);
     }
 
     [Fact]
-    public void HasLengthLessThan_WhenTooLong_ShouldThrow()
+    public void ToHaveLengthLessThan_WhenTooLong_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().HasLengthLessThan(3));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Verify().ToHaveLengthLessThan(3));
     }
 
     [Fact]
@@ -333,10 +333,10 @@ public class StringAssertionTests
     }
 
     [Fact]
-    public void HasLength_WithVeryLongString_ShouldSucceed()
+    public void ToHaveLength_WithVeryLongString_ShouldSucceed()
     {
         var longStr = new string('x', 10000);
-        longStr.Verify().HasLength(10000);
+        longStr.Verify().ToHaveLength(10000);
     }
 
     [Fact]

@@ -77,7 +77,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span has exactly <paramref name="expectedLength"/> elements.</summary>
     /// <param name="expectedLength">The expected number of elements.</param>
     /// <param name="lengthExpression">The expression for the expected length (automatically captured).</param>
-    public void HasLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
+    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
     {
         if (_actual.Length == expectedLength)
             return;
@@ -87,22 +87,16 @@ public readonly ref struct SpanAssertions<T>
             _expression);
     }
 
-    /// <summary>Verifies that the span has exactly <paramref name="expectedCount"/> elements (alias for <see cref="HasLength"/>).</summary>
-    /// <param name="expectedCount">The expected number of elements.</param>
-    /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void HasCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
-        HasLength(expectedCount, countExpression);
-
-    /// <summary>Verifies that the span has exactly <paramref name="expectedCount"/> elements (alias for <see cref="HasLength"/>).</summary>
+    /// <summary>Verifies that the span has exactly <paramref name="expectedCount"/> elements (alias for <see cref="ToHaveLength"/>).</summary>
     /// <param name="expectedCount">The expected number of elements.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
-        HasLength(expectedCount, countExpression);
+        ToHaveLength(expectedCount, countExpression);
 
     /// <summary>Verifies that the span count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the span count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
-    public void HasCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
+    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
     {
         if (_actual.Length > minimumCount)
             return;
@@ -115,7 +109,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span count is less than <paramref name="maximumCount"/>.</summary>
     /// <param name="maximumCount">The exclusive upper bound for the span count.</param>
     /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
-    public void HasCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
+    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
     {
         if (_actual.Length < maximumCount)
             return;
@@ -260,7 +254,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span contains exactly <paramref name="expectedUniqueCount"/> distinct elements.</summary>
     /// <param name="expectedUniqueCount">The expected number of distinct elements.</param>
     /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
-    public void HasUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
+    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
     {
         var set = new HashSet<T>();
         foreach (var item in _actual) set.Add(item);
@@ -354,7 +348,7 @@ public readonly ref struct SpanAssertions<T>
     /// <param name="predicate">The condition to test each item against.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void HasCountMatching(int expectedCount, Func<T, bool> predicate,
+    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
         [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
         [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {

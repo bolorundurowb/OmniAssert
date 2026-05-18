@@ -75,31 +75,6 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasCount_WhenCountMatches_ShouldSucceed()
-    {
-        (new[] { 1, 2, 3 }).Verify().HasCount(3);
-    }
-
-    [Fact]
-    public void HasCount_WhenCountDiffers_ShouldThrow()
-    {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().HasCount(2));
-    }
-
-    [Fact]
-    public void HasCount_NonICollection_WhenCountMatches_ShouldSucceed()
-    {
-        static IEnumerable<int> YieldThree()
-        {
-            yield return 1;
-            yield return 2;
-            yield return 3;
-        }
-
-        (YieldThree()).Verify().HasCount(3);
-    }
-
-    [Fact]
     public void ToHaveCount_WhenCountMatches_ShouldSucceed()
     {
         (new[] { 1, 2, 3 }).Verify().ToHaveCount(3);
@@ -112,33 +87,46 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasCountGreaterThan_WhenCountIsGreater_ShouldSucceed()
+    public void ToHaveCount_NonICollection_WhenCountMatches_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().HasCountGreaterThan(2);
+        static IEnumerable<int> YieldThree()
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+
+        (YieldThree()).Verify().ToHaveCount(3);
     }
 
     [Fact]
-    public void HasCountGreaterThan_WhenCountIsEqual_ShouldThrow()
+    public void ToHaveCountGreaterThan_WhenCountIsGreater_ShouldSucceed()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().HasCountGreaterThan(2));
+        (new[] { 1, 2, 3 }).Verify().ToHaveCountGreaterThan(2);
     }
 
     [Fact]
-    public void HasCountGreaterThan_WhenCountIsLess_ShouldThrow()
+    public void ToHaveCountGreaterThan_WhenCountIsEqual_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Verify().HasCountGreaterThan(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().ToHaveCountGreaterThan(2));
     }
 
     [Fact]
-    public void HasCountLessThan_WhenCountIsLess_ShouldSucceed()
+    public void ToHaveCountGreaterThan_WhenCountIsLess_ShouldThrow()
     {
-        (new[] { 1, 2, 3 }).Verify().HasCountLessThan(4);
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Verify().ToHaveCountGreaterThan(2));
     }
 
     [Fact]
-    public void HasCountLessThan_WhenCountIsEqual_ShouldThrow()
+    public void ToHaveCountLessThan_WhenCountIsLess_ShouldSucceed()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().HasCountLessThan(2));
+        (new[] { 1, 2, 3 }).Verify().ToHaveCountLessThan(4);
+    }
+
+    [Fact]
+    public void ToHaveCountLessThan_WhenCountIsEqual_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().ToHaveCountLessThan(2));
     }
 
     [Fact]
@@ -154,15 +142,15 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasUniqueCount_WhenCorrect_ShouldSucceed()
+    public void ToHaveUniqueCount_WhenCorrect_ShouldSucceed()
     {
-        (new[] { 1, 1, 2, 3 }).Verify().HasUniqueCount(3);
+        (new[] { 1, 1, 2, 3 }).Verify().ToHaveUniqueCount(3);
     }
 
     [Fact]
-    public void HasUniqueCount_WhenCountDiffers_ShouldThrow()
+    public void ToHaveUniqueCount_WhenCountDiffers_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 2, 3 }).Verify().HasUniqueCount(4));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 2, 3 }).Verify().ToHaveUniqueCount(4));
     }
 
     [Fact]
@@ -282,22 +270,22 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasCountMatching_WhenCountIsCorrect_ShouldSucceed()
+    public void ToHaveCountMatching_WhenCountIsCorrect_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Verify().HasCountMatching(3, x => x > 2);
+        (new[] { 1, 2, 3, 4, 5 }).Verify().ToHaveCountMatching(3, x => x > 2);
     }
 
     [Fact]
-    public void HasCountMatching_WhenCountIsWrong_ShouldThrow()
+    public void ToHaveCountMatching_WhenCountIsWrong_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3, 4, 5 }).Verify().HasCountMatching(2, x => x > 2));
+            (new[] { 1, 2, 3, 4, 5 }).Verify().ToHaveCountMatching(2, x => x > 2));
     }
 
     [Fact]
-    public void HasCountMatching_WhenNoElementsMatch_ShouldSucceedForZero()
+    public void ToHaveCountMatching_WhenNoElementsMatch_ShouldSucceedForZero()
     {
-        (new[] { 1, 2, 3 }).Verify().HasCountMatching(0, x => x > 10);
+        (new[] { 1, 2, 3 }).Verify().ToHaveCountMatching(0, x => x > 10);
     }
 
     [Fact]
@@ -345,14 +333,14 @@ public class CollectionAssertionTests
     [Fact]
     public void ToContain_WithNullElement_ShouldSucceed()
     {
-        (new string?[] { "a", null, "b" }).Verify().ToContain((string?) null);
+        (new string?[] { "a", null, "b" }).Verify().ToContain((string?)null);
     }
 
     [Fact]
     public void ToContain_WithNullElement_WhenNotPresent_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
-            (new string?[] { "a", "b" }).Verify().ToContain((string?) null));
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new string?[] { "a", "b" }).Verify().ToContain((string?)null));
     }
 
     [Fact]
@@ -364,7 +352,7 @@ public class CollectionAssertionTests
     [Fact]
     public void AnySatisfy_WithEmptyCollection_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
             Array.Empty<int>().Verify().AnySatisfy(x => x > 0));
     }
 
@@ -377,7 +365,7 @@ public class CollectionAssertionTests
     [Fact]
     public void ToContain_WithPredicate_WhenNoMatch_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
             (new[] { 1, 2, 3 }).Verify().ToContain(x => x > 10));
     }
 
@@ -394,9 +382,9 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasCountMatching_WithEmptyCollectionAndZero_ShouldSucceed()
+    public void ToHaveCountMatching_WithEmptyCollectionAndZero_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().HasCountMatching(0, x => x > 100);
+        (new[] { 1, 2, 3 }).Verify().ToHaveCountMatching(0, x => x > 100);
     }
 
     [Fact]
@@ -408,7 +396,7 @@ public class CollectionAssertionTests
     [Fact]
     public void ToBeUnique_WithDuplicateElements_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => 
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
             (new[] { 1, 2, 2, 3 }).Verify().ToBeUnique());
     }
 
@@ -419,9 +407,9 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasUniqueCount_WhenCountMatches_ShouldSucceed()
+    public void ToHaveUniqueCount_WhenCountMatches_ShouldSucceed()
     {
-        (new[] { 1, 1, 2, 3, 3 }).Verify().HasUniqueCount(3);
+        (new[] { 1, 1, 2, 3, 3 }).Verify().ToHaveUniqueCount(3);
     }
 
     [Fact]
@@ -436,13 +424,13 @@ public class CollectionAssertionTests
     }
 
     [Fact]
-    public void HasCount_WithinScope_MultipleFailures_ShouldThrowAggregate()
+    public void ToHaveCount_WithinScope_MultipleFailures_ShouldThrowAggregate()
     {
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            (new[] { 1 }).Verify().HasCount(5);
-            (new[] { 2 }).Verify().HasCount(5);
+            (new[] { 1 }).Verify().ToHaveCount(5);
+            (new[] { 2 }).Verify().ToHaveCount(5);
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }

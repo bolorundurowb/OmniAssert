@@ -50,7 +50,7 @@ public readonly struct DateOnlyAssertions
     /// <summary>Verifies that the date year matches <paramref name="expectedYear"/>.</summary>
     /// <param name="expectedYear">The expected year component.</param>
     /// <param name="yearExpression">The expression for the expected year (automatically captured).</param>
-    public void HasYear(int expectedYear, [CallerArgumentExpression(nameof(expectedYear))] string? yearExpression = null)
+    public void ToHaveYear(int expectedYear, [CallerArgumentExpression(nameof(expectedYear))] string? yearExpression = null)
     {
         if (_actual.Year == expectedYear)
             return;
@@ -63,7 +63,7 @@ public readonly struct DateOnlyAssertions
     /// <summary>Verifies that the date month matches <paramref name="expectedMonth"/>.</summary>
     /// <param name="expectedMonth">The expected month component.</param>
     /// <param name="monthExpression">The expression for the expected month (automatically captured).</param>
-    public void HasMonth(int expectedMonth, [CallerArgumentExpression(nameof(expectedMonth))] string? monthExpression = null)
+    public void ToHaveMonth(int expectedMonth, [CallerArgumentExpression(nameof(expectedMonth))] string? monthExpression = null)
     {
         if (_actual.Month == expectedMonth)
             return;
@@ -76,7 +76,7 @@ public readonly struct DateOnlyAssertions
     /// <summary>Verifies that the date day matches <paramref name="expectedDay"/>.</summary>
     /// <param name="expectedDay">The expected day component.</param>
     /// <param name="dayExpression">The expression for the expected day (automatically captured).</param>
-    public void HasDay(int expectedDay, [CallerArgumentExpression(nameof(expectedDay))] string? dayExpression = null)
+    public void ToHaveDay(int expectedDay, [CallerArgumentExpression(nameof(expectedDay))] string? dayExpression = null)
     {
         if (_actual.Day == expectedDay)
             return;

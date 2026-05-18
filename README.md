@@ -72,7 +72,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.0.1" />
+  <PackageReference Include="OmniAssert" Version="1.1.2" />
 </ItemGroup>
 ```
 
@@ -123,7 +123,7 @@ Fluent assertions for text analysis.
 ```csharp
 name.Verify().ToStartWith("John");
 email.Verify().ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-bio.Verify().HasLengthGreaterThan(10);
+bio.Verify().ToHaveLengthGreaterThan(10);
 role.Verify().ToBeIgnoringCase("admin");
 ```
 
@@ -134,27 +134,29 @@ role.Verify().ToBeIgnoringCase("admin");
 - `ToBeNull()` / `NotToBeNull()`
 - `ToBeEmpty()` / `NotToBeEmpty()`
 - `ToBeNullOrEmpty()` / `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
-- `HasLength(expected)` / `HasLengthGreaterThan(n)` / `HasLengthLessThan(n)`
+- `ToHaveLength(expected)` / `ToHaveLengthGreaterThan(n)` / `ToHaveLengthLessThan(n)`
 
 ### Collections & Dictionaries
 Deep verification for sequences and key-value pairs.
 
 ```csharp
-users.Verify().HasCount(3);
+users.Verify().ToHaveCount(3);
 items.Verify().ToContain(targetItem);
 results.Verify().ToBeUnique();
 settings.Verify().ContainKey("Theme");
 ```
 
-- `HasCount(n)` / `ToHaveCount(n)`
-- `HasCountGreaterThan(n)` / `HasCountLessThan(n)`
-- `HasCountMatching(n, predicate)`
+- `ToHaveCount(n)`
+- `ToHaveCountGreaterThan(n)` / `ToHaveCountLessThan(n)`
+- `ToHaveCountMatching(n, predicate)`
 - `ToBeEmpty()` / `NotToBeEmpty()`
 - `ToContain(item)` / `NotToContain(item)`
 - `ToContain(predicate)` / `AllSatisfy(predicate)` / `AnySatisfy(predicate)` / `NoneSatisfy(predicate)`
-- `ToBeUnique()` / `HasUniqueCount(n)`
+- `ToBeUnique()` / `ToHaveUniqueCount(n)`
 - `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
 - `ToBeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
+- `ToBeNull()` / `NotToBeNull()`
+- `ToHaveCount(n)`
 - `ContainKey(key)` / `NotContainKey(key)` / `ContainValue(value)` / `NotContainValue(value)` / `HaveValue(key, value)`
 
 ### Objects & Equivalence
