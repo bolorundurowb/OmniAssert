@@ -17,13 +17,14 @@
   </a>
 </p>
 
-> **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
-
 ## Introduction
 
 **OmniAssert** is a modern, fluent assertion library for .NET that makes your test code more readable and your test
 failures more informative. Built for **.NET 10** and **C# 14**, it combines the best ideas from established assertion
 frameworks while adding powerful compile-time features that help you write better tests faster.
+
+> **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
+
 
 At its core, OmniAssert provides an expressive, natural-language API for assertions: `Verify(user.Email).ToContain("@")`
 reads like plain English. When assertions fail, you get rich, detailed error messages that include the actual and
