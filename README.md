@@ -73,7 +73,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.1.2" />
+  <PackageReference Include="OmniAssert" Version="1.2.0" />
 </ItemGroup>
 ```
 

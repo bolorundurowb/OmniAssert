@@ -14,7 +14,10 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>v1.1.2
+    <PackageReleaseNotes>v1.2.0
+    - Added ToBeWhiteSpace, NotToBeWhiteSpace, NotToBeNullOrWhiteSpace, and NotToBeNullOrEmpty to StringAssertions.
+
+    v1.1.2
     - Added ToBeNull() and NotToBeNull() assertions to DictionaryAssertions.
     - Added ToHaveCount(n) assertion to DictionaryAssertions.
 
