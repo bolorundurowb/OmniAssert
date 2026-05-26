@@ -126,6 +126,9 @@ public readonly struct StringAssertions
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be null or empty, but was {Quote(_actual)}.", _expression);
     }
 
+    /// <summary>Verifies that the string is not null or empty.</summary>
+    public void NotToBeNullOrEmpty() => NotToBeEmpty();
+
     /// <summary>Verifies that the string is null, empty, or consists only of whitespace characters.</summary>
     public void ToBeNullOrWhiteSpace()
     {
@@ -134,6 +137,34 @@ public readonly struct StringAssertions
 
         VerificationFlow.Fail($"Verification failed: expected {_expression} to be null or whitespace, but was {Quote(_actual)}.", _expression);
     }
+
+    /// <summary>Verifies that the string is not null, empty, or consists only of whitespace characters.</summary>
+    public void NotToBeNullOrWhiteSpace()
+    {
+        if (!string.IsNullOrWhiteSpace(_actual))
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} not to be null or whitespace, but was {Quote(_actual)}.", _expression);
+    }
+
+    /// <summary>Verifies that the string consists only of whitespace characters (and is not null or empty).</summary>
+    public void ToBeWhiteSpace()
+    {
+        if (!string.IsNullOrEmpty(_actual) && string.IsNullOrWhiteSpace(_actual))
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} to be whitespace, but was {Quote(_actual)}.", _expression);
+    }
+
+    /// <summary>Verifies that the string does not consist only of whitespace characters.</summary>
+    public void NotToBeWhiteSpace()
+    {
+        if (string.IsNullOrEmpty(_actual) || !string.IsNullOrWhiteSpace(_actual))
+            return;
+
+        VerificationFlow.Fail($"Verification failed: expected {_expression} not to be whitespace, but was {Quote(_actual)}.", _expression);
+    }
+
 
     /// <summary>Verifies that the string is null.</summary>
     public void ToBeNull()

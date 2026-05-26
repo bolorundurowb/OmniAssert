@@ -134,7 +134,9 @@ role.Verify().ToBeIgnoringCase("admin");
 - `ToBeIgnoringCase(expected)` / `ToBeOneOf(values...)`
 - `ToBeNull()` / `NotToBeNull()`
 - `ToBeEmpty()` / `NotToBeEmpty()`
-- `ToBeNullOrEmpty()` / `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
+- `ToBeNullOrEmpty()` / `NotToBeNullOrEmpty()`
+- `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
+- `ToBeWhiteSpace()` / `NotToBeWhiteSpace()`
 - `ToHaveLength(expected)` / `ToHaveLengthGreaterThan(n)` / `ToHaveLengthLessThan(n)`
 
 ### Collections & Dictionaries

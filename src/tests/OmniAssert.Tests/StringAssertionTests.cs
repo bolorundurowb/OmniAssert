@@ -386,4 +386,78 @@ public class StringAssertionTests
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
+
+    [Fact]
+    public void NotToBeNullOrEmpty_WhenNotEmpty_ShouldSucceed()
+    {
+        ("hello").Verify().NotToBeNullOrEmpty();
+    }
+
+    [Fact]
+    public void NotToBeNullOrEmpty_WhenEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("").Verify().NotToBeNullOrEmpty());
+    }
+
+    [Fact]
+    public void NotToBeNullOrWhiteSpace_WhenNotWhiteSpace_ShouldSucceed()
+    {
+        ("hello").Verify().NotToBeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public void NotToBeNullOrWhiteSpace_WhenWhiteSpace_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("   ").Verify().NotToBeNullOrWhiteSpace());
+    }
+
+    [Fact]
+    public void ToBeWhiteSpace_WhenWhiteSpace_ShouldSucceed()
+    {
+        ("   ").Verify().ToBeWhiteSpace();
+    }
+
+    [Fact]
+    public void ToBeWhiteSpace_WhenEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("").Verify().ToBeWhiteSpace());
+    }
+
+    [Fact]
+    public void ToBeWhiteSpace_WhenNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Verify().ToBeWhiteSpace());
+    }
+
+    [Fact]
+    public void ToBeWhiteSpace_WhenNotWhiteSpace_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().ToBeWhiteSpace());
+    }
+
+    [Fact]
+    public void NotToBeWhiteSpace_WhenNotWhiteSpace_ShouldSucceed()
+    {
+        ("hello").Verify().NotToBeWhiteSpace();
+    }
+
+    [Fact]
+    public void NotToBeWhiteSpace_WhenNull_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Verify().NotToBeWhiteSpace();
+    }
+
+    [Fact]
+    public void NotToBeWhiteSpace_WhenEmpty_ShouldSucceed()
+    {
+        ("").Verify().NotToBeWhiteSpace();
+    }
+
+    [Fact]
+    public void NotToBeWhiteSpace_WhenWhiteSpace_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("   ").Verify().NotToBeWhiteSpace());
+    }
 }
