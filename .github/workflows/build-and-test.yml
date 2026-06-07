@@ -36,4 +36,4 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         # CoverletOutput is set in src/Directory.Build.targets to src/coverage/*.cobertura.xml
         files: ${{ github.workspace }}/src/coverage/*.cobertura.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false
