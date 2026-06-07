@@ -434,4 +434,69 @@ public class CollectionAssertionTests
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
+
+    [Fact]
+    public void ToBeSequenceEqual_WhenSequencesMatchInOrder_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 3 });
+    }
+
+    [Fact]
+    public void ToBeSequenceEqual_WhenOrderDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 3, 2, 1 }));
+    }
+
+    [Fact]
+    public void ToBeSequenceEqual_WhenElementsDiffer_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 4 }));
+    }
+
+    [Fact]
+    public void ToBeSequenceEqual_WhenCountDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 2 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 3 }));
+    }
+
+    [Fact]
+    public void ToContainInOrder_WhenItemsAppearInOrder_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3, 4, 5 }).Verify().ToContainInOrder(new[] { 2, 4 });
+    }
+
+    [Fact]
+    public void ToContainInOrder_WhenItemsAppearOutOfOrder_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 5, 4, 3, 2, 1 }).Verify().ToContainInOrder(new[] { 2, 4 }));
+    }
+
+    [Fact]
+    public void ToContainInOrder_WhenItemMissing_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 2, 3 }).Verify().ToContainInOrder(new[] { 1, 4 }));
+    }
+
+    [Fact]
+    public void ToContainInOrder_WithEmptyExpected_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3 }).Verify().ToContainInOrder(Array.Empty<int>());
+    }
+
+    [Fact]
+    public void ToContainInOrder_WhenItemsAreConsecutive_ShouldSucceed()
+    {
+        (new[] { 1, 2, 3, 4, 5 }).Verify().ToContainInOrder(new[] { 2, 3, 4 });
+    }
+
+    [Fact]
+    public void ToBeSequenceEqual_WithEmptyCollections_ShouldSucceed()
+    {
+        Array.Empty<int>().Verify().ToBeSequenceEqual(Array.Empty<int>());
+    }
 }

@@ -73,7 +73,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.2.0" />
+  <PackageReference Include="OmniAssert" Version="1.3.0" />
 </ItemGroup>
 ```
 
@@ -129,7 +129,7 @@ role.Verify().ToBeIgnoringCase("admin");
 ```
 
 - `ToContain(substring)` / `NotToContain(substring)`
-- `ToStartWith(prefix)` / `ToEndWith(suffix)`
+- `ToStartWith(prefix)` / `ToEndWith(suffix)` / `NotToEndWith(suffix)`
 - `ToMatch(regex)`
 - `ToBeIgnoringCase(expected)` / `ToBeOneOf(values...)`
 - `ToBeNull()` / `NotToBeNull()`
@@ -158,6 +158,8 @@ settings.Verify().ContainKey("Theme");
 - `ToBeUnique()` / `ToHaveUniqueCount(n)`
 - `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
 - `ToBeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
+- `ToBeSequenceEqual(other)` (Exact sequence equivalence—same elements in same order)
+- `ToContainInOrder(items...)` (Verifies items appear in the given order, not necessarily consecutively)
 - `ToBeNull()` / `NotToBeNull()`
 - `ToHaveCount(n)`
 - `ContainKey(key)` / `NotContainKey(key)` / `ContainValue(value)` / `NotContainValue(value)` / `HaveValue(key, value)`
@@ -194,7 +196,8 @@ await TimeSpan.FromSeconds(2).CompleteWithin(() => longRunningTask);
 
 - `Throws<T>()` / `ThrowsAsync<T>()`
 - `NotThrow()` / `NotThrowAsync()`
-- `WithMessage(expected)` / `WithMessageContaining(substring)`
+- `WithMessage(expected)` / `WithMessageContaining(substring)` / `WithMessageMatching(wildcard)`
+- `WithMessageIgnoringCase(expected)`
 - `WithInnerException<TInner>()`
 - `CompleteWithin(action)`
 

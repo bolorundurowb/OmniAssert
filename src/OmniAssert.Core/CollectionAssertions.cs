@@ -404,6 +404,69 @@ public readonly struct CollectionAssertions<T>
         }
     }
 
+    /// <summary>
+    /// Sequence equivalence: same elements in the same order. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">Expected sequence of elements.</param>
+    /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
+    public void ToBeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualList = _actual.ToList();
+        var expectedList = expected.ToList();
+
+        if (actualList.Count != expectedList.Count)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"} (count {expectedList.Count}), but had count {actualList.Count}.",
+                _expression);
+            return;
+        }
+
+        for (int i = 0; i < actualList.Count; i++)
+        {
+            if (!AreEquivalent(actualList[i], expectedList[i]))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"}, but element at index {i} was {FormatItem(actualList[i])} instead of {FormatItem(expectedList[i])}.",
+                    _expression);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verifies that the collection contains the specified elements in the given order,
+    /// not necessarily consecutively. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">The sequence of items expected to appear in order.</param>
+    /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
+    public void ToContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        EnsureActualNotNull();
+        var expectedList = expected.ToList();
+        if (expectedList.Count == 0)
+            return;
+
+        var actualList = _actual.ToList();
+        var expectedIndex = 0;
+
+        for (int actualIndex = 0; actualIndex < actualList.Count && expectedIndex < expectedList.Count; actualIndex++)
+        {
+            if (AreEquivalent(actualList[actualIndex], expectedList[expectedIndex]))
+            {
+                expectedIndex++;
+            }
+        }
+
+        if (expectedIndex == expectedList.Count)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to contain {expectedExpression ?? "expected"} in order, but did not find {FormatItem(expectedList[expectedIndex])} after the previously matched items.",
+            _expression);
+    }
+
     private static bool AreEquivalent(T a, T b)
     {
         if (EqualityComparer<T>.Default.Equals(a, b))

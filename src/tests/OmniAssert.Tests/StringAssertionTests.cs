@@ -460,4 +460,42 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("   ").Verify().NotToBeWhiteSpace());
     }
+
+    [Fact]
+    public void NotToEndWith_WhenSuffixNotPresent_ShouldSucceed()
+    {
+        ("hello world").Verify().NotToEndWith("bye");
+    }
+
+    [Fact]
+    public void NotToEndWith_WhenSuffixPresent_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello world").Verify().NotToEndWith("world"));
+    }
+
+    [Fact]
+    public void NotToEndWith_WithIgnoreCase_ShouldSucceed()
+    {
+        ("Hello").Verify().NotToEndWith("LO", StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void NotToEndWith_WithIgnoreCase_WhenPresent_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ("Hello").Verify().NotToEndWith("lo", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void NotToEndWith_WithNullString_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Verify().NotToEndWith("suffix");
+    }
+
+    [Fact]
+    public void NotToEndWith_WithEmptySuffix_WhenStringNotEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Verify().NotToEndWith(""));
+    }
 }

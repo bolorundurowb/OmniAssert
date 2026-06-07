@@ -212,6 +212,20 @@ public readonly struct StringAssertions
             _expression);
     }
 
+    /// <summary>Verifies that the string does not end with the specified <paramref name="suffix"/>.</summary>
+    /// <param name="suffix">The suffix that should not be at the end.</param>
+    /// <param name="comparison">The string comparison culture/options.</param>
+    /// <param name="suffixExpression">The expression for the suffix (automatically captured).</param>
+    public void NotToEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null)
+    {
+        if (_actual is null || !_actual.EndsWith(suffix, comparison))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to end with {suffixExpression ?? "suffix"} ({Quote(suffix)}), but it did.",
+            _expression);
+    }
+
     /// <summary>Verifies that the string matches the specified regular expression.</summary>
     /// <param name="regexPattern">The regular expression pattern.</param>
     /// <param name="options">The regex options.</param>

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace OmniAssert;
 
@@ -66,6 +67,22 @@ public readonly struct ExceptionAssertions<T> where T : Exception
 
         var actualType = Exception.InnerException?.GetType().Name ?? "null";
         VerificationFlow.Fail($"Verification failed: expected inner exception of type {typeof(TInner).Name}, but was {actualType}.", _expression);
+        return this;
+    }
+
+    /// <summary>Verifies that <see cref="Exception.Message"/> matches a wildcard pattern where <c>*</c> matches any sequence of characters.</summary>
+    /// <param name="wildcardPattern">The wildcard pattern (e.g., <c>"*text*"</c>).</param>
+    /// <param name="patternExpression">The expression for the pattern (automatically captured).</param>
+    /// <returns><c>this</c> when the message matches the wildcard pattern.</returns>
+    public ExceptionAssertions<T> WithMessageMatching(string wildcardPattern, [CallerArgumentExpression(nameof(wildcardPattern))] string? patternExpression = null)
+    {
+        var regexPattern = "^" + Regex.Escape(wildcardPattern).Replace("\\*", ".*") + "$";
+        if (Regex.IsMatch(Exception.Message, regexPattern, RegexOptions.Singleline))
+            return this;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected exception message to match wildcard pattern {patternExpression ?? "pattern"} (\"{wildcardPattern}\"), but was \"{Exception.Message}\".",
+            _expression);
         return this;
     }
 }

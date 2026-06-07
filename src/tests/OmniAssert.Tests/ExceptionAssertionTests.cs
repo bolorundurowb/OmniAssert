@@ -248,4 +248,48 @@ public class ExceptionAssertionTests
                 throw new InvalidOperationException("boom");
             }));
     }
+
+    [Fact]
+    public void WithMessageMatching_WhenWildcardMatches_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("User 42 not found"))).Throws<ArgumentException>()
+            .WithMessageMatching("*not found*");
+    }
+
+    [Fact]
+    public void WithMessageMatching_WhenWildcardMatchesStart_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("Error: something went wrong"))).Throws<ArgumentException>()
+            .WithMessageMatching("Error:*");
+    }
+
+    [Fact]
+    public void WithMessageMatching_WhenWildcardMatchesEnd_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("something went wrong"))).Throws<ArgumentException>()
+            .WithMessageMatching("*went wrong");
+    }
+
+    [Fact]
+    public void WithMessageMatching_WhenWildcardDoesNotMatch_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((Action)(() => throw new ArgumentException("User 42 not found"))).Throws<ArgumentException>()
+                .WithMessageMatching("*permission denied*"));
+        Xunit.Assert.Contains("42 not found", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WithMessageMatching_WithMultipleWildcards_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("Error: User 42 not found in database"))).Throws<ArgumentException>()
+            .WithMessageMatching("*User*not found*");
+    }
+
+    [Fact]
+    public void WithMessageMatching_WithExactMessage_ShouldSucceed()
+    {
+        ((Action)(() => throw new ArgumentException("exact message"))).Throws<ArgumentException>()
+            .WithMessageMatching("exact message");
+    }
 }

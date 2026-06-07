@@ -460,6 +460,120 @@ public readonly ref struct SpanAssertions<T>
         }
     }
 
+    /// <summary>
+    /// Sequence equivalence: same elements in the same order. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">Expected sequence of elements.</param>
+    /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
+    public void ToBeSequenceEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual.Length != expected.Length)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"} (length {expected.Length}), but had length {_actual.Length}.",
+                _expression);
+            return;
+        }
+
+        var comparer = EqualityComparer<T>.Default;
+        for (int i = 0; i < _actual.Length; i++)
+        {
+            if (!comparer.Equals(_actual[i], expected[i]))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"}, but element at index {i} was {OmniAssertionException.FormatValueForMessage(_actual[i]!)} instead of {OmniAssertionException.FormatValueForMessage(expected[i]!)}.",
+                    _expression);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sequence equivalence: same elements in the same order. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">Expected sequence of elements.</param>
+    /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
+    public void ToBeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        var expectedList = expected.ToList();
+        if (_actual.Length != expectedList.Count)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"} (count {expectedList.Count}), but had count {_actual.Length}.",
+                _expression);
+            return;
+        }
+
+        var comparer = EqualityComparer<T>.Default;
+        for (int i = 0; i < _actual.Length; i++)
+        {
+            if (!comparer.Equals(_actual[i], expectedList[i]))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to be sequence-equal to {expectedExpression ?? "expected"}, but element at index {i} was {OmniAssertionException.FormatValueForMessage(_actual[i]!)} instead of {OmniAssertionException.FormatValueForMessage(expectedList[i]!)}.",
+                    _expression);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verifies that the span contains the specified elements in the given order,
+    /// not necessarily consecutively. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">The sequence of items expected to appear in order.</param>
+    /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
+    public void ToContainInOrder(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (expected.Length == 0)
+            return;
+
+        var expectedIndex = 0;
+        for (int actualIndex = 0; actualIndex < _actual.Length && expectedIndex < expected.Length; actualIndex++)
+        {
+            if (AreEquivalent(_actual[actualIndex], expected[expectedIndex]))
+            {
+                expectedIndex++;
+            }
+        }
+
+        if (expectedIndex == expected.Length)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to contain {expectedExpression ?? "expected"} in order, but did not find {OmniAssertionException.FormatValueForMessage(expected[expectedIndex]!)} after the previously matched items.",
+            _expression);
+    }
+
+    /// <summary>
+    /// Verifies that the span contains the specified elements in the given order,
+    /// not necessarily consecutively. Uses default equality for <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="expected">The sequence of items expected to appear in order.</param>
+    /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
+    public void ToContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        var expectedList = expected.ToList();
+        if (expectedList.Count == 0)
+            return;
+
+        var expectedIndex = 0;
+        for (int actualIndex = 0; actualIndex < _actual.Length && expectedIndex < expectedList.Count; actualIndex++)
+        {
+            if (AreEquivalent(_actual[actualIndex], expectedList[expectedIndex]))
+            {
+                expectedIndex++;
+            }
+        }
+
+        if (expectedIndex == expectedList.Count)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to contain {expectedExpression ?? "expected"} in order, but did not find {OmniAssertionException.FormatValueForMessage(expectedList[expectedIndex]!)} after the previously matched items.",
+            _expression);
+    }
+
     private void VerifyOrdering(bool ascending)
     {
         if (_actual.Length <= 1)
