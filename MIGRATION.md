@@ -189,3 +189,7 @@ Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** instead o
 ## Need help?
 
 Open an [issue](https://github.com/bolorundurowb/OmniAssert/issues) with a minimal repro if a code fix does not apply cleanly or if you find a v1 pattern with no v2 equivalent.
+
+The full migration guide — API changes, Roslyn analyzer code fixes, and step-by-step instructions — lives in the
+**[OmniAssert documentation](https://bolorundurowb.github.io/OmniAssert/#migration)**.
+
