@@ -423,7 +423,7 @@ public class CollectionAssertionTests
         Xunit.Assert.NotNull(ex);
     }
 
-    [Fact]
+    [Fact]      
     public void ToHaveCount_WithinScope_MultipleFailures_ShouldThrowAggregate()
     {
         var ex = Xunit.Assert.Throws<AggregateException>(() =>

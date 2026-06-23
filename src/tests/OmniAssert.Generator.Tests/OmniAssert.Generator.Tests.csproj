@@ -7,7 +7,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <RootNamespace>OmniAssert.Generator.Tests</RootNamespace>
-    <LangVersion>14</LangVersion>
+    <LangVersion>13</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
