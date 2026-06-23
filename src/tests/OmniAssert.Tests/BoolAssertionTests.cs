@@ -122,4 +122,33 @@ public class BoolAssertionTests
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
+
+    [Fact]
+    public void ToBe_WhenMatchesTrue_ShouldNotThrow()
+    {
+        (true).Verify().ToBe(true);
+    }
+
+    [Fact]
+    public void ToBe_WhenMatchesFalse_ShouldNotThrow()
+    {
+        (false).Verify().ToBe(false);
+    }
+
+    [Fact]
+    public void ToBe_WhenMismatched_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (true).Verify().ToBe(false));
+        Xunit.Assert.Contains("expected", ex.Message, StringComparison.OrdinalIgnoreCase);
+        Xunit.Assert.Contains("false", ex.Message, StringComparison.Ordinal);
+        Xunit.Assert.Contains("true", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ToBe_WhenFalseExpectedTrueActual_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (false).Verify().ToBe(true));
+        Xunit.Assert.Contains("true", ex.Message, StringComparison.Ordinal);
+        Xunit.Assert.Contains("false", ex.Message, StringComparison.Ordinal);
+    }
 }

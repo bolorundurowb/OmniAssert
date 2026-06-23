@@ -48,6 +48,28 @@ public readonly struct DateTimeAssertions
         VerificationFlow.Fail(FormatFailure($"to be within {precision} of", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
     }
 
+    /// <summary>Verifies that the date/time is exactly equal to the <paramref name="expected"/> date/time.</summary>
+    /// <param name="expected">The expected date/time.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void ToBe(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual == expected)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("to be", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date/time is not equal to the <paramref name="unexpected"/> date/time.</summary>
+    /// <param name="unexpected">The unexpected date/time.</param>
+    /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
+    public void NotToBe(DateTime unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    {
+        if (_actual != unexpected)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("not to be", unexpected, unexpectedExpression ?? "unexpected", _actual, _expression), _expression);
+    }
+
     private static string FormatFailure(string relation, DateTime expected, string expectedLabel, DateTime actual, string actualLabel)
     {
         var sb = new System.Text.StringBuilder();
@@ -104,6 +126,28 @@ public readonly struct DateTimeOffsetAssertions
             return;
 
         VerificationFlow.Fail(FormatFailure($"to be within {precision} of", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date/time offset is exactly equal to the <paramref name="expected"/> date/time offset.</summary>
+    /// <param name="expected">The expected date/time offset.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void ToBe(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual == expected)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("to be", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date/time offset is not equal to the <paramref name="unexpected"/> date/time offset.</summary>
+    /// <param name="unexpected">The unexpected date/time offset.</param>
+    /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
+    public void NotToBe(DateTimeOffset unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    {
+        if (_actual != unexpected)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("not to be", unexpected, unexpectedExpression ?? "unexpected", _actual, _expression), _expression);
     }
 
     private static string FormatFailure(string relation, DateTimeOffset expected, string expectedLabel, DateTimeOffset actual, string actualLabel)

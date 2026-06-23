@@ -156,4 +156,64 @@ public class DateTimeAssertionTests
         });
         Xunit.Assert.NotNull(ex);
     }
+
+    [Fact]
+    public void DateTime_ToBe_WhenEqual_ShouldSucceed()
+    {
+        var now = DateTime.UtcNow;
+        now.Verify().ToBe(now);
+    }
+
+    [Fact]
+    public void DateTime_ToBe_WhenDifferent_ShouldThrow()
+    {
+        var now = DateTime.UtcNow;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => now.Verify().ToBe(now.AddSeconds(1)));
+        Xunit.Assert.Contains("to be", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DateTime_NotToBe_WhenDifferent_ShouldSucceed()
+    {
+        var now = DateTime.UtcNow;
+        now.Verify().NotToBe(now.AddSeconds(1));
+    }
+
+    [Fact]
+    public void DateTime_NotToBe_WhenEqual_ShouldThrow()
+    {
+        var now = DateTime.UtcNow;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => now.Verify().NotToBe(now));
+        Xunit.Assert.Contains("not to be", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DateTimeOffset_ToBe_WhenEqual_ShouldSucceed()
+    {
+        var now = DateTimeOffset.UtcNow;
+        now.Verify().ToBe(now);
+    }
+
+    [Fact]
+    public void DateTimeOffset_ToBe_WhenDifferent_ShouldThrow()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => now.Verify().ToBe(now.AddSeconds(1)));
+        Xunit.Assert.Contains("to be", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DateTimeOffset_NotToBe_WhenDifferent_ShouldSucceed()
+    {
+        var now = DateTimeOffset.UtcNow;
+        now.Verify().NotToBe(now.AddSeconds(1));
+    }
+
+    [Fact]
+    public void DateTimeOffset_NotToBe_WhenEqual_ShouldThrow()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => now.Verify().NotToBe(now));
+        Xunit.Assert.Contains("not to be", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
 }
