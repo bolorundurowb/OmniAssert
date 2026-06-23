@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for <see cref="Guid"/> subjects from <see cref="Assert.Verify(Guid, string?)"/>.</summary>
+/// <summary>Assertions for <see cref="Guid"/> subjects from <see cref="Ensure.Must(Guid, string?)"/>.</summary>
 public readonly struct GuidAssertions
 {
     private readonly Guid _actual;
@@ -17,7 +17,7 @@ public readonly struct GuidAssertions
     /// <summary>Verifies that the GUID is equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected GUID.</param>
     /// <param name="expectedExpression">The expression for the expected GUID (automatically captured).</param>
-    public void ToBe(Guid expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(Guid expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -28,7 +28,7 @@ public readonly struct GuidAssertions
     }
 
     /// <summary>Verifies that the GUID is <see cref="Guid.Empty"/>.</summary>
-    public void ToBeEmpty()
+    public void BeEmpty()
     {
         if (_actual == Guid.Empty)
             return;
@@ -39,7 +39,7 @@ public readonly struct GuidAssertions
     }
 
     /// <summary>Verifies that the GUID is not <see cref="Guid.Empty"/>.</summary>
-    public void NotToBeEmpty()
+    public void NotBeEmpty()
     {
         if (_actual != Guid.Empty)
             return;
@@ -51,7 +51,7 @@ public readonly struct GuidAssertions
 
     /// <summary>Verifies that the GUID matches one of the provided expected values.</summary>
     /// <param name="expected">Allowed GUID values.</param>
-    public void ToBeOneOf(params Guid[] expected)
+    public void BeOneOf(params Guid[] expected)
     {
         if (expected is not null)
         {
@@ -71,4 +71,12 @@ public readonly struct GuidAssertions
     }
 
     private static string FormatGuid(Guid value) => OmniAssertionException.FormatValueForMessage(value);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(Guid expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEmpty() => BeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeEmpty() => NotBeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOneOf(params Guid[] expected) => BeOneOf(expected);
 }

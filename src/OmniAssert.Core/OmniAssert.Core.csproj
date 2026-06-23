@@ -8,6 +8,7 @@
     <Description>OmniAssert runtime: fluent assertions for .NET tests with helpful failure messages, object diffing, exception helpers, and AssertionScope soft assertions.</Description>
     <PackageDescription>OmniAssert runtime package for .NET tests. Provides fluent Verify-style assertions, expressive failure messages, object equivalence diffing, exception assertions, and AssertionScope for aggregated failures.</PackageDescription>
     <LangVersion>14</LangVersion>
+    <OmniAssertDisableVerifyInterceptors>true</OmniAssertDisableVerifyInterceptors>
     <PackageId>OmniAssert</PackageId>
     <Title>Omni Assert</Title>
     <Authors>Winner-Timothy Bolorunduro</Authors>
@@ -54,6 +55,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <CompilerVisibleProperty Include="OmniAssertDisableVerifyInterceptors" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="OmniAssert.Tests" />
     <InternalsVisibleTo Include="OmniAssert.Tests.NoInterceptors" />
   </ItemGroup>
@@ -67,12 +72,19 @@
     <ProjectReference Include="..\OmniAssert.Generator\OmniAssert.Generator.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\OmniAssert.Analyzers\OmniAssert.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <!-- ProjectReference analyzer assets are not packed by default; ship the generator next to lib/ for NuGet consumers. -->
+  <!-- ProjectReference analyzer assets are not packed by default; ship analyzers next to lib/ for NuGet consumers. -->
   <Target Name="IncludeOmniAssertGeneratorInPackage" BeforeTargets="_GetPackageFiles" DependsOnTargets="ResolveProjectReferences">
     <ItemGroup>
       <None Include="$(MSBuildThisFileDirectory)..\OmniAssert.Generator\bin\$(Configuration)\netstandard2.0\OmniAssert.Generator.dll"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+      <None Include="$(MSBuildThisFileDirectory)..\OmniAssert.Analyzers\bin\$(Configuration)\netstandard2.0\OmniAssert.Analyzers.dll"
             Pack="true"
             PackagePath="analyzers/dotnet/cs"
             Visible="false" />

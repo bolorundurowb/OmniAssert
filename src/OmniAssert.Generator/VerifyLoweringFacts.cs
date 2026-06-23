@@ -2,16 +2,16 @@ using Microsoft.CodeAnalysis;
 
 namespace OmniAssert.Generator;
 
-/// <summary>Identifies <c>Assert.VerifyExpression(bool, string?)</c> for the incremental generator.</summary>
+/// <summary>Identifies <c>Ensure.VerifyExpression(bool, string?)</c> (and legacy <c>Assert.VerifyExpression</c>) for the incremental generator.</summary>
 internal static class VerifyLoweringFacts
 {
-    /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Assert</c>.</summary>
+    /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Ensure</c> or obsolete <c>Assert</c>.</summary>
     public static bool IsAssertVerifyExpression(IMethodSymbol sym)
     {
         if (sym.Name != "VerifyExpression")
             return false;
 
-        if (sym.ContainingType?.Name != "Assert" || sym.ContainingNamespace?.Name != "OmniAssert")
+        if (sym.ContainingType?.Name is not ("Assert" or "Ensure") || sym.ContainingNamespace?.Name != "OmniAssert")
             return false;
 
         // When called in extension-method form (receiver.VerifyExpression()), Roslyn provides the

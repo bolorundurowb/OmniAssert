@@ -5,20 +5,20 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>
-/// Entry point for fluent assertions. Overloads capture the caller’s expression text via
+/// Primary entry point for fluent assertions. Overloads capture the caller’s expression text via
 /// <see cref="CallerArgumentExpressionAttribute"/> so failures name the value or expression under test.
 /// </summary>
 /// <remarks>
 /// <para>Use <see cref="AssertionScope"/> to defer failures until the scope is disposed (soft asserts).</para>
 /// <para><see cref="VerifyExpression(bool, string?)"/> call sites are enhanced at compile time by the bundled Roslyn generator unless <c>OmniAssertDisableVerifyInterceptors</c> is set to <c>true</c>—see the README.</para>
 /// </remarks>
-public static partial class Assert
+public static partial class Ensure
 {
-    /// <summary>Begins verifying a boolean subject; chain <see cref="BoolAssertions.ToBeTrue"/> or <see cref="BoolAssertions.ToBeFalse"/>.</summary>
+    /// <summary>Begins verifying a boolean subject; chain <see cref="BoolAssertions.BeTrue"/> or <see cref="BoolAssertions.BeFalse"/>.</summary>
     /// <param name="actual">The boolean value under test.</param>
     /// <param name="expression">Caller expression text for failures (compiler-supplied via <c>[CallerArgumentExpression]</c>).</param>
     /// <returns>Fluent assertions for the boolean.</returns>
-    public static BoolAssertions Verify(this bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static BoolAssertions Must(this bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
 
@@ -50,105 +50,105 @@ public static partial class Assert
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<double> Verify(this double actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<double> Must(this double actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a float subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<float> Verify(this float actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<float> Must(this float actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a long subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<long> Verify(this long actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<long> Must(this long actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a decimal subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<decimal> Verify(this decimal actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<decimal> Must(this decimal actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying an integer subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<int> Verify(this int actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<int> Must(this int actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a short subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<short> Verify(this short actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<short> Must(this short actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a byte subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<byte> Verify(this byte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<byte> Must(this byte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a uint subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<uint> Verify(this uint actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<uint> Must(this uint actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a ulong subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<ulong> Verify(this ulong actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<ulong> Must(this ulong actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a ushort subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<ushort> Verify(this ushort actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<ushort> Must(this ushort actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying an sbyte subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<sbyte> Verify(this sbyte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<sbyte> Must(this sbyte actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a BigInteger subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="NumericAssertions{T}"/> object to continue the verification.</returns>
-    public static NumericAssertions<BigInteger> Verify(this BigInteger actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static NumericAssertions<BigInteger> Must(this BigInteger actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a GUID subject.</summary>
     /// <param name="actual">The GUID value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="GuidAssertions"/> object to continue the verification.</returns>
-    public static GuidAssertions Verify(this Guid actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static GuidAssertions Must(this Guid actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a string subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="StringAssertions"/> object to continue the verification.</returns>
-    public static StringAssertions Verify(this string? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static StringAssertions Must(this string? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a URI subject.</summary>
     /// <param name="actual">The URI value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="UriAssertions"/> object to continue the verification.</returns>
-    public static UriAssertions Verify(this Uri? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static UriAssertions Must(this Uri? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a collection subject.</summary>
@@ -156,7 +156,7 @@ public static partial class Assert
     /// <param name="actual">The collection to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="CollectionAssertions{T}"/> object to continue the verification.</returns>
-    public static CollectionAssertions<T> Verify<T>(this IEnumerable<T>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static CollectionAssertions<T> Must<T>(this IEnumerable<T>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual!, expression ?? "actual");
 
     /// <summary>Begins verifying a dictionary subject.</summary>
@@ -165,8 +165,8 @@ public static partial class Assert
     /// <param name="actual">The dictionary to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
-    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(this Dictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
-        Verify((IReadOnlyDictionary<TKey, TValue>?)actual, expression);
+    public static DictionaryAssertions<TKey, TValue> Must<TKey, TValue>(this Dictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+        Must((IReadOnlyDictionary<TKey, TValue>?)actual, expression);
 
     /// <summary>Begins verifying a dictionary subject.</summary>
     /// <typeparam name="TKey">The dictionary key type.</typeparam>
@@ -174,7 +174,7 @@ public static partial class Assert
     /// <param name="actual">The dictionary to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
-    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(this IDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static DictionaryAssertions<TKey, TValue> Must<TKey, TValue>(this IDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual is null ? null : new ReadOnlyDictionaryWrapper<TKey, TValue>(actual), expression ?? "actual");
 
     /// <summary>Begins verifying a read-only dictionary subject.</summary>
@@ -183,7 +183,7 @@ public static partial class Assert
     /// <param name="actual">The dictionary to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DictionaryAssertions{TKey, TValue}"/> object to continue the verification.</returns>
-    public static DictionaryAssertions<TKey, TValue> Verify<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static DictionaryAssertions<TKey, TValue> Must<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue>? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual!, expression ?? "actual");
 
     /// <summary>Verifies that a file exists at <paramref name="path"/> and returns file assertions.</summary>
@@ -223,7 +223,7 @@ public static partial class Assert
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="EnumAssertions{T}"/> object to continue the verification.</returns>
-    public static EnumAssertions<T> Verify<T>(this T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : struct, Enum =>
+    public static EnumAssertions<T> Must<T>(this T actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) where T : struct, Enum =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a nullable value type or reference type subject.</summary>
@@ -422,35 +422,35 @@ public static partial class Assert
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DateTimeAssertions"/> object to continue the verification.</returns>
-    public static DateTimeAssertions Verify(this DateTime actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static DateTimeAssertions Must(this DateTime actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a DateTimeOffset subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DateTimeOffsetAssertions"/> object to continue the verification.</returns>
-    public static DateTimeOffsetAssertions Verify(this DateTimeOffset actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static DateTimeOffsetAssertions Must(this DateTimeOffset actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a TimeSpan subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="TimeSpanAssertions"/> object to continue the verification.</returns>
-    public static TimeSpanAssertions Verify(this TimeSpan actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static TimeSpanAssertions Must(this TimeSpan actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a DateOnly subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="DateOnlyAssertions"/> object to continue the verification.</returns>
-    public static DateOnlyAssertions Verify(this DateOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static DateOnlyAssertions Must(this DateOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a TimeOnly subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="TimeOnlyAssertions"/> object to continue the verification.</returns>
-    public static TimeOnlyAssertions Verify(this TimeOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static TimeOnlyAssertions Must(this TimeOnly actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a <see cref="ReadOnlySpan{T}"/> subject without any allocation.</summary>
@@ -458,7 +458,7 @@ public static partial class Assert
     /// <param name="actual">The span to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
-    public static SpanAssertions<T> Verify<T>(this ReadOnlySpan<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static SpanAssertions<T> Must<T>(this ReadOnlySpan<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a <see cref="Span{T}"/> subject without any allocation.</summary>
@@ -466,7 +466,7 @@ public static partial class Assert
     /// <param name="actual">The span to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
-    public static SpanAssertions<T> Verify<T>(this Span<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static SpanAssertions<T> Must<T>(this Span<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     /// <summary>Begins verifying a <see cref="ReadOnlyMemory{T}"/> subject.</summary>
@@ -474,7 +474,7 @@ public static partial class Assert
     /// <param name="actual">The memory to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
-    public static SpanAssertions<T> Verify<T>(this ReadOnlyMemory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static SpanAssertions<T> Must<T>(this ReadOnlyMemory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual.Span, expression ?? "actual");
 
     /// <summary>Begins verifying a <see cref="Memory{T}"/> subject.</summary>
@@ -482,14 +482,14 @@ public static partial class Assert
     /// <param name="actual">The memory to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>A <see cref="SpanAssertions{T}"/> object to continue the verification.</returns>
-    public static SpanAssertions<T> Verify<T>(this Memory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static SpanAssertions<T> Must<T>(this Memory<T> actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual.Span, expression ?? "actual");
 
     /// <summary>Begins verifying an object subject.</summary>
     /// <param name="actual">The value to verify.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
     /// <returns>An <see cref="ObjectAssertions"/> object to continue the verification.</returns>
-    public static ObjectAssertions Verify(this object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
+    public static ObjectAssertions Must(this object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         new(actual, expression ?? "actual");
 
     private sealed class ReadOnlyDictionaryWrapper<TKey, TValue>(IDictionary<TKey, TValue> inner) : IReadOnlyDictionary<TKey, TValue>
@@ -504,4 +504,5 @@ public static partial class Assert
         public IEnumerable<TValue> Values => inner.Values;
     }
 }
+
 

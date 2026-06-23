@@ -72,7 +72,7 @@ internal sealed class VerifyExpansionEngine(SemanticModel model)
         var verifyCall = InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
-                    ParseTypeName("global::OmniAssert.Assert"),
+                    ParseTypeName("global::OmniAssert.Ensure"),
                     IdentifierName("VerifyExpression")))
             .WithArgumentList(
                 ArgumentList(SeparatedList([

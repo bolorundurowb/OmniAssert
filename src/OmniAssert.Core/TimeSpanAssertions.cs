@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for <see cref="TimeSpan"/> subjects from <see cref="Assert.Verify(TimeSpan, string?)"/>.</summary>
+/// <summary>Assertions for <see cref="TimeSpan"/> subjects from <see cref="Ensure.Must(TimeSpan, string?)"/>.</summary>
 public readonly struct TimeSpanAssertions
 {
     private readonly TimeSpan _actual;
@@ -14,7 +14,7 @@ public readonly struct TimeSpanAssertions
         _expression = expression;
     }
 
-    public void ToBe(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -23,7 +23,7 @@ public readonly struct TimeSpanAssertions
     }
 
     /// <summary>Verifies that the timespan is strictly positive.</summary>
-    public void ToBePositive()
+    public void BePositive()
     {
         if (_actual > TimeSpan.Zero)
             return;
@@ -32,7 +32,7 @@ public readonly struct TimeSpanAssertions
     }
 
     /// <summary>Verifies that the timespan is strictly negative.</summary>
-    public void ToBeNegative()
+    public void BeNegative()
     {
         if (_actual < TimeSpan.Zero)
             return;
@@ -43,7 +43,7 @@ public readonly struct TimeSpanAssertions
     /// <summary>Verifies that the timespan is greater than <paramref name="expected"/>.</summary>
     /// <param name="expected">The lower bound that actual duration must exceed.</param>
     /// <param name="expectedExpression">The expression for the expected timespan (automatically captured).</param>
-    public void ToBeGreaterThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeGreaterThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
             return;
@@ -54,7 +54,7 @@ public readonly struct TimeSpanAssertions
     /// <summary>Verifies that the timespan is less than <paramref name="expected"/>.</summary>
     /// <param name="expected">The upper bound that actual duration must be below.</param>
     /// <param name="expectedExpression">The expression for the expected timespan (automatically captured).</param>
-    public void ToBeLessThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeLessThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
             return;
@@ -65,7 +65,7 @@ public readonly struct TimeSpanAssertions
     /// <summary>Verifies that the timespan is not equal to <paramref name="unexpected"/>.</summary>
     /// <param name="unexpected">The value the timespan must not equal.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected timespan (automatically captured).</param>
-    public void NotToBe(TimeSpan unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(TimeSpan unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (_actual != unexpected)
             return;
@@ -76,7 +76,7 @@ public readonly struct TimeSpanAssertions
     /// <summary>Verifies that the timespan is greater than or equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The lower bound (inclusive) that actual duration must meet or exceed.</param>
     /// <param name="expectedExpression">The expression for the expected timespan (automatically captured).</param>
-    public void ToBeGreaterThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeGreaterThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual >= expected)
             return;
@@ -87,7 +87,7 @@ public readonly struct TimeSpanAssertions
     /// <summary>Verifies that the timespan is less than or equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The upper bound (inclusive) that actual duration must not exceed.</param>
     /// <param name="expectedExpression">The expression for the expected timespan (automatically captured).</param>
-    public void ToBeLessThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeLessThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual <= expected)
             return;
@@ -100,7 +100,7 @@ public readonly struct TimeSpanAssertions
     /// <param name="max">The maximum inclusive duration.</param>
     /// <param name="minExpression">The expression for the minimum value (automatically captured).</param>
     /// <param name="maxExpression">The expression for the maximum value (automatically captured).</param>
-    public void ToBeInRange(TimeSpan min, TimeSpan max,
+    public void BeInRange(TimeSpan min, TimeSpan max,
         [CallerArgumentExpression(nameof(min))] string? minExpression = null,
         [CallerArgumentExpression(nameof(max))] string? maxExpression = null)
     {
@@ -117,7 +117,7 @@ public readonly struct TimeSpanAssertions
 
     /// <summary>Verifies that the timespan matches one of the provided expected values.</summary>
     /// <param name="expected">Allowed timespan values.</param>
-    public void ToBeOneOf(params TimeSpan[] expected)
+    public void BeOneOf(params TimeSpan[] expected)
     {
         if (expected is not null)
         {
@@ -159,4 +159,27 @@ public readonly struct TimeSpanAssertions
         sb.Append(AnsiColour.Actual(FormatValue(actual)));
         return sb.ToString();
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+
+    public void ToBe(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBePositive() => BePositive();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNegative() => BeNegative();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeGreaterThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeGreaterThan(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeLessThan(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeLessThan(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(TimeSpan unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeGreaterThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeGreaterThanOrEqualTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeLessThanOrEqualTo(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeLessThanOrEqualTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInRange(TimeSpan min, TimeSpan max,
+        [CallerArgumentExpression(nameof(min))] string? minExpression = null,
+        [CallerArgumentExpression(nameof(max))] string? maxExpression = null) => BeInRange(min, max, minExpression, maxExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOneOf(params TimeSpan[] expected) => BeOneOf(expected);
 }

@@ -79,7 +79,8 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.Contains("ToBeTrue()", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
+        Xunit.Assert.Contains("BeTrue()", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
+        Xunit.Assert.Contains("Ensure.Must", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

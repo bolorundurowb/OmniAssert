@@ -3,7 +3,7 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Assert.Verify(bool)"/>.</summary>
+/// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Ensure.Must(bool)"/>.</summary>
 /// <remarks>Failures respect an enclosing <see cref="AssertionScope"/> when present; otherwise they throw <see cref="OmniAssertionException"/>.</remarks>
 public readonly struct BoolAssertions
 {
@@ -20,7 +20,7 @@ public readonly struct BoolAssertions
 
     /// <summary>Fails when the subject is <c>false</c>.</summary>
     /// <exception cref="OmniAssertionException">Thrown when the subject is false and no <see cref="AssertionScope"/> is collecting failures.</exception>
-    public void ToBeTrue()
+    public void BeTrue()
     {
         if (_actual)
             return;
@@ -37,7 +37,7 @@ public readonly struct BoolAssertions
 
     /// <summary>Fails when the subject is <c>true</c>.</summary>
     /// <exception cref="OmniAssertionException">Thrown when the subject is true and no <see cref="AssertionScope"/> is collecting failures.</exception>
-    public void ToBeFalse()
+    public void BeFalse()
     {
         if (!_actual)
             return;
@@ -55,7 +55,7 @@ public readonly struct BoolAssertions
     /// <summary>Verifies that the subject is equal to the <paramref name="expected"/> boolean value.</summary>
     /// <param name="expected">The expected boolean value.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(bool expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(bool expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -83,4 +83,10 @@ public readonly struct BoolAssertions
             msg.AppendLine();
         }
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeTrue() => BeTrue();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeFalse() => BeFalse();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(bool expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
 }

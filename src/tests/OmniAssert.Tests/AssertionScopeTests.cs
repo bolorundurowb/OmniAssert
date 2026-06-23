@@ -7,7 +7,7 @@ public class AssertionScopeTests
     {
         using (new AssertionScope())
         {
-            (1).Verify().ToBe(1);
+            (1).Must().Be(1);
         }
     }
 
@@ -18,7 +18,7 @@ public class AssertionScopeTests
         {
             using (new AssertionScope())
             {
-                (1).Verify().ToBe(2);
+                (1).Must().Be(2);
             }
         });
         Xunit.Assert.NotNull(ex);
@@ -31,8 +31,8 @@ public class AssertionScopeTests
         {
             using (new AssertionScope())
             {
-                (1).Verify().ToBe(2);
-                (3).Verify().ToBe(4);
+                (1).Must().Be(2);
+                (3).Must().Be(4);
             }
         });
         Xunit.Assert.Equal(2, ex!.InnerExceptions.Count);
@@ -45,8 +45,8 @@ public class AssertionScopeTests
         {
             using (new AssertionScope())
             {
-                (1).Verify().ToBe(2);
-                (3).Verify().ToBe(4);
+                (1).Must().Be(2);
+                (3).Must().Be(4);
             }
         });
         Xunit.Assert.All(ex.InnerExceptions, e => Xunit.Assert.IsType<OmniAssertionException>(e));
@@ -79,12 +79,12 @@ public class AssertionScopeTests
         {
             using (new AssertionScope())
             {
-                (1).Verify().ToBe(2);
-                (3).Verify().ToBe(4);
+                (1).Must().Be(2);
+                (3).Must().Be(4);
             }
         });
 
         // After scope is disposed, assertions should throw immediately again
-        Xunit.Assert.Throws<OmniAssertionException>(() => (5).Verify().ToBe(6));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (5).Must().Be(6));
     }
 }

@@ -5,13 +5,13 @@ public class CollectionAssertionTests
     [Fact]
     public void ToContain_WhenItemPresent_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToContain(2);
+        (new[] { 1, 2, 3 }).Must().Contain(2);
     }
 
     [Fact]
     public void ToContain_WhenItemAbsent_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().ToContain(4));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().Contain(4));
     }
 
     [Fact]
@@ -24,31 +24,31 @@ public class CollectionAssertionTests
             yield return 3;
         }
 
-        (Yield123()).Verify().ToContain(2);
+        (Yield123()).Must().Contain(2);
     }
 
     [Fact]
     public void NotToContain_WhenItemAbsent_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().NotToContain(4);
+        (new[] { 1, 2, 3 }).Must().NotContain(4);
     }
 
     [Fact]
     public void NotToContain_WhenItemPresent_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NotToContain(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().NotContain(2));
     }
 
     [Fact]
     public void ToBeEmpty_WhenEmpty_ShouldSucceed()
     {
-        (Array.Empty<int>()).Verify().ToBeEmpty();
+        (Array.Empty<int>()).Must().BeEmpty();
     }
 
     [Fact]
     public void ToBeEmpty_WhenNotEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Verify().ToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Must().BeEmpty());
     }
 
     [Fact]
@@ -59,31 +59,31 @@ public class CollectionAssertionTests
             yield break;
         }
 
-        (YieldNone()).Verify().ToBeEmpty();
+        (YieldNone()).Must().BeEmpty();
     }
 
     [Fact]
     public void NotToBeEmpty_WhenNotEmpty_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().NotToBeEmpty();
+        (new[] { 1, 2, 3 }).Must().NotBeEmpty();
     }
 
     [Fact]
     public void NotToBeEmpty_WhenEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (Array.Empty<int>()).Verify().NotToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Array.Empty<int>()).Must().NotBeEmpty());
     }
 
     [Fact]
     public void ToHaveCount_WhenCountMatches_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToHaveCount(3);
+        (new[] { 1, 2, 3 }).Must().HaveCount(3);
     }
 
     [Fact]
     public void ToHaveCount_WhenCountDiffers_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().ToHaveCount(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().HaveCount(2));
     }
 
     [Fact]
@@ -96,230 +96,230 @@ public class CollectionAssertionTests
             yield return 3;
         }
 
-        (YieldThree()).Verify().ToHaveCount(3);
+        (YieldThree()).Must().HaveCount(3);
     }
 
     [Fact]
     public void ToHaveCountGreaterThan_WhenCountIsGreater_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToHaveCountGreaterThan(2);
+        (new[] { 1, 2, 3 }).Must().HaveCountGreaterThan(2);
     }
 
     [Fact]
     public void ToHaveCountGreaterThan_WhenCountIsEqual_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().ToHaveCountGreaterThan(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Must().HaveCountGreaterThan(2));
     }
 
     [Fact]
     public void ToHaveCountGreaterThan_WhenCountIsLess_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Verify().ToHaveCountGreaterThan(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1 }).Must().HaveCountGreaterThan(2));
     }
 
     [Fact]
     public void ToHaveCountLessThan_WhenCountIsLess_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToHaveCountLessThan(4);
+        (new[] { 1, 2, 3 }).Must().HaveCountLessThan(4);
     }
 
     [Fact]
     public void ToHaveCountLessThan_WhenCountIsEqual_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Verify().ToHaveCountLessThan(2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2 }).Must().HaveCountLessThan(2));
     }
 
     [Fact]
     public void ToBeUnique_WhenAllElementsUnique_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToBeUnique();
+        (new[] { 1, 2, 3 }).Must().BeUnique();
     }
 
     [Fact]
     public void ToBeUnique_WhenDuplicatesExist_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 1 }).Verify().ToBeUnique());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 1 }).Must().BeUnique());
     }
 
     [Fact]
     public void ToHaveUniqueCount_WhenCorrect_ShouldSucceed()
     {
-        (new[] { 1, 1, 2, 3 }).Verify().ToHaveUniqueCount(3);
+        (new[] { 1, 1, 2, 3 }).Must().HaveUniqueCount(3);
     }
 
     [Fact]
     public void ToHaveUniqueCount_WhenCountDiffers_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 2, 3 }).Verify().ToHaveUniqueCount(4));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 2, 3 }).Must().HaveUniqueCount(4));
     }
 
     [Fact]
     public void ToBeInAscendingOrder_WhenSorted_ShouldSucceed()
     {
-        (new[] { 1, 2, 2, 3 }).Verify().ToBeInAscendingOrder();
+        (new[] { 1, 2, 2, 3 }).Must().BeInAscendingOrder();
     }
 
     [Fact]
     public void ToBeInAscendingOrder_WhenUnsorted_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 3, 2 }).Verify().ToBeInAscendingOrder());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 3, 2 }).Must().BeInAscendingOrder());
     }
 
     [Fact]
     public void ToBeInDescendingOrder_WhenSorted_ShouldSucceed()
     {
-        (new[] { 3, 2, 2, 1 }).Verify().ToBeInDescendingOrder();
+        (new[] { 3, 2, 2, 1 }).Must().BeInDescendingOrder();
     }
 
     [Fact]
     public void ToBeInDescendingOrder_WhenUnsorted_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 3, 1, 2 }).Verify().ToBeInDescendingOrder());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 3, 1, 2 }).Must().BeInDescendingOrder());
     }
 
     [Fact]
     public void AllSatisfy_WhenAllElementsSatisfy_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().AllSatisfy(x => x > 0);
+        (new[] { 1, 2, 3 }).Must().AllSatisfy(x => x > 0);
     }
 
     [Fact]
     public void AllSatisfy_WhenOneElementFails_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, -1 }).Verify().AllSatisfy(x => x > 0));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, -1 }).Must().AllSatisfy(x => x > 0));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenOrderDiffers_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToBeEquivalentTo(new[] { 3, 2, 1 });
+        (new[] { 1, 2, 3 }).Must().BeEquivalentTo(new[] { 3, 2, 1 });
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenElementsDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().ToBeEquivalentTo(new[] { 1, 2, 4 }));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().BeEquivalentTo(new[] { 1, 2, 4 }));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2 }).Verify().ToBeEquivalentTo(new[] { 1, 2, 3 }));
+            (new[] { 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 3 }));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenMultisetDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 1, 2 }).Verify().ToBeEquivalentTo(new[] { 1, 2, 2 }));
+            (new[] { 1, 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 2 }));
     }
 
     [Fact]
     public void ToContain_WithPredicate_WhenMatchExists_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToContain(x => x > 2);
+        (new[] { 1, 2, 3 }).Must().Contain(x => x > 2);
     }
 
     [Fact]
     public void NotToContain_WithPredicate_WhenNoMatchExists_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().NotToContain(x => x > 10);
+        (new[] { 1, 2, 3 }).Must().NotContain(x => x > 10);
     }
 
     [Fact]
     public void NotToContain_WithPredicate_WhenMatchExists_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NotToContain(x => x > 2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().NotContain(x => x > 2));
     }
 
     [Fact]
     public void AnySatisfy_WhenOneElementSatisfies_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x == 2);
+        (new[] { 1, 2, 3 }).Must().AnySatisfy(x => x == 2);
     }
 
     [Fact]
     public void AnySatisfy_WhenNoElementSatisfies_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x > 10));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().AnySatisfy(x => x > 10));
     }
 
     [Fact]
     public void AnySatisfy_WhenAllElementsSatisfy_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().AnySatisfy(x => x > 0);
+        (new[] { 1, 2, 3 }).Must().AnySatisfy(x => x > 0);
     }
 
     [Fact]
     public void NoneSatisfy_WhenNoElementSatisfies_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x > 10);
+        (new[] { 1, 2, 3 }).Must().NoneSatisfy(x => x > 10);
     }
 
     [Fact]
     public void NoneSatisfy_WhenOneElementSatisfies_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x == 2));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().NoneSatisfy(x => x == 2));
     }
 
     [Fact]
     public void NoneSatisfy_WhenAllElementsSatisfy_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Verify().NoneSatisfy(x => x > 0));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().NoneSatisfy(x => x > 0));
     }
 
     [Fact]
     public void ToHaveCountMatching_WhenCountIsCorrect_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Verify().ToHaveCountMatching(3, x => x > 2);
+        (new[] { 1, 2, 3, 4, 5 }).Must().HaveCountMatching(3, x => x > 2);
     }
 
     [Fact]
     public void ToHaveCountMatching_WhenCountIsWrong_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3, 4, 5 }).Verify().ToHaveCountMatching(2, x => x > 2));
+            (new[] { 1, 2, 3, 4, 5 }).Must().HaveCountMatching(2, x => x > 2));
     }
 
     [Fact]
     public void ToHaveCountMatching_WhenNoElementsMatch_ShouldSucceedForZero()
     {
-        (new[] { 1, 2, 3 }).Verify().ToHaveCountMatching(0, x => x > 10);
+        (new[] { 1, 2, 3 }).Must().HaveCountMatching(0, x => x > 10);
     }
 
     [Fact]
     public void ToBeInAscendingOrder_WithKeySelector_WhenSorted_ShouldSucceed()
     {
         var items = new[] { new { Name = "Alice", Age = 20 }, new { Name = "Bob", Age = 25 }, new { Name = "Carol", Age = 30 } };
-        items.Verify().ToBeInAscendingOrder(x => x.Age);
+        items.Must().BeInAscendingOrder(x => x.Age);
     }
 
     [Fact]
     public void ToBeInAscendingOrder_WithKeySelector_WhenUnsorted_ShouldThrow()
     {
         var items = new[] { new { Name = "Bob", Age = 25 }, new { Name = "Alice", Age = 20 } };
-        Xunit.Assert.Throws<OmniAssertionException>(() => items.Verify().ToBeInAscendingOrder(x => x.Age));
+        Xunit.Assert.Throws<OmniAssertionException>(() => items.Must().BeInAscendingOrder(x => x.Age));
     }
 
     [Fact]
     public void ToBeInDescendingOrder_WithKeySelector_WhenSorted_ShouldSucceed()
     {
         var items = new[] { new { Name = "Carol", Age = 30 }, new { Name = "Bob", Age = 25 }, new { Name = "Alice", Age = 20 } };
-        items.Verify().ToBeInDescendingOrder(x => x.Age);
+        items.Must().BeInDescendingOrder(x => x.Age);
     }
 
     [Fact]
     public void ToBeInDescendingOrder_WithKeySelector_WhenUnsorted_ShouldThrow()
     {
         var items = new[] { new { Name = "Alice", Age = 20 }, new { Name = "Bob", Age = 25 } };
-        Xunit.Assert.Throws<OmniAssertionException>(() => items.Verify().ToBeInDescendingOrder(x => x.Age));
+        Xunit.Assert.Throws<OmniAssertionException>(() => items.Must().BeInDescendingOrder(x => x.Age));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WithNullElements_ShouldSucceed()
     {
-        (new string?[] { null, "a", null }).Verify().ToBeEquivalentTo(new string?[] { "a", null, null });
+        (new string?[] { null, "a", null }).Must().BeEquivalentTo(new string?[] { "a", null, null });
     }
 
     [Fact]
@@ -327,89 +327,89 @@ public class CollectionAssertionTests
     {
         var actual = new[] { new[] { 1, 2 }, new[] { 3, 4 } };
         var expected = new[] { new[] { 3, 4 }, new[] { 1, 2 } };
-        actual.Verify().ToBeEquivalentTo(expected);
+        actual.Must().BeEquivalentTo(expected);
     }
 
     [Fact]
     public void ToContain_WithNullElement_ShouldSucceed()
     {
-        (new string?[] { "a", null, "b" }).Verify().ToContain((string?)null);
+        (new string?[] { "a", null, "b" }).Must().Contain((string?)null);
     }
 
     [Fact]
     public void ToContain_WithNullElement_WhenNotPresent_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new string?[] { "a", "b" }).Verify().ToContain((string?)null));
+            (new string?[] { "a", "b" }).Must().Contain((string?)null));
     }
 
     [Fact]
     public void AllSatisfy_WithEmptyCollection_ShouldSucceed()
     {
-        Array.Empty<int>().Verify().AllSatisfy(x => x > 0);
+        Array.Empty<int>().Must().AllSatisfy(x => x > 0);
     }
 
     [Fact]
     public void AnySatisfy_WithEmptyCollection_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            Array.Empty<int>().Verify().AnySatisfy(x => x > 0));
+            Array.Empty<int>().Must().AnySatisfy(x => x > 0));
     }
 
     [Fact]
     public void NoneSatisfy_WithEmptyCollection_ShouldSucceed()
     {
-        Array.Empty<int>().Verify().NoneSatisfy(x => x > 0);
+        Array.Empty<int>().Must().NoneSatisfy(x => x > 0);
     }
 
     [Fact]
     public void ToContain_WithPredicate_WhenNoMatch_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Verify().ToContain(x => x > 10));
+            (new[] { 1, 2, 3 }).Must().Contain(x => x > 10));
     }
 
     [Fact]
     public void ToBeInAscendingOrder_WithDuplicates_ShouldSucceed()
     {
-        (new[] { 1, 2, 2, 3, 3, 3 }).Verify().ToBeInAscendingOrder();
+        (new[] { 1, 2, 2, 3, 3, 3 }).Must().BeInAscendingOrder();
     }
 
     [Fact]
     public void ToBeInDescendingOrder_WithDuplicates_ShouldSucceed()
     {
-        (new[] { 3, 3, 3, 2, 2, 1 }).Verify().ToBeInDescendingOrder();
+        (new[] { 3, 3, 3, 2, 2, 1 }).Must().BeInDescendingOrder();
     }
 
     [Fact]
     public void ToHaveCountMatching_WithEmptyCollectionAndZero_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToHaveCountMatching(0, x => x > 100);
+        (new[] { 1, 2, 3 }).Must().HaveCountMatching(0, x => x > 100);
     }
 
     [Fact]
     public void ToBeUnique_WithAllUniqueElements_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToBeUnique();
+        (new[] { 1, 2, 3 }).Must().BeUnique();
     }
 
     [Fact]
     public void ToBeUnique_WithDuplicateElements_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 2, 3 }).Verify().ToBeUnique());
+            (new[] { 1, 2, 2, 3 }).Must().BeUnique());
     }
 
     [Fact]
     public void ToBeUnique_WithEmptyCollection_ShouldSucceed()
     {
-        Array.Empty<int>().Verify().ToBeUnique();
+        Array.Empty<int>().Must().BeUnique();
     }
 
     [Fact]
     public void ToHaveUniqueCount_WhenCountMatches_ShouldSucceed()
     {
-        (new[] { 1, 1, 2, 3, 3 }).Verify().ToHaveUniqueCount(3);
+        (new[] { 1, 1, 2, 3, 3 }).Must().HaveUniqueCount(3);
     }
 
     [Fact]
@@ -418,7 +418,7 @@ public class CollectionAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (new[] { 1, 2 }).Verify().ToContain(9);
+            (new[] { 1, 2 }).Must().Contain(9);
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -429,8 +429,8 @@ public class CollectionAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            (new[] { 1 }).Verify().ToHaveCount(5);
-            (new[] { 2 }).Verify().ToHaveCount(5);
+            (new[] { 1 }).Must().HaveCount(5);
+            (new[] { 2 }).Must().HaveCount(5);
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
@@ -438,65 +438,65 @@ public class CollectionAssertionTests
     [Fact]
     public void ToBeSequenceEqual_WhenSequencesMatchInOrder_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 3 });
+        (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 1, 2, 3 });
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenOrderDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 3, 2, 1 }));
+            (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 3, 2, 1 }));
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenElementsDiffer_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 4 }));
+            (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 1, 2, 4 }));
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2 }).Verify().ToBeSequenceEqual(new[] { 1, 2, 3 }));
+            (new[] { 1, 2 }).Must().BeSequenceEqual(new[] { 1, 2, 3 }));
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAppearInOrder_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Verify().ToContainInOrder(new[] { 2, 4 });
+        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder(new[] { 2, 4 });
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAppearOutOfOrder_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 5, 4, 3, 2, 1 }).Verify().ToContainInOrder(new[] { 2, 4 }));
+            (new[] { 5, 4, 3, 2, 1 }).Must().ContainInOrder(new[] { 2, 4 }));
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Verify().ToContainInOrder(new[] { 1, 4 }));
+            (new[] { 1, 2, 3 }).Must().ContainInOrder(new[] { 1, 4 }));
     }
 
     [Fact]
     public void ToContainInOrder_WithEmptyExpected_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Verify().ToContainInOrder(Array.Empty<int>());
+        (new[] { 1, 2, 3 }).Must().ContainInOrder(Array.Empty<int>());
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAreConsecutive_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Verify().ToContainInOrder(new[] { 2, 3, 4 });
+        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder(new[] { 2, 3, 4 });
     }
 
     [Fact]
     public void ToBeSequenceEqual_WithEmptyCollections_ShouldSucceed()
     {
-        Array.Empty<int>().Verify().ToBeSequenceEqual(Array.Empty<int>());
+        Array.Empty<int>().Must().BeSequenceEqual(Array.Empty<int>());
     }
 }

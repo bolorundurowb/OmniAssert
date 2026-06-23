@@ -28,7 +28,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span is sequence-equal to <paramref name="expected"/> (no allocation).</summary>
     /// <param name="expected">The expected element sequence.</param>
     /// <param name="expectedExpression">The expression for the expected span (automatically captured).</param>
-    public void ToEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Equal(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (SpanSequenceEqual(_actual, expected))
             return;
@@ -42,7 +42,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span is not sequence-equal to <paramref name="unexpected"/>.</summary>
     /// <param name="unexpected">The element sequence the span must not equal.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected span (automatically captured).</param>
-    public void NotToEqual(ReadOnlySpan<T> unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotEqual(ReadOnlySpan<T> unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (!SpanSequenceEqual(_actual, unexpected))
             return;
@@ -53,7 +53,7 @@ public readonly ref struct SpanAssertions<T>
     }
 
     /// <summary>Verifies that the span is empty (length == 0).</summary>
-    public void ToBeEmpty()
+    public void BeEmpty()
     {
         if (_actual.IsEmpty)
             return;
@@ -64,7 +64,7 @@ public readonly ref struct SpanAssertions<T>
     }
 
     /// <summary>Verifies that the span is not empty (length &gt; 0).</summary>
-    public void NotToBeEmpty()
+    public void NotBeEmpty()
     {
         if (!_actual.IsEmpty)
             return;
@@ -77,7 +77,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span has exactly <paramref name="expectedLength"/> elements.</summary>
     /// <param name="expectedLength">The expected number of elements.</param>
     /// <param name="lengthExpression">The expression for the expected length (automatically captured).</param>
-    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
+    public void HaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
     {
         if (_actual.Length == expectedLength)
             return;
@@ -90,13 +90,13 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span has exactly <paramref name="expectedCount"/> elements (alias for <see cref="ToHaveLength"/>).</summary>
     /// <param name="expectedCount">The expected number of elements.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
-        ToHaveLength(expectedCount, countExpression);
+    public void HaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) =>
+        HaveLength(expectedCount, countExpression);
 
     /// <summary>Verifies that the span count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the span count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
-    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
+    public void HaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
     {
         if (_actual.Length > minimumCount)
             return;
@@ -109,7 +109,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span count is less than <paramref name="maximumCount"/>.</summary>
     /// <param name="maximumCount">The exclusive upper bound for the span count.</param>
     /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
-    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
+    public void HaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
     {
         if (_actual.Length < maximumCount)
             return;
@@ -122,7 +122,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span contains <paramref name="item"/>.</summary>
     /// <param name="item">The element expected to be present.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
-    public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
+    public void Contain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         var comparer = EqualityComparer<T>.Default;
         foreach (var element in _actual)
@@ -139,7 +139,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span contains at least one element satisfying <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that at least one item must meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void ToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    public void Contain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
         foreach (var item in _actual)
         {
@@ -155,7 +155,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span does not contain <paramref name="item"/>.</summary>
     /// <param name="item">The element that must not be present.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
-    public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
+    public void NotContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         var comparer = EqualityComparer<T>.Default;
         var index = 0;
@@ -175,7 +175,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span contains no elements satisfying <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that no item should meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void NotToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    public void NotContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
         var index = 0;
         foreach (var item in _actual)
@@ -194,7 +194,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span starts with the element sequence in <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected prefix sequence.</param>
     /// <param name="expectedExpression">The expression for the expected span (automatically captured).</param>
-    public void ToStartWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void StartWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (expected.Length > _actual.Length)
         {
@@ -215,7 +215,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span ends with the element sequence in <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected suffix sequence.</param>
     /// <param name="expectedExpression">The expression for the expected span (automatically captured).</param>
-    public void ToEndWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void EndWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (expected.Length > _actual.Length)
         {
@@ -234,7 +234,7 @@ public readonly ref struct SpanAssertions<T>
     }
 
     /// <summary>Verifies that all elements in the span are unique.</summary>
-    public void ToBeUnique()
+    public void BeUnique()
     {
         var seen = new HashSet<T>();
         var index = 0;
@@ -254,7 +254,7 @@ public readonly ref struct SpanAssertions<T>
     /// <summary>Verifies that the span contains exactly <paramref name="expectedUniqueCount"/> distinct elements.</summary>
     /// <param name="expectedUniqueCount">The expected number of distinct elements.</param>
     /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
-    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
+    public void HaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
     {
         var set = new HashSet<T>();
         foreach (var item in _actual) set.Add(item);
@@ -268,16 +268,16 @@ public readonly ref struct SpanAssertions<T>
     }
 
     /// <summary>Verifies that the span is in ascending order (non-decreasing) using <see cref="Comparer{T}.Default"/>.</summary>
-    public void ToBeInAscendingOrder() => VerifyOrdering(ascending: true);
+    public void BeInAscendingOrder() => VerifyOrdering(ascending: true);
 
     /// <summary>Verifies that the span is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
-    public void ToBeInDescendingOrder() => VerifyOrdering(ascending: false);
+    public void BeInDescendingOrder() => VerifyOrdering(ascending: false);
 
     /// <summary>Verifies that the span is in ascending order (non-decreasing) by the key returned by <paramref name="keySelector"/>.</summary>
     /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
     /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
     /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
-    public void ToBeInAscendingOrder<TKey>(Func<T, TKey> keySelector,
+    public void BeInAscendingOrder<TKey>(Func<T, TKey> keySelector,
         [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null) =>
         VerifyOrderingByKey(keySelector, ascending: true, keySelectorExpression ?? "keySelector");
 
@@ -285,7 +285,7 @@ public readonly ref struct SpanAssertions<T>
     /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
     /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
     /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
-    public void ToBeInDescendingOrder<TKey>(Func<T, TKey> keySelector,
+    public void BeInDescendingOrder<TKey>(Func<T, TKey> keySelector,
         [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null) =>
         VerifyOrderingByKey(keySelector, ascending: false, keySelectorExpression ?? "keySelector");
 
@@ -348,7 +348,7 @@ public readonly ref struct SpanAssertions<T>
     /// <param name="predicate">The condition to test each item against.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
+    public void HaveCountMatching(int expectedCount, Func<T, bool> predicate,
         [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
         [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
@@ -372,7 +372,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">Expected multiset of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeEquivalentTo(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeEquivalentTo(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual.Length != expected.Length)
         {
@@ -418,7 +418,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">Expected multiset of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         var expectedList = expected.ToList();
         if (_actual.Length != expectedList.Count)
@@ -465,7 +465,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">Expected sequence of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeSequenceEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeSequenceEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual.Length != expected.Length)
         {
@@ -493,7 +493,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">Expected sequence of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         var expectedList = expected.ToList();
         if (_actual.Length != expectedList.Count)
@@ -523,7 +523,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">The sequence of items expected to appear in order.</param>
     /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
-    public void ToContainInOrder(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void ContainInOrder(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (expected.Length == 0)
             return;
@@ -551,7 +551,7 @@ public readonly ref struct SpanAssertions<T>
     /// </summary>
     /// <param name="expected">The sequence of items expected to appear in order.</param>
     /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
-    public void ToContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void ContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         var expectedList = expected.ToList();
         if (expectedList.Count == 0)
@@ -726,4 +726,46 @@ public readonly ref struct SpanAssertions<T>
         }
         return true;
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Equal(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToEqual(ReadOnlySpan<T> unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotEqual(unexpected, unexpectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEmpty() => BeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeEmpty() => NotBeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null) => HaveLength(expectedLength, lengthExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) => HaveCount(expectedCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null) => HaveCountGreaterThan(minimumCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null) => HaveCountLessThan(maximumCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null) => Contain(item, itemExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null) => NotContain(item, itemExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToStartWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => StartWith(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToEndWith(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => EndWith(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeUnique() => BeUnique();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null) => HaveUniqueCount(expectedUniqueCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInAscendingOrder() => BeInAscendingOrder();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInDescendingOrder() => BeInDescendingOrder();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
+        [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
+        [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null) => HaveCountMatching(expectedCount, predicate, countExpression, predicateExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEquivalentTo(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeEquivalentTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeSequenceEqual(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeSequenceEqual(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToContainInOrder(ReadOnlySpan<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => ContainInOrder(expected, expectedExpression);
 }

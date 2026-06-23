@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for <see cref="IEnumerable{T}"/> subjects from <see cref="Assert.Verify{T}(IEnumerable{T}, string?)"/>.</summary>
+/// <summary>Assertions for <see cref="IEnumerable{T}"/> subjects from <see cref="Ensure.Must{T}(IEnumerable{T}, string?)"/>.</summary>
 /// <typeparam name="T">Element type.</typeparam>
 public readonly struct CollectionAssertions<T>
 {
@@ -18,7 +18,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection is the same instance as <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected collection instance.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (ReferenceEquals(_actual, expected))
             return;
@@ -31,7 +31,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection contains the specified <paramref name="item"/>.</summary>
     /// <param name="item">The item expected to be in the collection.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
-    public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
+    public void Contain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         EnsureActualNotNull();
         if (_actual is ICollection<T> list && list.Contains(item))
@@ -51,7 +51,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection contains at least one element satisfying <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that at least one item must meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void ToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    public void Contain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
         EnsureActualNotNull();
         foreach (var item in _actual)
@@ -66,7 +66,7 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>Verifies that the collection is empty.</summary>
-    public void ToBeEmpty()
+    public void BeEmpty()
     {
         EnsureActualNotNull();
         if (_actual is ICollection<T> c && c.Count == 0)
@@ -82,7 +82,7 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>Verifies that the collection is not empty.</summary>
-    public void NotToBeEmpty()
+    public void NotBeEmpty()
     {
         EnsureActualNotNull();
         if (_actual is ICollection<T> c && c.Count > 0)
@@ -100,7 +100,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection does not contain the specified <paramref name="item"/>.</summary>
     /// <param name="item">The item that should not be in the collection.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
-    public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
+    public void NotContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null)
     {
         EnsureActualNotNull();
         var found = false;
@@ -131,7 +131,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection contains no elements satisfying <paramref name="predicate"/>.</summary>
     /// <param name="predicate">The condition that no item should meet.</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void NotToContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    public void NotContain(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
         EnsureActualNotNull();
         var index = 0;
@@ -151,7 +151,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection has the expected number of items.</summary>
     /// <param name="expectedCount">The expected count.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
+    public void HaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = 0;
@@ -175,7 +175,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection count is greater than <paramref name="minimumCount"/>.</summary>
     /// <param name="minimumCount">The exclusive lower bound for the collection count.</param>
     /// <param name="countExpression">The expression for the minimum count (automatically captured).</param>
-    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
+    public void HaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = GetActualCount();
@@ -190,7 +190,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection count is less than <paramref name="maximumCount"/>.</summary>
     /// <param name="maximumCount">The exclusive upper bound for the collection count.</param>
     /// <param name="countExpression">The expression for the maximum count (automatically captured).</param>
-    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
+    public void HaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = GetActualCount();
@@ -203,7 +203,7 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>Verifies that all elements in the collection are unique.</summary>
-    public void ToBeUnique()
+    public void BeUnique()
     {
         EnsureActualNotNull();
         var seen = new HashSet<T>();
@@ -224,7 +224,7 @@ public readonly struct CollectionAssertions<T>
     /// <summary>Verifies that the collection contains exactly <paramref name="expectedUniqueCount"/> distinct elements.</summary>
     /// <param name="expectedUniqueCount">The expected number of distinct elements.</param>
     /// <param name="countExpression">The expression for the expected unique count (automatically captured).</param>
-    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
+    public void HaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var uniqueCount = new HashSet<T>(_actual).Count;
@@ -237,7 +237,7 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>Verifies that the collection is in ascending order (non-decreasing) using <see cref="Comparer{T}.Default"/>.</summary>
-    public void ToBeInAscendingOrder()
+    public void BeInAscendingOrder()
     {
         EnsureActualNotNull();
         VerifyOrdering(ascending: true);
@@ -247,7 +247,7 @@ public readonly struct CollectionAssertions<T>
     /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
     /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
     /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
-    public void ToBeInAscendingOrder<TKey>(Func<T, TKey> keySelector,
+    public void BeInAscendingOrder<TKey>(Func<T, TKey> keySelector,
         [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null)
     {
         EnsureActualNotNull();
@@ -255,7 +255,7 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>Verifies that the collection is in descending order (non-increasing) using <see cref="Comparer{T}.Default"/>.</summary>
-    public void ToBeInDescendingOrder()
+    public void BeInDescendingOrder()
     {
         EnsureActualNotNull();
         VerifyOrdering(ascending: false);
@@ -265,7 +265,7 @@ public readonly struct CollectionAssertions<T>
     /// <typeparam name="TKey">The type of the key used for ordering.</typeparam>
     /// <param name="keySelector">A function that extracts the comparison key from each element.</param>
     /// <param name="keySelectorExpression">The expression for the key selector (automatically captured).</param>
-    public void ToBeInDescendingOrder<TKey>(Func<T, TKey> keySelector,
+    public void BeInDescendingOrder<TKey>(Func<T, TKey> keySelector,
         [CallerArgumentExpression(nameof(keySelector))] string? keySelectorExpression = null)
     {
         EnsureActualNotNull();
@@ -334,7 +334,7 @@ public readonly struct CollectionAssertions<T>
     /// <param name="predicate">The condition to test each item against.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
     /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
-    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
+    public void HaveCountMatching(int expectedCount, Func<T, bool> predicate,
         [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
         [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
     {
@@ -359,7 +359,7 @@ public readonly struct CollectionAssertions<T>
     /// </summary>
     /// <param name="expected">Expected multiset of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         EnsureActualNotNull();
         var actualList = _actual.ToList();
@@ -409,7 +409,7 @@ public readonly struct CollectionAssertions<T>
     /// </summary>
     /// <param name="expected">Expected sequence of elements.</param>
     /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
-    public void ToBeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         EnsureActualNotNull();
         var actualList = _actual.ToList();
@@ -441,7 +441,7 @@ public readonly struct CollectionAssertions<T>
     /// </summary>
     /// <param name="expected">The sequence of items expected to appear in order.</param>
     /// <param name="expectedExpression">The expression for the expected items (automatically captured).</param>
-    public void ToContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void ContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         EnsureActualNotNull();
         var expectedList = expected.ToList();
@@ -610,4 +610,38 @@ public readonly struct CollectionAssertions<T>
             $"Verification failed: expected {_expression} not to be null, but it was.",
             _expression);
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null) => Contain(item, itemExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEmpty() => BeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeEmpty() => NotBeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null) => NotContain(item, itemExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) => HaveCount(expectedCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountGreaterThan(int minimumCount, [CallerArgumentExpression(nameof(minimumCount))] string? countExpression = null) => HaveCountGreaterThan(minimumCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountLessThan(int maximumCount, [CallerArgumentExpression(nameof(maximumCount))] string? countExpression = null) => HaveCountLessThan(maximumCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeUnique() => BeUnique();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveUniqueCount(int expectedUniqueCount, [CallerArgumentExpression(nameof(expectedUniqueCount))] string? countExpression = null) => HaveUniqueCount(expectedUniqueCount, countExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInAscendingOrder() => BeInAscendingOrder();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInDescendingOrder() => BeInDescendingOrder();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCountMatching(int expectedCount, Func<T, bool> predicate,
+        [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null,
+        [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null) => HaveCountMatching(expectedCount, predicate, countExpression, predicateExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEquivalentTo(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeEquivalentTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeSequenceEqual(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeSequenceEqual(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToContainInOrder(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => ContainInOrder(expected, expectedExpression);
 }

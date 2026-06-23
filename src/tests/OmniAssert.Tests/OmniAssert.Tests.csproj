@@ -26,5 +26,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\OmniAssert.Core\OmniAssert.Core.csproj" />
     <ProjectReference Include="..\..\OmniAssert.Generator\OmniAssert.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\OmniAssert.Analyzers\OmniAssert.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 </Project>

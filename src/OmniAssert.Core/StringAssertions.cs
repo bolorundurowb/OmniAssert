@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for <see cref="string"/> (or null) subjects from <see cref="Assert.Verify(string?, string?)"/>.</summary>
+/// <summary>Assertions for <see cref="string"/> (or null) subjects from <see cref="Ensure.Must(string?, string?)"/>.</summary>
 public readonly struct StringAssertions
 {
     private readonly string? _actual;
@@ -19,7 +19,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string is equal to the <paramref name="expected"/> string using ordinal comparison.</summary>
     /// <param name="expected">The expected string.</param>
     /// <param name="expectedExpression">The expression for the expected string (automatically captured).</param>
-    public void ToBe(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (string.Equals(_actual, expected, StringComparison.Ordinal))
             return;
@@ -31,7 +31,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string is not equal to the <paramref name="unexpected"/> string using ordinal comparison.</summary>
     /// <param name="unexpected">The unexpected string.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected string (automatically captured).</param>
-    public void NotToBe(string? unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(string? unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (!string.Equals(_actual, unexpected, StringComparison.Ordinal))
             return;
@@ -43,7 +43,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string contains the specified <paramref name="substring"/> using ordinal comparison.</summary>
     /// <param name="substring">The substring expected to be present.</param>
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
-    public void ToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
+    public void Contain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
         if (_actual is not null && _actual.Contains(substring, StringComparison.Ordinal))
             return;
@@ -54,7 +54,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is empty.</summary>
-    public void ToBeEmpty()
+    public void BeEmpty()
     {
         if (string.IsNullOrEmpty(_actual))
             return;
@@ -65,7 +65,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is not null or empty.</summary>
-    public void NotToBeEmpty()
+    public void NotBeEmpty()
     {
         if (!string.IsNullOrEmpty(_actual))
             return;
@@ -78,7 +78,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string has exactly <paramref name="expectedLength"/> characters.</summary>
     /// <param name="expectedLength">The expected string length.</param>
     /// <param name="lengthExpression">The expression for the expected length (automatically captured).</param>
-    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
+    public void HaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length == expectedLength)
             return;
@@ -92,7 +92,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string length is greater than <paramref name="minimumLength"/>.</summary>
     /// <param name="minimumLength">The exclusive lower bound for the string length.</param>
     /// <param name="lengthExpression">The expression for the minimum length (automatically captured).</param>
-    public void ToHaveLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null)
+    public void HaveLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length > minimumLength)
             return;
@@ -106,7 +106,7 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string length is less than <paramref name="maximumLength"/>.</summary>
     /// <param name="maximumLength">The exclusive upper bound for the string length.</param>
     /// <param name="lengthExpression">The expression for the maximum length (automatically captured).</param>
-    public void ToHaveLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null)
+    public void HaveLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null)
     {
         if (_actual is not null && _actual.Length < maximumLength)
             return;
@@ -118,7 +118,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is null or empty.</summary>
-    public void ToBeNullOrEmpty()
+    public void BeNullOrEmpty()
     {
         if (string.IsNullOrEmpty(_actual))
             return;
@@ -127,10 +127,10 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is not null or empty.</summary>
-    public void NotToBeNullOrEmpty() => NotToBeEmpty();
+    public void NotBeNullOrEmpty() => NotBeEmpty();
 
     /// <summary>Verifies that the string is null, empty, or consists only of whitespace characters.</summary>
-    public void ToBeNullOrWhiteSpace()
+    public void BeNullOrWhiteSpace()
     {
         if (string.IsNullOrWhiteSpace(_actual))
             return;
@@ -139,7 +139,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is not null, empty, or consists only of whitespace characters.</summary>
-    public void NotToBeNullOrWhiteSpace()
+    public void NotBeNullOrWhiteSpace()
     {
         if (!string.IsNullOrWhiteSpace(_actual))
             return;
@@ -148,7 +148,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string consists only of whitespace characters (and is not null or empty).</summary>
-    public void ToBeWhiteSpace()
+    public void BeWhiteSpace()
     {
         if (!string.IsNullOrEmpty(_actual) && string.IsNullOrWhiteSpace(_actual))
             return;
@@ -157,7 +157,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string does not consist only of whitespace characters.</summary>
-    public void NotToBeWhiteSpace()
+    public void NotBeWhiteSpace()
     {
         if (string.IsNullOrEmpty(_actual) || !string.IsNullOrWhiteSpace(_actual))
             return;
@@ -167,7 +167,7 @@ public readonly struct StringAssertions
 
 
     /// <summary>Verifies that the string is null.</summary>
-    public void ToBeNull()
+    public void BeNull()
     {
         if (_actual is null)
             return;
@@ -176,7 +176,7 @@ public readonly struct StringAssertions
     }
 
     /// <summary>Verifies that the string is not null.</summary>
-    public void NotToBeNull()
+    public void NotBeNull()
     {
         if (_actual is not null)
             return;
@@ -188,7 +188,7 @@ public readonly struct StringAssertions
     /// <param name="prefix">The expected prefix.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="prefixExpression">The expression for the prefix (automatically captured).</param>
-    public void ToStartWith(string prefix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(prefix))] string? prefixExpression = null)
+    public void StartWith(string prefix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(prefix))] string? prefixExpression = null)
     {
         if (_actual is not null && _actual.StartsWith(prefix, comparison))
             return;
@@ -202,7 +202,7 @@ public readonly struct StringAssertions
     /// <param name="suffix">The expected suffix.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="suffixExpression">The expression for the suffix (automatically captured).</param>
-    public void ToEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null)
+    public void EndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null)
     {
         if (_actual is not null && _actual.EndsWith(suffix, comparison))
             return;
@@ -216,7 +216,7 @@ public readonly struct StringAssertions
     /// <param name="suffix">The suffix that should not be at the end.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="suffixExpression">The expression for the suffix (automatically captured).</param>
-    public void NotToEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null)
+    public void NotEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null)
     {
         if (_actual is null || !_actual.EndsWith(suffix, comparison))
             return;
@@ -230,7 +230,7 @@ public readonly struct StringAssertions
     /// <param name="regexPattern">The regular expression pattern.</param>
     /// <param name="options">The regex options.</param>
     /// <param name="patternExpression">The expression for the pattern (automatically captured).</param>
-    public void ToMatch(string regexPattern, RegexOptions options = RegexOptions.None, [CallerArgumentExpression(nameof(regexPattern))] string? patternExpression = null)
+    public void Match(string regexPattern, RegexOptions options = RegexOptions.None, [CallerArgumentExpression(nameof(regexPattern))] string? patternExpression = null)
     {
         if (_actual is not null && Regex.IsMatch(_actual, regexPattern, options))
             return;
@@ -244,7 +244,7 @@ public readonly struct StringAssertions
     /// <param name="expected">The expected string.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="expectedExpression">The expression for the expected string (automatically captured).</param>
-    public void ToBe(string? expected, StringComparison comparison, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(string? expected, StringComparison comparison, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (string.Equals(_actual, expected, comparison))
             return;
@@ -256,12 +256,12 @@ public readonly struct StringAssertions
     /// <summary>Verifies that the string is equal to the <paramref name="expected"/> string using ordinal case-insensitive comparison.</summary>
     /// <param name="expected">The expected string.</param>
     /// <param name="expectedExpression">The expression for the expected string (automatically captured).</param>
-    public void ToBeIgnoringCase(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) =>
-        ToBe(expected, StringComparison.OrdinalIgnoreCase, expectedExpression);
+    public void BeIgnoringCase(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) =>
+        Be(expected, StringComparison.OrdinalIgnoreCase, expectedExpression);
 
     /// <summary>Verifies that the string is equal to one of the provided expected values using ordinal comparison.</summary>
     /// <param name="expected">Allowed expected string values.</param>
-    public void ToBeOneOf(params string?[] expected)
+    public void BeOneOf(params string?[] expected)
     {
         if (expected is not null)
         {
@@ -284,7 +284,7 @@ public readonly struct StringAssertions
     /// <param name="substring">The substring expected to be present.</param>
     /// <param name="comparison">The string comparison culture/options.</param>
     /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
-    public void ToContain(string substring, StringComparison comparison, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
+    public void Contain(string substring, StringComparison comparison, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
     {
         if (_actual is not null && _actual.Contains(substring, comparison))
             return;
@@ -381,4 +381,48 @@ public readonly struct StringAssertions
     }
 
     private static string Quote(string? s) => StringFormatter.Quote(s);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(string? unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null) => Contain(substring, substringExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEmpty() => BeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeEmpty() => NotBeEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveLength(int expectedLength, [CallerArgumentExpression(nameof(expectedLength))] string? lengthExpression = null) => HaveLength(expectedLength, lengthExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveLengthGreaterThan(int minimumLength, [CallerArgumentExpression(nameof(minimumLength))] string? lengthExpression = null) => HaveLengthGreaterThan(minimumLength, lengthExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveLengthLessThan(int maximumLength, [CallerArgumentExpression(nameof(maximumLength))] string? lengthExpression = null) => HaveLengthLessThan(maximumLength, lengthExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNullOrEmpty() => BeNullOrEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNullOrEmpty() => NotBeNullOrEmpty();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNullOrWhiteSpace() => BeNullOrWhiteSpace();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNullOrWhiteSpace() => NotBeNullOrWhiteSpace();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeWhiteSpace() => BeWhiteSpace();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeWhiteSpace() => NotBeWhiteSpace();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToStartWith(string prefix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(prefix))] string? prefixExpression = null) => StartWith(prefix, comparison, prefixExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null) => EndWith(suffix, comparison, suffixExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToEndWith(string suffix, StringComparison comparison = StringComparison.Ordinal, [CallerArgumentExpression(nameof(suffix))] string? suffixExpression = null) => NotEndWith(suffix, comparison, suffixExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToMatch(string regexPattern, RegexOptions options = RegexOptions.None, [CallerArgumentExpression(nameof(regexPattern))] string? patternExpression = null) => Match(regexPattern, options, patternExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeIgnoringCase(string? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeIgnoringCase(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOneOf(params string?[] expected) => BeOneOf(expected);
 }

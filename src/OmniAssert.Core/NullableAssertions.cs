@@ -14,7 +14,7 @@ public readonly struct NullableValueAssertions<T> where T : struct
     }
 
     /// <summary>Asserts the nullable has no value; fails when it has a value.</summary>
-    public void ToBeNull()
+    public void BeNull()
     {
         if (!_actual.HasValue)
             return;
@@ -23,7 +23,7 @@ public readonly struct NullableValueAssertions<T> where T : struct
     }
 
     /// <summary>Asserts the nullable has a value; fails when it is null.</summary>
-    public void NotToBeNull()
+    public void NotBeNull()
     {
         if (_actual.HasValue)
             return;
@@ -32,6 +32,10 @@ public readonly struct NullableValueAssertions<T> where T : struct
     }
 
     private static string FormatValue(T value) => OmniAssertionException.FormatValueForMessage(value!);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
 }
 
 /// <summary>Assertions for nullable reference types from the nullable reference <see cref="Assert"/> entry points.</summary>
@@ -48,7 +52,7 @@ public readonly struct NullableReferenceAssertions<T> where T : class
     }
 
     /// <summary>Asserts the reference is <c>null</c>; fails when it has a value.</summary>
-    public void ToBeNull()
+    public void BeNull()
     {
         if (_actual is null)
             return;
@@ -57,7 +61,7 @@ public readonly struct NullableReferenceAssertions<T> where T : class
     }
 
     /// <summary>Asserts the reference is not <c>null</c>; fails when it is null.</summary>
-    public void NotToBeNull()
+    public void NotBeNull()
     {
         if (_actual is not null)
             return;
@@ -66,4 +70,8 @@ public readonly struct NullableReferenceAssertions<T> where T : class
     }
 
     private static string FormatValue(T? value) => OmniAssertionException.FormatValueForMessage(value!);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
 }
