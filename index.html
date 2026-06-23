@@ -27,13 +27,8 @@
       --shadow: 0 24px 70px rgba(59, 31, 157, 0.18);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -46,19 +41,10 @@
       line-height: 1.65;
     }
 
-    a {
-      color: var(--brand);
-      text-decoration: none;
-    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { color: var(--brand-dark); text-decoration: underline; }
 
-    a:hover {
-      color: var(--brand-dark);
-      text-decoration: underline;
-    }
-
-    code,
-    pre,
-    kbd {
+    code, pre, kbd {
       font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
     }
 
@@ -73,10 +59,7 @@
       background: var(--brand-dark);
       transition: top 0.2s ease;
     }
-
-    .skip-link:focus {
-      top: 1rem;
-    }
+    .skip-link:focus { top: 1rem; }
 
     .site-header {
       position: sticky;
@@ -105,27 +88,18 @@
       font-weight: 800;
       letter-spacing: -0.025em;
     }
-
-    .brand img {
-      width: 38px;
-      height: 38px;
-    }
+    .brand img { width: 38px; height: 38px; }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 0.85rem 1rem;
       font-size: 0.92rem;
       font-weight: 600;
     }
-
-    .nav-links a {
-      color: var(--muted);
-    }
-
-    .nav-links a:hover {
-      color: var(--brand);
-    }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--brand); }
 
     .hero {
       width: min(1180px, calc(100% - 2rem));
@@ -153,7 +127,6 @@
       font-size: 0.88rem;
       font-weight: 700;
     }
-
     .eyebrow::before {
       width: 0.55rem;
       height: 0.55rem;
@@ -162,28 +135,16 @@
       content: "";
     }
 
-    h1,
-    h2,
-    h3 {
+    h1, h2, h3, h4 {
       margin: 0;
       color: var(--ink);
       line-height: 1.13;
       letter-spacing: -0.04em;
     }
-
-    h1 {
-      max-width: 13ch;
-      font-size: clamp(3rem, 8vw, 6.5rem);
-    }
-
-    h2 {
-      font-size: clamp(2rem, 4vw, 3.1rem);
-    }
-
-    h3 {
-      margin-top: 1.75rem;
-      font-size: 1.35rem;
-    }
+    h1 { max-width: 13ch; font-size: clamp(3rem, 8vw, 6.5rem); }
+    h2 { font-size: clamp(2rem, 4vw, 3.1rem); }
+    h3 { margin-top: 1.75rem; font-size: 1.35rem; }
+    h4 { margin-top: 1.25rem; font-size: 1.08rem; letter-spacing: -0.02em; }
 
     .lead {
       max-width: 63ch;
@@ -209,23 +170,17 @@
       font-weight: 800;
       text-decoration: none;
     }
-
     .button.primary {
       color: white;
       background: linear-gradient(135deg, var(--brand), var(--brand-2));
       box-shadow: 0 14px 30px rgba(81, 43, 212, 0.28);
     }
-
     .button.secondary {
       border: 1px solid var(--line);
       color: var(--brand-dark);
       background: white;
     }
-
-    .button:hover {
-      text-decoration: none;
-      transform: translateY(-1px);
-    }
+    .button:hover { text-decoration: none; transform: translateY(-1px); }
 
     .hero-card {
       position: relative;
@@ -235,7 +190,6 @@
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(247, 245, 255, 0.94));
       box-shadow: var(--shadow);
     }
-
     .hero-card::before {
       position: absolute;
       inset: 0;
@@ -243,11 +197,7 @@
       content: "";
       pointer-events: none;
     }
-
-    .hero-card-inner {
-      position: relative;
-      padding: 2rem;
-    }
+    .hero-card-inner { position: relative; padding: 2rem; }
 
     .logo-wrap {
       display: grid;
@@ -259,11 +209,7 @@
       background: white;
       box-shadow: inset 0 0 0 1px var(--line);
     }
-
-    .logo-wrap img {
-      width: 72px;
-      height: 72px;
-    }
+    .logo-wrap img { width: 72px; height: 72px; }
 
     .command {
       margin-top: 1.4rem;
@@ -283,25 +229,19 @@
       gap: 0.8rem;
       margin-top: 1.5rem;
     }
-
     .stat {
       padding: 0.9rem;
       border: 1px solid var(--line);
       border-radius: 1rem;
       background: rgba(255, 255, 255, 0.68);
     }
-
     .stat strong {
       display: block;
       color: var(--brand-dark);
       font-size: 1.2rem;
       line-height: 1.2;
     }
-
-    .stat span {
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
+    .stat span { color: var(--muted); font-size: 0.85rem; }
 
     main {
       width: min(1180px, calc(100% - 2rem));
@@ -330,7 +270,6 @@
       letter-spacing: 0.13em;
       text-transform: uppercase;
     }
-
     .section-intro {
       margin: 0;
       color: var(--muted);
@@ -342,10 +281,7 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 1rem;
     }
-
-    .grid.two {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .card {
       padding: 1.35rem;
@@ -354,39 +290,17 @@
       background: rgba(255, 255, 255, 0.78);
       box-shadow: 0 10px 35px rgba(59, 31, 157, 0.06);
     }
+    .card h3, .card h4 { margin-top: 0; font-size: 1.06rem; letter-spacing: -0.02em; }
+    .card p, .card li { color: var(--muted); }
+    .card p:last-child, .card ul:last-child, .card ol:last-child { margin-bottom: 0; }
 
-    .card h3 {
-      margin-top: 0;
-      font-size: 1.06rem;
-      letter-spacing: -0.02em;
-    }
-
-    .card p,
-    .card li {
-      color: var(--muted);
-    }
-
-    .card p:last-child,
-    .card ul:last-child,
-    .card ol:last-child {
-      margin-bottom: 0;
-    }
-
-    .feature-list,
-    .check-list {
+    .feature-list, .check-list, .method-list {
       padding-left: 1.2rem;
+      margin: 0.5rem 0 0;
     }
+    .feature-list li, .check-list li, .method-list li { margin: 0.35rem 0; color: var(--muted); }
 
-    .feature-list li,
-    .check-list li {
-      margin: 0.45rem 0;
-    }
-
-    .steps {
-      display: grid;
-      gap: 1rem;
-      counter-reset: steps;
-    }
+    .steps { display: grid; gap: 1rem; counter-reset: steps; }
 
     .step {
       position: relative;
@@ -395,7 +309,6 @@
       border-radius: 1.25rem;
       background: white;
     }
-
     .step::before {
       position: absolute;
       top: 1.35rem;
@@ -411,10 +324,7 @@
       content: counter(steps);
       font-weight: 800;
     }
-
-    .step h3 {
-      margin-top: 0;
-    }
+    .step h3 { margin-top: 0; }
 
     pre[class*="language-"] {
       margin: 1rem 0 0;
@@ -440,61 +350,48 @@
       background: var(--paper-soft);
       color: var(--muted);
     }
-
     .callout.warning {
       border-color: var(--warning);
       background: #fff7ed;
     }
+    .callout strong { color: var(--ink); }
 
-    .callout strong {
-      color: var(--ink);
-    }
-
-    .api-table {
+    .api-table, .migration-table {
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 1.2rem;
       background: white;
+      margin-top: 1rem;
     }
 
-    .api-row {
+    .api-row, .migration-row {
       display: grid;
       grid-template-columns: minmax(170px, 0.32fr) minmax(0, 0.68fr);
       gap: 1rem;
       padding: 1rem 1.1rem;
       border-top: 1px solid var(--line);
     }
+    .api-row:first-child, .migration-row:first-child { border-top: 0; }
+    .api-row strong, .migration-row strong { color: var(--brand-dark); }
+    .api-row span, .migration-row span { color: var(--muted); }
 
-    .api-row:first-child {
-      border-top: 0;
+    .migration-table .migration-row {
+      grid-template-columns: minmax(0, 0.48fr) minmax(0, 0.52fr);
     }
 
-    .api-row strong {
-      color: var(--brand-dark);
-    }
-
-    .api-row span {
-      color: var(--muted);
-    }
-
-    .faq {
-      display: grid;
-      gap: 1rem;
-    }
+    .faq { display: grid; gap: 1rem; }
 
     details {
       border: 1px solid var(--line);
       border-radius: 1rem;
       background: white;
     }
-
     summary {
       cursor: pointer;
       padding: 1rem 1.1rem;
       color: var(--ink);
       font-weight: 800;
     }
-
     details p {
       margin: 0;
       padding: 0 1.1rem 1rem;
@@ -506,7 +403,6 @@
       background: #130f24;
       color: #ddd7ff;
     }
-
     .footer-inner {
       display: flex;
       flex-wrap: wrap;
@@ -516,50 +412,19 @@
       margin: 0 auto;
       padding: 2rem 0;
     }
-
-    .footer a {
-      color: var(--accent-light);
-    }
+    .footer a { color: var(--accent-light); }
 
     @media (max-width: 960px) {
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .nav-links {
-        flex-wrap: wrap;
-      }
-
-      .hero {
-        padding-top: 4rem;
-      }
-
-      .hero-grid,
-      .section-header,
-      .grid,
-      .grid.two {
-        grid-template-columns: 1fr;
-      }
+      .nav { align-items: flex-start; flex-direction: column; }
+      .hero { padding-top: 4rem; }
+      .hero-grid, .section-header, .grid, .grid.two { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 640px) {
-      .stats {
-        grid-template-columns: 1fr;
-      }
-
-      .api-row {
-        grid-template-columns: 1fr;
-      }
-
-      .step {
-        padding-left: 1.35rem;
-      }
-
-      .step::before {
-        position: static;
-        margin-bottom: 0.8rem;
-      }
+      .stats { grid-template-columns: 1fr; }
+      .api-row, .migration-row { grid-template-columns: 1fr; }
+      .step { padding-left: 1.35rem; }
+      .step::before { position: static; margin-bottom: 0.8rem; }
     }
   </style>
 </head>
@@ -576,7 +441,9 @@
         <a href="#overview">Overview</a>
         <a href="#installation">Install</a>
         <a href="#quick-start">Quick start</a>
+        <a href="#api-reference">API</a>
         <a href="#advanced">Advanced</a>
+        <a href="#migration">Migration</a>
         <a href="#faq">FAQ</a>
         <a href="https://github.com/bolorundurowb/OmniAssert">GitHub</a>
       </div>
@@ -589,9 +456,9 @@
         <p class="eyebrow">Fluent assertions for modern .NET</p>
         <h1>Tests that read clearly and fail helpfully.</h1>
         <p class="lead">
-          OmniAssert is a fluent assertion library for .NET 10 and C# 14. It helps you express test intent in plain
-          language, collect related failures, compare complex objects, and use optional compile-time diagnostics for
-          boolean expressions.
+          OmniAssert is a fluent assertion library for .NET 10 and C# 14. Express test intent in plain language,
+          collect related failures, compare complex objects, and use optional compile-time diagnostics for boolean
+          expressions.
         </p>
         <div class="actions">
           <a class="button primary" href="#installation">Install OmniAssert</a>
@@ -604,12 +471,12 @@
           <div class="logo-wrap">
             <img src="assets/omni-assert-logo.svg" alt="OmniAssert shield logo">
           </div>
-          <h2>OmniAssert 1.2.0</h2>
+          <h2>OmniAssert 2.0.0</h2>
           <p>
-            A GPL-3.0-only package for test projects targeting .NET 10, with bundled Roslyn generator support for richer
-            <code>VerifyExpression()</code> failures.
+            A GPL-3.0-only package for test projects targeting .NET 10. The runtime assembly is
+            <code>OmniAssert.Core</code>. Roslyn generators and analyzers ship in the same NuGet package.
           </p>
-          <div class="command">dotnet add package OmniAssert --version 1.2.0</div>
+          <div class="command">dotnet add package OmniAssert --version 2.0.0</div>
           <div class="stats" aria-label="Key capabilities">
             <div class="stat">
               <strong>.NET 10</strong>
@@ -634,12 +501,12 @@
       <div class="section-header">
         <div>
           <p class="section-kicker">01. Overview</p>
-          <h2>Project overview and value proposition</h2>
+          <h2>What OmniAssert gives you</h2>
         </div>
         <p class="section-intro">
-          OmniAssert exists to make tests easier to read at the point of writing and easier to diagnose at the point of
-          failure. Its fluent API keeps assertions close to the values being checked, while its failure messages capture
-          the expression, actual value, expected value, and useful context.
+          OmniAssert makes tests easier to read at the point of writing and easier to diagnose at the point of failure.
+          Assertions start from the value under test, failure messages capture the expression and formatted actual values,
+          and optional compile-time tooling enriches boolean diagnostics.
         </p>
       </div>
 
@@ -647,23 +514,39 @@
         <article class="card">
           <h3>Readable intent</h3>
           <p>
-            Assertions start from the subject under test, for example <code>user.Email.Verify().ToContain("@")</code>.
-            The result reads like plain English and stays consistent across strings, numbers, collections, objects,
-            exceptions, files, dates, GUIDs, URIs, spans, and nullable values.
+            Start from the subject: <code>user.Email.Must().Contain("@")</code>. The same pattern works across strings,
+            numbers, collections, objects, exceptions, files, dates, GUIDs, URIs, spans, and nullable values.
           </p>
         </article>
         <article class="card">
           <h3>Better failures</h3>
           <p>
-            Failures include captured caller expressions and formatted values. Complex collections are expanded, object
-            equivalence failures show the path where data diverges, and ANSI colour support improves terminal output.
+            Failures include caller expressions and formatted values. Collections are expanded, object equivalence shows
+            where graphs diverge, and ANSI colour improves terminal output.
           </p>
         </article>
         <article class="card">
           <h3>Modern diagnostics</h3>
           <p>
-            The bundled Roslyn generator can enhance <code>VerifyExpression()</code> calls at compile time, so failed
-            boolean expressions report operand values rather than a bare “condition was false”.
+            The bundled Roslyn generator can rewrite <code>VerifyExpression()</code> call sites at compile time so failed
+            boolean expressions report operand values, not just “condition was false”.
+          </p>
+        </article>
+      </div>
+
+      <div class="grid two" style="margin-top: 1rem;">
+        <article class="card">
+          <h3>Deep object comparison</h3>
+          <p>
+            <code>BeEquivalentTo</code> performs structural comparison of object graphs, handles collections as unordered
+            multisets, and navigates circular references safely.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Soft assertions</h3>
+          <p>
+            Wrap checks in <code>AssertionScope</code> to collect every failure in a test and report them together when
+            the scope is disposed.
           </p>
         </article>
       </div>
@@ -672,6 +555,12 @@
         <strong>Provenance note:</strong> OmniAssert was created with substantial AI-assisted coding support. If you use
         it in production, security-sensitive, or compliance-heavy environments, review the implementation, run your own
         tests, and apply your organisation’s supply-chain policies.
+      </div>
+
+      <div class="callout">
+        <strong>Upgrading from v1?</strong> Legacy <code>Verify()</code> / <code>To*</code> syntax still compiles in v2
+        but is obsolete. See the <a href="#migration">migration guide</a> and bundled Roslyn analyzers OA001–OA003 for
+        automated fixes.
       </div>
     </section>
 
@@ -682,9 +571,8 @@
           <h2>What you need before installing</h2>
         </div>
         <p class="section-intro">
-          OmniAssert is intended for test projects in the current .NET ecosystem. Basic assertions need only the package
-          and a compatible target framework. Compile-time boolean diagnostics require the newer compiler features used by
-          C# interceptors.
+          Basic assertions need only the NuGet package and a compatible target framework. Compile-time boolean
+          diagnostics require C# 14 interceptors.
         </p>
       </div>
 
@@ -692,19 +580,18 @@
         <article class="card">
           <h3>For normal package usage</h3>
           <ul class="check-list">
-            <li>A test project targeting <code>net10.0</code> or a compatible target framework.</li>
-            <li>The .NET SDK installed locally and available on your <code>PATH</code>.</li>
-            <li>A test framework such as xUnit, NUnit, or MSTest. OmniAssert is framework-agnostic.</li>
+            <li>A test project targeting <code>net10.0</code> or a compatible TFM.</li>
+            <li>The .NET SDK on your <code>PATH</code>.</li>
+            <li>Any test framework — xUnit, NUnit, MSTest, etc. OmniAssert is framework-agnostic.</li>
             <li>NuGet access to install the <code>OmniAssert</code> package.</li>
           </ul>
         </article>
         <article class="card">
           <h3>For interceptor diagnostics</h3>
           <ul class="check-list">
-            <li>.NET 10 SDK.</li>
-            <li>C# 14 or later.</li>
-            <li><code>InterceptorsNamespaces</code> configured if your project pins language settings manually.</li>
-            <li>No opt-out property such as <code>OmniAssertDisableVerifyInterceptors</code> set to <code>true</code>.</li>
+            <li>.NET 10 SDK and C# 14 (or later).</li>
+            <li><code>InterceptorsNamespaces</code> configured if you pin language settings manually.</li>
+            <li><code>OmniAssertDisableVerifyInterceptors</code> not set to <code>true</code>.</li>
           </ul>
         </article>
       </div>
@@ -717,45 +604,39 @@
           <h2>Install and configure OmniAssert</h2>
         </div>
         <p class="section-intro">
-          Install the package in your test project, import the <code>OmniAssert</code> namespace, then write assertions
-          using <code>.Verify()</code>, <code>.VerifyNullable()</code>, <code>.VerifyExpression()</code>, and the
-          exception/file helpers.
+          Add the package to your test project, import <code>OmniAssert</code>, then write assertions with
+          <code>.Must()</code>, <code>.VerifyNullable()</code>, <code>.VerifyExpression()</code>, and the exception and
+          file helpers.
         </p>
       </div>
 
       <div class="steps">
         <article class="step">
           <h3>Add the NuGet package</h3>
-          <p>Use the .NET CLI from the directory that contains your test project file.</p>
-          <pre><code class="language-bash">dotnet add package OmniAssert --version 1.2.0</code></pre>
+          <pre><code class="language-bash">dotnet add package OmniAssert --version 2.0.0</code></pre>
         </article>
 
         <article class="step">
           <h3>Or add the package reference manually</h3>
-          <p>If you prefer editing the project file directly, add a package reference to your test project.</p>
           <pre><code class="language-xml">&lt;ItemGroup&gt;
-  &lt;PackageReference Include="OmniAssert" Version="1.2.0" /&gt;
+  &lt;PackageReference Include="OmniAssert" Version="2.0.0" /&gt;
 &lt;/ItemGroup&gt;</code></pre>
         </article>
 
         <article class="step">
           <h3>Import the namespace</h3>
-          <p>Bring the extension methods into scope in each test file, or configure a global using for your test project.</p>
           <pre><code class="language-csharp">using OmniAssert;</code></pre>
         </article>
 
         <article class="step">
-          <h3>Check interceptor settings if needed</h3>
-          <p>
-            Interceptors are bundled and enabled by default. If your project pins language settings, ensure C# 14 and the
-            generated namespace are configured.
-          </p>
+          <h3>Configure interceptors if needed</h3>
+          <p>Interceptors are bundled and enabled by default. If you pin language settings, ensure C# 14 and the generated namespace are configured:</p>
           <pre><code class="language-xml">&lt;PropertyGroup&gt;
   &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
   &lt;LangVersion&gt;14&lt;/LangVersion&gt;
   &lt;InterceptorsNamespaces&gt;$(InterceptorsNamespaces);OmniAssert.Generated&lt;/InterceptorsNamespaces&gt;
 &lt;/PropertyGroup&gt;</code></pre>
-          <p>To opt out of compile-time boolean diagnostics, set:</p>
+          <p>To opt out of compile-time boolean diagnostics:</p>
           <pre><code class="language-xml">&lt;PropertyGroup&gt;
   &lt;OmniAssertDisableVerifyInterceptors&gt;true&lt;/OmniAssertDisableVerifyInterceptors&gt;
 &lt;/PropertyGroup&gt;</code></pre>
@@ -770,8 +651,8 @@
           <h2>Your first OmniAssert test</h2>
         </div>
         <p class="section-intro">
-          This small xUnit example validates a user object. The same assertion style works with other .NET test
-          frameworks because OmniAssert throws assertion exceptions directly.
+          This xUnit example validates a user object. The same style works with any .NET test framework because
+          OmniAssert throws assertion exceptions directly.
         </p>
       </div>
 
@@ -786,91 +667,190 @@ public class UserTests
     {
         var user = new User(42, "ada@example.com", true);
 
-        user.Id.Verify().ToBeGreaterThan(0);
-        user.Email.Verify().ToContain("@");
-        user.Email.Verify().ToEndWith(".com");
-        user.IsActive.Verify().ToBeTrue();
+        user.Id.Must().BeGreaterThan(0);
+        user.Email.Must().Contain("@");
+        user.Email.Must().EndWith(".com");
+        user.IsActive.Must().BeTrue();
     }
 }</code></pre>
 
       <div class="callout">
-        <strong>How to read the API:</strong> start with the value under test, call <code>Verify()</code>, then choose the
-        assertion that describes the expected behaviour. For boolean conditions, use either
-        <code>flag.Verify().ToBeTrue()</code> or <code>(count &gt; 0).VerifyExpression()</code>.
+        <strong>How to read the API:</strong> start with the value under test, call <code>Must()</code>, then choose the
+        assertion that describes the expected behaviour. For nullable subjects use <code>VerifyNullable()</code>. For
+        boolean conditions use either <code>flag.Must().BeTrue()</code> or
+        <code>(count &gt; 0).VerifyExpression()</code>.
       </div>
+    </section>
+
+    <section class="section" id="api-reference">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">05. API reference</p>
+          <h2>Assertion types and methods</h2>
+        </div>
+        <p class="section-intro">
+          Fluent assertions begin with <code>.Must()</code> on any value. Nullable subjects use
+          <code>.VerifyNullable()</code>. Exception testing uses extension methods on <code>Action</code>,
+          <code>Func&lt;Task&gt;</code>, or the static <code>Ensure.Throws&lt;T&gt;()</code> helper.
+        </p>
+      </div>
+
+      <article class="card">
+        <h4>Basic values and numeric</h4>
+        <p>Assertions for standard numeric types including <code>BigInteger</code>.</p>
+        <pre><code class="language-csharp">answer.Must().Be(42);
+count.Must().BeGreaterThan(0);
+price.Must().BeApproximately(9.99, 0.01);
+score.Must().BeOneOf(10, 20, 30);</code></pre>
+        <ul class="method-list">
+          <li><code>Be(expected)</code> / <code>NotBe(unexpected)</code></li>
+          <li><code>BeGreaterThan(threshold)</code> / <code>BeGreaterThanOrEqualTo(threshold)</code></li>
+          <li><code>BeLessThan(threshold)</code> / <code>BeLessThanOrEqualTo(threshold)</code></li>
+          <li><code>BeInRange(min, max)</code></li>
+          <li><code>BeApproximately(expected, precision)</code></li>
+          <li><code>BeOneOf(values...)</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Strings</h4>
+        <pre><code class="language-csharp">name.Must().StartWith("John");
+email.Must().Match(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+bio.Must().HaveLengthGreaterThan(10);
+role.Must().BeIgnoringCase("admin");</code></pre>
+        <ul class="method-list">
+          <li><code>Contain(substring)</code> / <code>NotContain(substring)</code></li>
+          <li><code>StartWith(prefix)</code> / <code>EndWith(suffix)</code> / <code>NotEndWith(suffix)</code></li>
+          <li><code>Match(regex)</code></li>
+          <li><code>BeIgnoringCase(expected)</code> / <code>BeOneOf(values...)</code></li>
+          <li><code>BeNull()</code> / <code>NotBeNull()</code></li>
+          <li><code>BeEmpty()</code> / <code>NotBeEmpty()</code></li>
+          <li><code>BeNullOrEmpty()</code> / <code>NotBeNullOrEmpty()</code></li>
+          <li><code>BeNullOrWhiteSpace()</code> / <code>NotBeNullOrWhiteSpace()</code></li>
+          <li><code>BeWhiteSpace()</code> / <code>NotBeWhiteSpace()</code></li>
+          <li><code>HaveLength(n)</code> / <code>HaveLengthGreaterThan(n)</code> / <code>HaveLengthLessThan(n)</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Collections and dictionaries</h4>
+        <pre><code class="language-csharp">users.Must().HaveCount(3);
+items.Must().Contain(targetItem);
+results.Must().BeUnique();
+settings.Must().ContainKey("Theme");</code></pre>
+        <ul class="method-list">
+          <li><code>HaveCount(n)</code>, <code>HaveCountGreaterThan(n)</code>, <code>HaveCountLessThan(n)</code></li>
+          <li><code>HaveCountMatching(n, predicate)</code></li>
+          <li><code>BeEmpty()</code> / <code>NotBeEmpty()</code></li>
+          <li><code>Contain(item)</code> / <code>NotContain(item)</code></li>
+          <li><code>Contain(predicate)</code>, <code>AllSatisfy(predicate)</code>, <code>AnySatisfy(predicate)</code>, <code>NoneSatisfy(predicate)</code></li>
+          <li><code>BeUnique()</code> / <code>HaveUniqueCount(n)</code></li>
+          <li><code>BeInAscendingOrder()</code> / <code>BeInDescendingOrder()</code></li>
+          <li><code>BeEquivalentTo(other)</code> — multiset equivalence, order ignored</li>
+          <li><code>BeSequenceEqual(other)</code> — exact sequence, same order</li>
+          <li><code>ContainInOrder(items...)</code> — items appear in order, not necessarily consecutively</li>
+          <li><code>BeNull()</code> / <code>NotBeNull()</code></li>
+          <li>Dictionaries: <code>ContainKey</code>, <code>NotContainKey</code>, <code>ContainValue</code>, <code>NotContainValue</code>, <code>HaveValue(key, value)</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Objects and equivalence</h4>
+        <pre><code class="language-csharp">instance.Must().BeOfType&lt;MyClass&gt;();
+actualDto.Must().BeEquivalentTo(expectedDto);</code></pre>
+        <ul class="method-list">
+          <li><code>Be(expected)</code> — reference equality</li>
+          <li><code>BeNull()</code> / <code>NotBeNull()</code></li>
+          <li><code>BeOfType&lt;T&gt;()</code> / <code>NotBeOfType&lt;T&gt;()</code></li>
+          <li><code>BeAssignableTo&lt;T&gt;()</code> / <code>NotBeAssignableTo&lt;T&gt;()</code></li>
+          <li><code>BeEquivalentTo(expected)</code> — recursive property comparison with diff</li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Exceptions and tasks</h4>
+        <pre><code class="language-csharp">Action act = () =&gt; service.DoWork();
+act.Throws&lt;InvalidOperationException&gt;().WithMessage("Failed");
+
+Func&lt;Task&gt; asyncAct = () =&gt; service.DoWorkAsync();
+await asyncAct.ThrowsAsync&lt;ArgumentException&gt;();
+
+await TimeSpan.FromSeconds(2).CompleteWithin(() =&gt; longRunningTask);</code></pre>
+        <ul class="method-list">
+          <li><code>Throws&lt;T&gt;()</code> / <code>ThrowsAsync&lt;T&gt;()</code></li>
+          <li><code>NotThrow()</code> / <code>NotThrowAsync()</code></li>
+          <li><code>WithMessage(expected)</code>, <code>WithMessageContaining(substring)</code>, <code>WithMessageMatching(wildcard)</code></li>
+          <li><code>WithMessageIgnoringCase(expected)</code></li>
+          <li><code>WithInnerException&lt;TInner&gt;()</code></li>
+          <li><code>CompleteWithin(action)</code> on <code>TimeSpan</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Dates, times, and other types</h4>
+        <pre><code class="language-csharp">dateTime.Must().BeAfter(yesterday);
+timeSpan.Must().BePositive();
+guid.Must().NotBeEmpty();
+uri.Must().HaveHost("github.com");</code></pre>
+        <ul class="method-list">
+          <li><code>DateTime</code> / <code>DateTimeOffset</code>: <code>BeBefore</code>, <code>BeAfter</code>, <code>BeWithin</code></li>
+          <li><code>DateOnly</code> / <code>TimeOnly</code>: <code>BeBefore</code>, <code>BeAfter</code></li>
+          <li><code>TimeSpan</code>: <code>BePositive</code>, <code>BeNegative</code></li>
+          <li><code>Guid</code>: <code>BeEmpty</code>, <code>NotBeEmpty</code></li>
+          <li><code>Enum</code>: <code>Be</code>, <code>BeOneOf</code></li>
+          <li><code>Uri</code>: <code>HaveScheme</code>, <code>HaveHost</code>, <code>HavePath</code>, <code>HaveQuery</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>File system</h4>
+        <pre><code class="language-csharp">"config.json".FileExists().HaveContent(expectedJson);
+"temp".DirectoryExists().BeEmpty();</code></pre>
+        <ul class="method-list">
+          <li><code>FileExists()</code> → <code>HaveContent(text)</code>, <code>BeEmpty()</code></li>
+          <li><code>DirectoryExists()</code> → <code>BeEmpty()</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Booleans: <code>Must()</code> vs <code>VerifyExpression()</code></h4>
+        <pre><code class="language-csharp">// Fluent — consistent with other assertions
+isValid.Must().BeTrue();
+
+// Expression — best for compound conditions with rich diagnostics
+(x &gt; 0 &amp;&amp; count &lt; limit).VerifyExpression();</code></pre>
+      </article>
     </section>
 
     <section class="section" id="advanced">
       <div class="section-header">
         <div>
-          <p class="section-kicker">05. Advanced usage</p>
-          <h2>Use OmniAssert across real test suites</h2>
+          <p class="section-kicker">06. Advanced usage</p>
+          <h2>Real-world test patterns</h2>
         </div>
         <p class="section-intro">
-          OmniAssert covers common assertion categories and a few deeper workflows: soft assertions, object graph
-          comparison, exception verification, unordered collection equivalence, span assertions, and compile-time boolean
-          diagnostics.
+          Soft assertions, deep object comparison, predicate-based collection checks, async exception testing, and
+          compile-time boolean operand capture.
         </p>
       </div>
 
-      <div class="api-table" aria-label="Assertion category reference">
-        <div class="api-row">
-          <strong>Numbers</strong>
-          <span><code>ToBe</code>, <code>NotToBe</code>, <code>ToBeGreaterThan</code>, <code>ToBeInRange</code>, <code>ToBeApproximately</code>, <code>ToBeOneOf</code></span>
-        </div>
-        <div class="api-row">
-          <strong>Strings</strong>
-          <span><code>ToContain</code>, <code>ToStartWith</code>, <code>ToEndWith</code>, <code>ToMatch</code>, <code>ToBeIgnoringCase</code>, length and whitespace assertions</span>
-        </div>
-        <div class="api-row">
-          <strong>Collections and spans</strong>
-          <span><code>ToHaveCount</code>, <code>ToBeUnique</code>, <code>AllSatisfy</code>, <code>AnySatisfy</code>, <code>NoneSatisfy</code>, ordering checks, unordered equivalence</span>
-        </div>
-        <div class="api-row">
-          <strong>Objects</strong>
-          <span><code>ToBe</code> for reference identity, <code>ToBeOfType&lt;T&gt;</code>, <code>ToBeAssignableTo&lt;T&gt;</code>, <code>ToBeEquivalentTo</code> for structural comparison</span>
-        </div>
-        <div class="api-row">
-          <strong>Exceptions and tasks</strong>
-          <span><code>Throws&lt;T&gt;</code>, <code>ThrowsAsync&lt;T&gt;</code>, <code>NotThrow</code>, <code>NotThrowAsync</code>, message checks, inner exception checks, timeout checks</span>
-        </div>
-        <div class="api-row">
-          <strong>Other types</strong>
-          <span>Date/time, <code>TimeSpan</code>, <code>Guid</code>, <code>Enum</code>, <code>Uri</code>, nullable values, files, and directories</span>
-        </div>
-      </div>
-
       <h3>Soft assertions with <code>AssertionScope</code></h3>
-      <p>
-        Use a scope when one test should report every related failure together. Instead of stopping at the first failed
-        assertion, OmniAssert collects failures and throws when the scope is disposed.
-      </p>
-      <pre><code class="language-csharp">using OmniAssert;
-
-[Fact]
-public void Should_validate_imported_customer()
+      <pre><code class="language-csharp">using (new AssertionScope())
 {
-    var customer = ImportCustomer();
-
-    using (new AssertionScope())
-    {
-        customer.Id.Verify().ToBeGreaterThan(0);
-        customer.Name.Verify().NotToBeNullOrWhiteSpace();
-        customer.Email.Verify().ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-        customer.Roles.Verify().ToContain("Reader");
-    }
+    user.Name.Must().Be("John");
+    user.Age.Must().Be(30);
+    user.Email.Must().Contain("@");
 }</code></pre>
 
       <h3>Deep object comparison</h3>
       <p>
-        <code>ToBeEquivalentTo</code> compares object graphs recursively and reports the path where expected and actual
-        values differ. When you call <code>ToBeEquivalentTo</code> on a collection directly, OmniAssert treats the
-        expected and actual sequences as multisets, so the same elements can appear in a different order.
+        <code>BeEquivalentTo</code> compares object graphs recursively and reports the path where values diverge. On
+        collections it treats sequences as multisets — same elements in any order. Use <code>BeSequenceEqual</code> when
+        order matters.
       </p>
       <pre><code class="language-csharp">var expected = new InvoiceDto
 {
     Number = "INV-2026-001",
-    Currency = "GBP",
     Lines =
     [
         new InvoiceLineDto("Consulting", 2, 750m),
@@ -879,19 +859,15 @@ public void Should_validate_imported_customer()
 };
 
 var actual = await client.GetInvoiceAsync("INV-2026-001");
-
-actual.Verify().ToBeEquivalentTo(expected);
-actual.Lines.Verify().ToBeEquivalentTo(expected.Lines);</code></pre>
+actual.Must().BeEquivalentTo(expected);</code></pre>
 
       <h3>Collections, predicates, and ordering</h3>
-      <pre><code class="language-csharp">var results = await search.IndexAsync(documents);
-
-results.Verify().ToHaveCount(documents.Count);
-results.Verify().ToBeUnique();
-results.Verify().AllSatisfy(result =&gt; result.Score &gt; 0);
-results.Verify().AnySatisfy(result =&gt; result.Title.Contains("OmniAssert"));
-results.Verify().NoneSatisfy(result =&gt; result.Status == "Failed");
-results.Verify().ToBeInDescendingOrder(result =&gt; result.Score);</code></pre>
+      <pre><code class="language-csharp">results.Must().HaveCount(documents.Count);
+results.Must().BeUnique();
+results.Must().AllSatisfy(r =&gt; r.Score &gt; 0);
+results.Must().AnySatisfy(r =&gt; r.Title.Contains("OmniAssert"));
+results.Must().NoneSatisfy(r =&gt; r.Status == "Failed");
+results.Must().BeInDescendingOrder(r =&gt; r.Score);</code></pre>
 
       <h3>Exception and asynchronous assertions</h3>
       <pre><code class="language-csharp">Action syncAct = () =&gt; parser.Parse("");
@@ -906,74 +882,206 @@ await TimeSpan.FromSeconds(2).CompleteWithin(
 
       <h3>Compile-time boolean diagnostics</h3>
       <p>
-        <code>VerifyExpression()</code> is useful when the shape of the boolean condition matters. With interceptors
-        active, the generator rewrites supported call sites so failure output can include operand snapshots.
+        The bundled Roslyn generator rewrites supported <code>VerifyExpression()</code> call sites at compile time. When
+        active, a bare identifier such as <code>flag.VerifyExpression()</code> becomes
+        <code>flag.Must(expression).BeTrue()</code>, and compound expressions capture operand snapshots on failure.
       </p>
       <pre><code class="language-csharp">var count = orders.Count;
 var limit = 10;
-var hasPriorityOrder = orders.Any(order =&gt; order.Priority == Priority.High);
+var hasPriorityOrder = orders.Any(o =&gt; o.Priority == Priority.High);
 
 (count &gt; 0 &amp;&amp; count &lt;= limit &amp;&amp; hasPriorityOrder).VerifyExpression();</code></pre>
 
-      <h3>Advanced operand-capture rewrite from source files</h3>
-      <p>
-        Repository-based or experimental setups can provide a source file as an <code>AdditionalFiles</code> item and
-        exclude it from direct compilation. The generator emits the rewritten compilation unit with richer operand
-        capture. This is not required for normal NuGet consumers.
-      </p>
-      <pre><code class="language-xml">&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
-  &lt;PropertyGroup&gt;
-    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
-    &lt;TargetFramework&gt;net10.0&lt;/TargetFramework&gt;
-    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
-    &lt;Nullable&gt;enable&lt;/Nullable&gt;
-    &lt;LangVersion&gt;14&lt;/LangVersion&gt;
-    &lt;InterceptorsNamespaces&gt;$(InterceptorsNamespaces);OmniAssert.Generated&lt;/InterceptorsNamespaces&gt;
-  &lt;/PropertyGroup&gt;
-
-  &lt;ItemGroup&gt;
-    &lt;AdditionalFiles Include="Program.cs" /&gt;
-    &lt;Compile Remove="Program.cs" /&gt;
-  &lt;/ItemGroup&gt;
-
-  &lt;ItemGroup&gt;
-    &lt;ProjectReference Include="..\..\OmniAssert.Core\OmniAssert.Core.csproj" /&gt;
-    &lt;ProjectReference Include="..\..\OmniAssert.Generator\OmniAssert.Generator.csproj"
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" /&gt;
-  &lt;/ItemGroup&gt;
-&lt;/Project&gt;</code></pre>
-
       <h3>File system and URI checks</h3>
-      <pre><code class="language-csharp">"appsettings.test.json".FileExists()
-    .HaveContent(expectedJson);
-
-"artifacts".DirectoryExists()
-    .BeEmpty();
+      <pre><code class="language-csharp">"appsettings.test.json".FileExists().HaveContent(expectedJson);
+"artifacts".DirectoryExists().BeEmpty();
 
 var callback = new Uri("https://github.com/bolorundurowb/OmniAssert");
-callback.Verify().HaveScheme("https");
-callback.Verify().HaveHost("github.com");</code></pre>
+callback.Must().HaveScheme("https");
+callback.Must().HaveHost("github.com");</code></pre>
+    </section>
+
+    <section class="section" id="migration">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">07. Migration</p>
+          <h2>Upgrading from v1.x to v2</h2>
+        </div>
+        <p class="section-intro">
+          OmniAssert v2 modernises the fluent API, avoids naming clashes with NUnit’s <code>Assert</code>, and ships
+          Roslyn analyzers to automate migration. Legacy v1 syntax still compiles but is <code>[Obsolete]</code> — plan
+          to migrate before v3 removes it.
+        </p>
+      </div>
+
+      <h3>Summary of changes</h3>
+      <div class="migration-table" aria-label="v1 to v2 API mapping">
+        <div class="migration-row">
+          <strong>v1 (legacy)</strong>
+          <span><strong>v2 (recommended)</strong></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>Assert</code> static entry point</strong>
+          <span><code>Ensure</code></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>.Verify()</code></strong>
+          <span><code>.Must()</code></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>.ToBeTrue()</code>, <code>.ToBe(42)</code>, <code>.ToContain("x")</code></strong>
+          <span><code>.BeTrue()</code>, <code>.Be(42)</code>, <code>.Contain("x")</code></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>.NotToBe(...)</code>, <code>.NotToBeNull()</code></strong>
+          <span><code>.NotBe(...)</code>, <code>.NotBeNull()</code></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>.ToHaveCount(3)</code>, <code>.ToBeGreaterThan(0)</code></strong>
+          <span><code>.HaveCount(3)</code>, <code>.BeGreaterThan(0)</code></span>
+        </div>
+        <div class="migration-row">
+          <strong><code>Expect.Throws&lt;T&gt;(...)</code></strong>
+          <span><code>Ensure.Throws&lt;T&gt;(...)</code> or <code>(...).Throws&lt;T&gt;()</code></span>
+        </div>
+      </div>
+
+      <p style="margin-top: 1rem; color: var(--muted);">
+        Methods that never used a <code>To</code> prefix in v1 are unchanged — for example <code>ContainKey</code>,
+        <code>HaveHost</code>, <code>AllSatisfy</code>, and file helpers like <code>HaveContent</code>.
+      </p>
+
+      <h3>Entry point: <code>Assert</code> → <code>Ensure</code></h3>
+      <p>v1 used a static class named <code>Assert</code>, which conflicts with NUnit, xUnit, and other frameworks.</p>
+      <pre><code class="language-csharp">// v1
+OmniAssert.Assert.VerifyExpression(condition);
+
+// v2
+Ensure.VerifyExpression(condition);</code></pre>
+
+      <h3>Fluent chain: <code>Verify()</code> → <code>Must()</code></h3>
+      <pre><code class="language-csharp">// v1
+count.Verify().ToBeGreaterThan(0);
+user.Email.Verify().ToContain("@");
+
+// v2
+count.Must().BeGreaterThan(0);
+user.Email.Must().Contain("@");</code></pre>
+
+      <h3>Assertion grammar: drop the <code>To</code> prefix</h3>
+      <p>General rules:</p>
+      <ul class="check-list">
+        <li><code>ToXxx(...)</code> → <code>Xxx(...)</code> — e.g. <code>ToBeFalse()</code> → <code>BeFalse()</code></li>
+        <li><code>NotToXxx(...)</code> → <code>NotXxx(...)</code> — e.g. <code>NotToBeNull()</code> → <code>NotBeNull()</code></li>
+      </ul>
+
+      <div class="migration-table" aria-label="Common v1 to v2 method mappings">
+        <div class="migration-row"><strong><code>ToBeTrue()</code> / <code>ToBeFalse()</code></strong><span><code>BeTrue()</code> / <code>BeFalse()</code></span></div>
+        <div class="migration-row"><strong><code>ToBe(expected)</code></strong><span><code>Be(expected)</code></span></div>
+        <div class="migration-row"><strong><code>NotToBe(unexpected)</code></strong><span><code>NotBe(unexpected)</code></span></div>
+        <div class="migration-row"><strong><code>ToBeNull()</code> / <code>NotToBeNull()</code></strong><span><code>BeNull()</code> / <code>NotBeNull()</code></span></div>
+        <div class="migration-row"><strong><code>ToContain(...)</code> / <code>NotToContain(...)</code></strong><span><code>Contain(...)</code> / <code>NotContain(...)</code></span></div>
+        <div class="migration-row"><strong><code>ToBeEquivalentTo(...)</code></strong><span><code>BeEquivalentTo(...)</code></span></div>
+        <div class="migration-row"><strong><code>ToBeOfType&lt;T&gt;()</code></strong><span><code>BeOfType&lt;T&gt;()</code></span></div>
+      </div>
+
+      <h3>What did not change</h3>
+      <ul class="check-list">
+        <li><code>VerifyExpression(...)</code> — boolean expression assertions and interceptors</li>
+        <li><code>VerifyNullable(...)</code> — nullable entry point (e.g. <code>value.VerifyNullable().BeNull()</code>)</li>
+        <li>Exception extensions — <code>(...).Throws&lt;T&gt;()</code>, <code>NotThrow()</code>, <code>ThrowsAsync&lt;T&gt;()</code></li>
+        <li>File/directory helpers — <code>"path".FileExists().HaveContent(...)</code></li>
+        <li><code>AssertionScope</code> — soft assertions behave the same</li>
+        <li><code>WithMessage</code> / <code>WithInnerException&lt;T&gt;</code> — exception chaining</li>
+      </ul>
+
+      <h3>Automated migration (Roslyn analyzers)</h3>
+      <p>
+        The <code>OmniAssert</code> NuGet package includes <code>OmniAssert.Analyzers.dll</code> — no extra package
+        reference is required.
+      </p>
+
+      <div class="api-table" aria-label="Migration analyzer rules">
+        <div class="api-row">
+          <strong>OA001</strong>
+          <span>Legacy <code>OmniAssert.Assert</code> → replace with <code>Ensure</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA002</strong>
+          <span><code>.Verify()</code> fluent entry → replace with <code>.Must()</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA003</strong>
+          <span>Legacy <code>To*</code> / <code>NotTo*</code> methods → replace with <code>Be*</code> / <code>Not*</code> / <code>Have*</code></span>
+        </div>
+      </div>
+
+      <h4>Applying fixes</h4>
+      <ol class="feature-list">
+        <li>Build the solution so analyzers load from the package.</li>
+        <li>Open a file with legacy syntax (light bulb on OA001–OA003).</li>
+        <li>Choose <strong>Migrate to Ensure/Must/Be* syntax</strong>, or <strong>Fix all occurrences in Solution</strong>.</li>
+      </ol>
+
+      <pre><code class="language-csharp">// Before
+Assert.Throws&lt;InvalidOperationException&gt;(() =&gt; act());
+value.Verify().ToBeFalse();
+items.Verify().NotToBeNull();
+
+// After
+Ensure.Throws&lt;InvalidOperationException&gt;(() =&gt; act());
+value.Must().BeFalse();
+items.Must().NotBeNull();</code></pre>
+
+      <h3>Framework name collisions</h3>
+      <p>If you used <code>Expect</code> to avoid clashing with NUnit’s <code>Assert</code>, prefer <code>Ensure</code> in v2:</p>
+      <pre><code class="language-csharp">// v1
+Expect.Throws&lt;ArgumentException&gt;(() =&gt; act());
+
+// v2
+Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
+// or
+((Action)act).Throws&lt;ArgumentException&gt;();</code></pre>
+
+      <h3>Recommended migration steps</h3>
+      <ol class="feature-list">
+        <li>Upgrade the <code>OmniAssert</code> package to v2.x.</li>
+        <li>Build and review OA001–OA003 warnings.</li>
+        <li>Run code fixes (per file or fix all in solution).</li>
+        <li>Search for remaining <code>.Verify()</code>, <code>.ToBe</code>, or <code>OmniAssert.Assert</code> usages.</li>
+        <li>Run tests and confirm failure messages still read as expected.</li>
+        <li>Optionally treat warnings as errors until migration is complete.</li>
+      </ol>
+
+      <pre><code class="language-xml">&lt;PropertyGroup&gt;
+  &lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;
+  &lt;WarningsNotAsErrors&gt;OA001;OA002;OA003&lt;/WarningsNotAsErrors&gt;
+&lt;/PropertyGroup&gt;</code></pre>
+
+      <div class="callout">
+        <strong>Need help?</strong> Open an
+        <a href="https://github.com/bolorundurowb/OmniAssert/issues">issue</a> with a minimal repro if a code fix does
+        not apply cleanly or you find a v1 pattern with no v2 equivalent.
+      </div>
     </section>
 
     <section class="section" id="faq">
       <div class="section-header">
         <div>
-          <p class="section-kicker">06. Troubleshooting</p>
+          <p class="section-kicker">08. Troubleshooting</p>
           <h2>Frequently asked questions</h2>
         </div>
         <p class="section-intro">
-          Most setup issues come from target framework mismatches, missing namespace imports, or projects that pin
-          language/compiler options.
+          Most setup issues come from target framework mismatches, missing namespace imports, or pinned language settings.
         </p>
       </div>
 
       <div class="faq">
         <details>
-          <summary>Why does <code>.Verify()</code> not appear in IntelliSense?</summary>
+          <summary>Why does <code>.Must()</code> not appear in IntelliSense?</summary>
           <p>
-            Confirm that the package is referenced by the test project and that <code>using OmniAssert;</code> is in
-            scope. If you use central package management or shared props files, restore packages and reload the project.
+            Confirm the package is referenced by the test project and <code>using OmniAssert;</code> is in scope. Restore
+            packages and reload the project if you use central package management.
           </p>
         </details>
 
@@ -981,15 +1089,15 @@ callback.Verify().HaveHost("github.com");</code></pre>
           <summary>Why are interceptor diagnostics not showing operand values?</summary>
           <p>
             Check that the project builds with the .NET 10 SDK and C# 14, and that
-            <code>OmniAssertDisableVerifyInterceptors</code> is not set to <code>true</code>. If you pin language
-            settings, add <code>OmniAssert.Generated</code> to <code>InterceptorsNamespaces</code>.
+            <code>OmniAssertDisableVerifyInterceptors</code> is not <code>true</code>. If you pin language settings, add
+            <code>OmniAssert.Generated</code> to <code>InterceptorsNamespaces</code>.
           </p>
         </details>
 
         <details>
-          <summary>Should I use <code>Verify().ToBeTrue()</code> or <code>VerifyExpression()</code>?</summary>
+          <summary>Should I use <code>Must().BeTrue()</code> or <code>VerifyExpression()</code>?</summary>
           <p>
-            Use <code>Verify().ToBeTrue()</code> for simple boolean values and consistency with other fluent assertions.
+            Use <code>Must().BeTrue()</code> for simple boolean values and consistency with other fluent assertions.
             Use <code>VerifyExpression()</code> when a compound condition benefits from expression capture and richer
             diagnostics.
           </p>
@@ -998,25 +1106,34 @@ callback.Verify().HaveHost("github.com");</code></pre>
         <details>
           <summary>Why did my collection equivalence assertion pass even though the order changed?</summary>
           <p>
-            <code>ToBeEquivalentTo</code> for collections treats the expected and actual sequences as multisets. Use
-            ordering assertions such as <code>ToBeInAscendingOrder()</code> or compare an exact sequence when order is a
-            behaviour requirement.
+            <code>BeEquivalentTo</code> for collections treats sequences as multisets. Use
+            <code>BeSequenceEqual</code> or ordering assertions such as <code>BeInAscendingOrder()</code> when order is
+            part of the behaviour under test.
           </p>
         </details>
 
         <details>
           <summary>Why do I see several failures in one exception?</summary>
           <p>
-            The assertions were probably run inside an <code>AssertionScope</code>. This is expected: the scope collects
-            failures and throws an aggregate result when disposed.
+            The assertions were probably inside an <code>AssertionScope</code>. The scope collects failures and throws
+            an aggregate result when disposed — this is expected.
           </p>
         </details>
 
         <details>
           <summary>Can I use OmniAssert with NUnit, xUnit, or MSTest?</summary>
           <p>
-            Yes. OmniAssert is a standalone assertion library and is not tied to a specific test runner. Import the
-            namespace and use it from whichever .NET test framework your project already uses.
+            Yes. OmniAssert is a standalone assertion library. Import the namespace and use it from whichever .NET test
+            framework your project already uses. v2’s <code>Ensure</code> entry point avoids clashing with NUnit’s
+            <code>Assert</code>.
+          </p>
+        </details>
+
+        <details>
+          <summary>I upgraded from v1 — why do I see compiler warnings?</summary>
+          <p>
+            Legacy <code>Verify()</code> and <code>To*</code> APIs are marked obsolete in v2. Apply the OA001–OA003 code
+            fixes or follow the <a href="#migration">migration guide</a>. Legacy syntax will be removed in v3.
           </p>
         </details>
       </div>
@@ -1025,7 +1142,7 @@ callback.Verify().HaveHost("github.com");</code></pre>
     <section class="section" id="contributing">
       <div class="section-header">
         <div>
-          <p class="section-kicker">07. Contributing</p>
+          <p class="section-kicker">09. Contributing</p>
           <h2>Contributing and support</h2>
         </div>
         <p class="section-intro">
@@ -1039,8 +1156,7 @@ callback.Verify().HaveHost("github.com");</code></pre>
           <h3>Report issues</h3>
           <p>
             Use GitHub issues for bug reports, documentation gaps, feature requests, or confusing diagnostics. Include
-            the OmniAssert version, target framework, relevant test framework, a minimal reproduction, and the failure
-            output where possible.
+            the OmniAssert version, target framework, test framework, a minimal reproduction, and failure output.
           </p>
           <p><a href="https://github.com/bolorundurowb/OmniAssert/issues">Open an issue on GitHub</a></p>
         </article>
@@ -1050,7 +1166,7 @@ callback.Verify().HaveHost("github.com");</code></pre>
             <li>Fork and clone the repository.</li>
             <li>Build and test the solution locally.</li>
             <li>Make focused changes with accompanying tests.</li>
-            <li>Open a pull request with a concise description of the behaviour change.</li>
+            <li>Open a pull request with a concise description.</li>
           </ol>
           <pre><code class="language-powershell">dotnet build src/OmniAssert.slnx
 dotnet test src/OmniAssert.slnx
@@ -1062,7 +1178,7 @@ dotnet test src/OmniAssert.slnx /p:CollectCoverage=true</code></pre>
 
   <footer class="footer">
     <div class="footer-inner">
-      <span>OmniAssert documentation. Built from the project README and repository metadata.</span>
+      <span>OmniAssert documentation · v2.0.0</span>
       <span>
         <a href="https://github.com/bolorundurowb/OmniAssert">GitHub</a>
         ·
