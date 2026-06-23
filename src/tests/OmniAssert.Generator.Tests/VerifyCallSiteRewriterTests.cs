@@ -25,7 +25,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "RewriterAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -61,7 +61,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "RewriterNoVerifyAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -96,7 +96,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "RewriterMultiAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -134,7 +134,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "RewriterLineDirectiveAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

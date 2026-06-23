@@ -154,7 +154,7 @@ public class NullableAssertionTests
     [Fact]
     public void NullableReference_ClassType_NotToBeNull_WhenNotNull_ShouldSucceed()
     {
-        List<int>? list = new List<int>();
+        List<int>? list = [];
         (list).VerifyNullable().NotBeNull();
     }
 }

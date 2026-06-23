@@ -68,7 +68,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
                     if (!byTree.TryGetValue(tree, out var list))
                     {
-                        list = new List<InterceptorCandidate>();
+                        list = [];
                         byTree[tree] = list;
                     }
 

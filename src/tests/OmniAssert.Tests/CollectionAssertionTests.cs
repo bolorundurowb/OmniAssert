@@ -192,27 +192,27 @@ public class CollectionAssertionTests
     [Fact]
     public void ToBeEquivalentTo_WhenOrderDiffers_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Must().BeEquivalentTo(new[] { 3, 2, 1 });
+        (new[] { 1, 2, 3 }).Must().BeEquivalentTo([3, 2, 1]);
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenElementsDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().BeEquivalentTo(new[] { 1, 2, 4 }));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().BeEquivalentTo([1, 2, 4]));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 3 }));
+            (new[] { 1, 2 }).Must().BeEquivalentTo([1, 2, 3]));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenMultisetDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 2 }));
+            (new[] { 1, 1, 2 }).Must().BeEquivalentTo([1, 2, 2]));
     }
 
     [Fact]
@@ -319,7 +319,7 @@ public class CollectionAssertionTests
     [Fact]
     public void ToBeEquivalentTo_WithNullElements_ShouldSucceed()
     {
-        (new string?[] { null, "a", null }).Must().BeEquivalentTo(new string?[] { "a", null, null });
+        (new string?[] { null, "a", null }).Must().BeEquivalentTo(["a", null, null]);
     }
 
     [Fact]
@@ -438,66 +438,66 @@ public class CollectionAssertionTests
     [Fact]
     public void ToBeSequenceEqual_WhenSequencesMatchInOrder_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 1, 2, 3 });
+        (new[] { 1, 2, 3 }).Must().BeSequenceEqual([1, 2, 3]);
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenOrderDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 3, 2, 1 }));
+            (new[] { 1, 2, 3 }).Must().BeSequenceEqual([3, 2, 1]));
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenElementsDiffer_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Must().BeSequenceEqual(new[] { 1, 2, 4 }));
+            (new[] { 1, 2, 3 }).Must().BeSequenceEqual([1, 2, 4]));
     }
 
     [Fact]
     public void ToBeSequenceEqual_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2 }).Must().BeSequenceEqual(new[] { 1, 2, 3 }));
+            (new[] { 1, 2 }).Must().BeSequenceEqual([1, 2, 3]));
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAppearInOrder_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder(new[] { 2, 4 });
+        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder([2, 4]);
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAppearOutOfOrder_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 5, 4, 3, 2, 1 }).Must().ContainInOrder(new[] { 2, 4 }));
+            (new[] { 5, 4, 3, 2, 1 }).Must().ContainInOrder([2, 4]));
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 2, 3 }).Must().ContainInOrder(new[] { 1, 4 }));
+            (new[] { 1, 2, 3 }).Must().ContainInOrder([1, 4]));
     }
 
     [Fact]
     public void ToContainInOrder_WithEmptyExpected_ShouldSucceed()
     {
-        (new[] { 1, 2, 3 }).Must().ContainInOrder(Array.Empty<int>());
+        (new[] { 1, 2, 3 }).Must().ContainInOrder([]);
     }
 
     [Fact]
     public void ToContainInOrder_WhenItemsAreConsecutive_ShouldSucceed()
     {
-        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder(new[] { 2, 3, 4 });
+        (new[] { 1, 2, 3, 4, 5 }).Must().ContainInOrder([2, 3, 4]);
     }
 
     [Fact]
     public void ToBeSequenceEqual_WithEmptyCollections_ShouldSucceed()
     {
-        Array.Empty<int>().Must().BeSequenceEqual(Array.Empty<int>());
+        Array.Empty<int>().Must().BeSequenceEqual([]);
     }
 
     [Fact]
@@ -529,15 +529,15 @@ public class CollectionAssertionTests
     [Fact]
     public void Be_WhenSameReference_ShouldSucceed()
     {
-        IEnumerable<int> arr = new[] { 1, 2, 3 };
+        IEnumerable<int> arr = [1, 2, 3];
         arr.Must().Be(arr);
     }
 
     [Fact]
     public void Be_WhenDifferentReference_ShouldThrow()
     {
-        IEnumerable<int> arr1 = new[] { 1, 2, 3 };
-        IEnumerable<int> arr2 = new[] { 1, 2, 3 };
+        IEnumerable<int> arr1 = [1, 2, 3];
+        IEnumerable<int> arr2 = [1, 2, 3];
         Xunit.Assert.Throws<OmniAssertionException>(() => arr1.Must().Be(arr2));
     }
 
@@ -545,7 +545,7 @@ public class CollectionAssertionTests
     public void BeEquivalentTo_WhenElementCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new[] { 1, 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 3 }));
+            (new[] { 1, 1, 2 }).Must().BeEquivalentTo([1, 2, 3]));
     }
 
     [Fact]

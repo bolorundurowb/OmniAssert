@@ -217,7 +217,7 @@ public static class T
             .GetMethod("EscapeCSharpStringLiteral", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var result = (string)method!.Invoke(null, new object[] { input })!;
+        var result = (string)method!.Invoke(null, [input])!;
         Xunit.Assert.Equal(expected, result);
     }
 
@@ -228,7 +228,7 @@ public static class T
             .GetMethod("MakeFileScopedClassName", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var result = (string)method!.Invoke(null, new object[] { "/path/to/MyFile.cs" })!;
+        var result = (string)method!.Invoke(null, ["/path/to/MyFile.cs"])!;
 
         Xunit.Assert.StartsWith("OmniAssertVerifyInterceptors_MyFile_", result, StringComparison.Ordinal);
         Xunit.Assert.True(result.All(c => char.IsLetterOrDigit(c) || c == '_'),
@@ -242,8 +242,8 @@ public static class T
             .GetMethod("MakeFileScopedClassName", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var name1 = (string)method!.Invoke(null, new object[] { "/a/FileA.cs" })!;
-        var name2 = (string)method!.Invoke(null, new object[] { "/b/FileB.cs" })!;
+        var name1 = (string)method!.Invoke(null, ["/a/FileA.cs"])!;
+        var name2 = (string)method!.Invoke(null, ["/b/FileB.cs"])!;
 
         Xunit.Assert.NotEqual(name1, name2);
     }
@@ -255,8 +255,8 @@ public static class T
             .GetMethod("MakeFileScopedClassName", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var name1 = (string)method!.Invoke(null, new object[] { "/src/MyFile.cs" })!;
-        var name2 = (string)method!.Invoke(null, new object[] { "/src/MyFile.cs" })!;
+        var name1 = (string)method!.Invoke(null, ["/src/MyFile.cs"])!;
+        var name2 = (string)method!.Invoke(null, ["/src/MyFile.cs"])!;
 
         Xunit.Assert.Equal(name1, name2);
     }
@@ -268,7 +268,7 @@ public static class T
             .GetMethod("MakeFileScopedClassName", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var result = (string)method!.Invoke(null, new object[] { "/path/my-file.name.cs" })!;
+        var result = (string)method!.Invoke(null, ["/path/my-file.name.cs"])!;
 
         Xunit.Assert.StartsWith("OmniAssertVerifyInterceptors_my_file_name_", result, StringComparison.Ordinal);
     }
@@ -280,8 +280,8 @@ public static class T
             .GetMethod("SanitizeFileHint", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var hint1 = (string)method!.Invoke(null, new object[] { "/src/File.cs" })!;
-        var hint2 = (string)method!.Invoke(null, new object[] { "/src/File.cs" })!;
+        var hint1 = (string)method!.Invoke(null, ["/src/File.cs"])!;
+        var hint2 = (string)method!.Invoke(null, ["/src/File.cs"])!;
 
         Xunit.Assert.Equal(hint1, hint2);
     }
@@ -293,8 +293,8 @@ public static class T
             .GetMethod("SanitizeFileHint", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var hint1 = (string)method!.Invoke(null, new object[] { "/src/A.cs" })!;
-        var hint2 = (string)method!.Invoke(null, new object[] { "/src/B.cs" })!;
+        var hint1 = (string)method!.Invoke(null, ["/src/A.cs"])!;
+        var hint2 = (string)method!.Invoke(null, ["/src/B.cs"])!;
 
         Xunit.Assert.NotEqual(hint1, hint2);
     }
@@ -306,7 +306,7 @@ public static class T
             .GetMethod("SanitizeFileHint", BindingFlags.NonPublic | BindingFlags.Static);
         Xunit.Assert.NotNull(method);
 
-        var hint = (string)method!.Invoke(null, new object[] { "/some/path.cs" })!;
+        var hint = (string)method!.Invoke(null, ["/some/path.cs"])!;
 
         Xunit.Assert.Equal(16, hint.Length);
         Xunit.Assert.True(hint.All(c => char.IsAsciiHexDigit(c)), $"Expected hex string, got: {hint}");
@@ -326,7 +326,7 @@ public static class T { public static void M() { OmniAssert.Assert.Verify(true);
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyLoweringFactsNameAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -354,7 +354,7 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyLoweringFactsParamAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -376,7 +376,7 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "GeneratorTestAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -405,7 +405,7 @@ public static class T { public static void M() { OmniAssert.Assert.VerifyExpress
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "GeneratorDefaultAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

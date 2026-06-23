@@ -27,13 +27,13 @@ public class SpanAssertionTests
     [Fact]
     public void Verify_Memory_CanBeChained()
     {
-        new Memory<int>(new int[] { 1, 2, 3 }).Must().HaveLength(3);
+        new Memory<int>([1, 2, 3]).Must().HaveLength(3);
     }
 
     [Fact]
     public void Verify_ReadOnlyMemory_CanBeChained()
     {
-        new ReadOnlyMemory<int>(new int[] { 1, 2, 3 }).Must().HaveLength(3);
+        new ReadOnlyMemory<int>([1, 2, 3]).Must().HaveLength(3);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class SpanAssertionTests
     [Fact]
     public void ToEqual_Memory_WhenSequencesMatch_ShouldSucceed()
     {
-        new ReadOnlyMemory<byte>(new byte[] { 0x01, 0x02, 0x03 }).Must()
+        new ReadOnlyMemory<byte>([0x01, 0x02, 0x03]).Must()
             .Equal(new byte[] { 0x01, 0x02, 0x03 }.AsSpan());
     }
 

@@ -39,7 +39,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyLoweringFactsAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -83,7 +83,7 @@ public static class T
         };
         var compilation = CSharpCompilation.Create(
             "ZeroParamAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

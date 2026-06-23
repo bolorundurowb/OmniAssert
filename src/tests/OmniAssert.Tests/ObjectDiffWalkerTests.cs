@@ -79,14 +79,14 @@ public class ObjectDiffWalkerTests
 
     private sealed class WithList
     {
-        public List<int> Items { get; set; } = new();
+        public List<int> Items { get; set; } = [];
     }
 
     [Fact]
     public void Diff_WhenEnumerablePropertiesDiffer_ShouldDetectMismatch()
     {
-        var a = new WithList { Items = new List<int> { 1, 2, 3 } };
-        var b = new WithList { Items = new List<int> { 1, 2, 4 } };
+        var a = new WithList { Items = [1, 2, 3] };
+        var b = new WithList { Items = [1, 2, 4] };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.NotNull(diff);
         var msg = diff!.FormatMessage();
@@ -96,8 +96,8 @@ public class ObjectDiffWalkerTests
     [Fact]
     public void Diff_WhenEnumerablePropertiesAreEqual_ShouldReturnNull()
     {
-        var a = new WithList { Items = new List<int> { 1, 2, 3 } };
-        var b = new WithList { Items = new List<int> { 1, 2, 3 } };
+        var a = new WithList { Items = [1, 2, 3] };
+        var b = new WithList { Items = [1, 2, 3] };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.Null(diff);
     }
@@ -105,8 +105,8 @@ public class ObjectDiffWalkerTests
     [Fact]
     public void Diff_WhenEnumerablePropertyActualIsShorter_ShouldDetectMismatch()
     {
-        var a = new WithList { Items = new List<int> { 1, 2, 3 } };
-        var b = new WithList { Items = new List<int> { 1, 2 } };
+        var a = new WithList { Items = [1, 2, 3] };
+        var b = new WithList { Items = [1, 2] };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.NotNull(diff);
         var msg = diff!.FormatMessage();
@@ -116,8 +116,8 @@ public class ObjectDiffWalkerTests
     [Fact]
     public void Diff_WhenEnumerablePropertyActualIsLonger_ShouldDetectMismatch()
     {
-        var a = new WithList { Items = new List<int> { 1 } };
-        var b = new WithList { Items = new List<int> { 1, 2 } };
+        var a = new WithList { Items = [1] };
+        var b = new WithList { Items = [1, 2] };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.NotNull(diff);
         var msg = diff!.FormatMessage();
@@ -179,7 +179,7 @@ public class ObjectDiffWalkerTests
 
     private sealed class WithNestedEnumerable
     {
-        public List<WithList> Children { get; set; } = new();
+        public List<WithList> Children { get; set; } = [];
     }
 
     [Fact]
@@ -187,19 +187,19 @@ public class ObjectDiffWalkerTests
     {
         var a = new WithNestedEnumerable
         {
-            Children = new List<WithList>
-            {
-                new() { Items = new List<int> { 1, 2 } },
-                new() { Items = new List<int> { 3, 4 } }
-            }
+            Children =
+            [
+                new() { Items = [1, 2] },
+                new() { Items = [3, 4] }
+            ]
         };
         var b = new WithNestedEnumerable
         {
-            Children = new List<WithList>
-            {
-                new() { Items = new List<int> { 1, 2 } },
-                new() { Items = new List<int> { 3, 5 } }
-            }
+            Children =
+            [
+                new() { Items = [1, 2] },
+                new() { Items = [3, 5] }
+            ]
         };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.NotNull(diff);
@@ -210,8 +210,8 @@ public class ObjectDiffWalkerTests
     [Fact]
     public void Diff_WhenEmptyEnumerables_ShouldReturnNull()
     {
-        var a = new WithList { Items = new List<int>() };
-        var b = new WithList { Items = new List<int>() };
+        var a = new WithList { Items = [] };
+        var b = new WithList { Items = [] };
         var diff = ObjectDiffWalker.Diff(a, b, "root");
         Xunit.Assert.Null(diff);
     }

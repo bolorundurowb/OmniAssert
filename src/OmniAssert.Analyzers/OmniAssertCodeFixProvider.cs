@@ -12,10 +12,11 @@ namespace OmniAssert.Analyzers;
 public sealed class OmniAssertCodeFixProvider : CodeFixProvider
 {
     public sealed override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(
-            OmniAssertDiagnosticAnalyzer.LegacyAssertId,
+    [
+        OmniAssertDiagnosticAnalyzer.LegacyAssertId,
             OmniAssertDiagnosticAnalyzer.LegacyVerifyId,
-            OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId);
+            OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId
+    ];
 
     public sealed override FixAllProvider GetFixAllProvider() =>
         WellKnownFixAllProviders.BatchFixer;

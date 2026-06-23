@@ -27,7 +27,7 @@ public sealed class OmniAssertDiagnosticAnalyzer : DiagnosticAnalyzer
         LegacyFluentGrammarId, Title, MessageFormat, "Usage", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(LegacyAssertRule, LegacyVerifyRule, LegacyFluentGrammarRule);
+        [LegacyAssertRule, LegacyVerifyRule, LegacyFluentGrammarRule];
 
     public override void Initialize(AnalysisContext context)
     {
