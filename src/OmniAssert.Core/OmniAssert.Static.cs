@@ -266,6 +266,30 @@ public static partial class Assert
         throw new UnreachableException();
     }
 
+    /// <summary>Verifies that the given function throws an exception of type <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The expected exception type.</typeparam>
+    /// <param name="func">The function that is expected to throw (its return value is ignored).</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>An <see cref="ExceptionAssertions{T}"/> object to continue verifying the exception.</returns>
+    public static ExceptionAssertions<T> Throws<T>(this Func<object?> func, [CallerArgumentExpression(nameof(func))] string? expression = null) where T : Exception
+    {
+        try
+        {
+            func();
+        }
+        catch (T ex)
+        {
+            return new ExceptionAssertions<T>(ex, expression ?? "func");
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} to throw {typeof(T).Name}, but it threw {ex.GetType().Name}.", expression ?? "func");
+        }
+
+        VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} to throw {typeof(T).Name}, but it did not throw.", expression ?? "func");
+        throw new UnreachableException();
+    }
+
     /// <summary>Verifies that the given action does not throw any exception.</summary>
     /// <param name="action">The action that should not throw.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
@@ -278,6 +302,21 @@ public static partial class Assert
         catch (Exception ex)
         {
             VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "action");
+        }
+    }
+
+    /// <summary>Verifies that the given function does not throw any exception.</summary>
+    /// <param name="func">The function that should not throw (its return value is ignored).</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    public static void NotThrow(this Func<object?> func, [CallerArgumentExpression(nameof(func))] string? expression = null)
+    {
+        try
+        {
+            func();
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "func");
         }
     }
 
@@ -305,6 +344,30 @@ public static partial class Assert
         throw new UnreachableException();
     }
 
+    /// <summary>Verifies that the given asynchronous function throws an exception of type <typeparamref name="T"/>.</summary>
+    /// <typeparam name="T">The expected exception type.</typeparam>
+    /// <param name="func">The asynchronous function that is expected to throw (its return value is ignored).</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A task representing the asynchronous operation, containing <see cref="ExceptionAssertions{T}"/> to continue verifying the exception.</returns>
+    public static async Task<ExceptionAssertions<T>> ThrowsAsync<T>(this Func<Task<object?>> func, [CallerArgumentExpression(nameof(func))] string? expression = null) where T : Exception
+    {
+        try
+        {
+            await func();
+        }
+        catch (T ex)
+        {
+            return new ExceptionAssertions<T>(ex, expression ?? "func");
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} to throw {typeof(T).Name}, but it threw {ex.GetType().Name}.", expression ?? "func");
+        }
+
+        VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} to throw {typeof(T).Name}, but it did not throw.", expression ?? "func");
+        throw new UnreachableException();
+    }
+
     /// <summary>Verifies that the given asynchronous action does not throw any exception.</summary>
     /// <param name="action">The asynchronous action that should not throw.</param>
     /// <param name="expression">The expression being verified (automatically captured).</param>
@@ -318,6 +381,22 @@ public static partial class Assert
         catch (Exception ex)
         {
             VerificationFlow.Fail($"Verification failed: expected {expression ?? "action"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "action");
+        }
+    }
+
+    /// <summary>Verifies that the given asynchronous function does not throw any exception.</summary>
+    /// <param name="func">The asynchronous function that should not throw (its return value is ignored).</param>
+    /// <param name="expression">The expression being verified (automatically captured).</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public static async Task NotThrowAsync(this Func<Task<object?>> func, [CallerArgumentExpression(nameof(func))] string? expression = null)
+    {
+        try
+        {
+            await func();
+        }
+        catch (Exception ex)
+        {
+            VerificationFlow.Fail($"Verification failed: expected {expression ?? "func"} not to throw, but it threw {ex.GetType().Name}: {ex.Message}", expression ?? "func");
         }
     }
 
