@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace OmniAssert;
@@ -47,6 +48,20 @@ public readonly struct BoolAssertions
         msg.Append(_expression);
         msg.Append(": ");
         msg.Append(AnsiColour.Actual("true"));
+        AppendOperandContext(msg);
+        VerificationFlow.Fail(msg.ToString(), _expression);
+    }
+
+    /// <summary>Verifies that the subject is equal to the <paramref name="expected"/> boolean value.</summary>
+    /// <param name="expected">The expected boolean value.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void ToBe(bool expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual == expected)
+            return;
+
+        var msg = new StringBuilder();
+        msg.AppendLine($"Verification failed: expected {_expression} to be {expectedExpression ?? "expected"} ({AnsiColour.Expected(expected.ToString().ToLowerInvariant())}), but was {AnsiColour.Actual(_actual.ToString().ToLowerInvariant())}.");
         AppendOperandContext(msg);
         VerificationFlow.Fail(msg.ToString(), _expression);
     }

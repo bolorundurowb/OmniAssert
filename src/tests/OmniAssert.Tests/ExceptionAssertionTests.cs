@@ -287,9 +287,110 @@ public class ExceptionAssertionTests
     }
 
     [Fact]
-    public void WithMessageMatching_WithExactMessage_ShouldSucceed()
+    public void WithMessageMatching_WhenExactMessage_ShouldSucceed()
     {
         ((Action)(() => throw new ArgumentException("exact message"))).Throws<ArgumentException>()
             .WithMessageMatching("exact message");
+    }
+
+    [Fact]
+    public void Throws_FuncReturningValue_WhenThrows_ShouldSucceed()
+    {
+        var result = ((Func<object?>)(() => throw new ArgumentException("bad"))).Throws<ArgumentException>();
+        Xunit.Assert.IsType<ArgumentException>(result.Exception);
+    }
+
+    [Fact]
+    public void Throws_FuncReturningValue_WhenNoException_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((Func<object?>)(() => 42)).Throws<ArgumentException>());
+        Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void NotThrow_FuncReturningValue_WhenNoException_ShouldSucceed()
+    {
+        ((Func<object?>)(() => 42)).NotThrow();
+    }
+
+    [Fact]
+    public void NotThrow_FuncReturningValue_WhenException_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ((Func<object?>)(() => throw new Exception("fail"))).NotThrow());
+    }
+
+    [Fact]
+    public async Task ThrowsAsync_FuncReturningValue_WhenThrows_ShouldSucceed()
+    {
+        var result = await ((Func<Task<object?>>)(async () =>
+        {
+            await Task.Yield();
+            throw new ArgumentException("bad");
+        })).ThrowsAsync<ArgumentException>();
+        Xunit.Assert.IsType<ArgumentException>(result.Exception);
+    }
+
+    [Fact]
+    public async Task ThrowsAsync_FuncReturningValue_WhenNoException_ShouldThrow()
+    {
+        var ex = await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
+            await ((Func<Task<object?>>)(async () => await Task.FromResult<object?>(42))).ThrowsAsync<ArgumentException>());
+        Xunit.Assert.Contains("did not throw", ex.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task NotThrowAsync_FuncReturningValue_WhenNoException_ShouldSucceed()
+    {
+        await ((Func<Task<object?>>)(async () => await Task.FromResult<object?>(42))).NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task NotThrowAsync_FuncReturningValue_WhenException_ShouldThrow()
+    {
+        await Xunit.Assert.ThrowsAsync<OmniAssertionException>(async () =>
+            await ((Func<Task<object?>>)(async () =>
+            {
+                await Task.Yield();
+                throw new Exception("fail");
+            })).NotThrowAsync());
+    }
+
+    [Fact]
+    public void Expect_Throws_WhenCorrectExceptionType_ShouldSucceed()
+    {
+        var result = Expect.Throws<ArgumentException>(() => throw new ArgumentException("bad"));
+        Xunit.Assert.IsType<ArgumentException>(result.Exception);
+    }
+
+    [Fact]
+    public void Expect_Throws_FuncReturningValue_WhenThrows_ShouldSucceed()
+    {
+        var result = Expect.Throws<ArgumentException>(() => throw new ArgumentException("bad"));
+        Xunit.Assert.IsType<ArgumentException>(result.Exception);
+    }
+
+    [Fact]
+    public void Expect_NotThrow_WhenNoException_ShouldSucceed()
+    {
+        Expect.NotThrow(() => { });
+    }
+
+    [Fact]
+    public async Task Expect_ThrowsAsync_WhenCorrectExceptionType_ShouldSucceed()
+    {
+        var result = await Expect.ThrowsAsync<ArgumentException>(async () =>
+        {
+            await Task.Yield();
+            throw new ArgumentException("bad");
+        });
+        Xunit.Assert.IsType<ArgumentException>(result.Exception);
+    }
+
+    [Fact]
+    public async Task Expect_NotThrowAsync_WhenNoException_ShouldSucceed()
+    {
+        await Expect.NotThrowAsync(async () => await Task.Yield());
     }
 }
