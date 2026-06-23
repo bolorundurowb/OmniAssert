@@ -6,7 +6,7 @@
     <RootNamespace>OmniAssert</RootNamespace>
     <AssemblyName>OmniAssert.Core</AssemblyName>
     <Description>OmniAssert runtime: fluent assertions for .NET tests with helpful failure messages, object diffing, exception helpers, and AssertionScope soft assertions.</Description>
-    <PackageDescription>OmniAssert runtime package for .NET tests. Provides fluent Verify-style assertions, expressive failure messages, object equivalence diffing, exception assertions, and AssertionScope for aggregated failures.</PackageDescription>
+    <PackageDescription>OmniAssert runtime package for .NET tests. Provides fluent Ensure/Must assertions, expressive failure messages, object equivalence diffing, exception assertions, AssertionScope soft assertions, compile-time interceptors, and Roslyn migration analyzers.</PackageDescription>
     <LangVersion>14</LangVersion>
     <OmniAssertDisableVerifyInterceptors>true</OmniAssertDisableVerifyInterceptors>
     <PackageId>OmniAssert</PackageId>
@@ -15,9 +15,17 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.3.0</Version>
-    <PackageVersion>1.3.0</PackageVersion>
-    <PackageReleaseNotes>v1.3.0
+    <Version>2.0.0</Version>
+    <PackageVersion>2.0.0</PackageVersion>
+    <PackageReleaseNotes>v2.0.0
+    - Introduced Ensure as the primary static entry point; legacy Assert remains as an obsolete compatibility wrapper.
+    - Replaced fluent .Verify() with .Must(); assertion grammar now uses Be*, Not*, Have*, and related names instead of To* / NotTo* (for example BeTrue(), NotBeNull(), HaveCount()).
+    - Legacy v1 syntax still compiles in v2 with [Obsolete] warnings; Assert, .Verify(), To* / NotTo* wrappers, and Expect will be removed in v3.0. See MIGRATION.md (included in the package).
+    - Added OmniAssert.Analyzers with OA001–OA003 diagnostics and code fixes to migrate Assert → Ensure, .Verify() → .Must(), and legacy fluent names automatically.
+    - Updated the compile-time interceptor source generator to emit Ensure.Must(...).BeTrue() instead of Assert.Verify(...).ToBeTrue().
+    - VerifyExpression, VerifyNullable, exception extensions, file/directory helpers, and AssertionScope are unchanged in v2.
+
+    v1.3.0
     - Added direct equality assertions ToBe and NotToBe to DateTimeAssertions and DateTimeOffsetAssertions.
     - Added bool ToBe(expected) overload to BoolAssertions for universal ShouldBe-style ergonomics.
     - Added Func&lt;object?&gt; and Func&lt;Task&lt;object?&gt;&gt; overloads for Throws/NotThrow/ThrowsAsync/NotThrowAsync so expression-bodied lambdas that return values work without statement-body casts.
