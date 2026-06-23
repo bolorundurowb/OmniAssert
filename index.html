@@ -549,6 +549,14 @@
             the scope is disposed.
           </p>
         </article>
+        <article class="card">
+          <h3>Explicit outcomes</h3>
+          <p>
+            Use <code>Ensure.Succeed()</code> to mark a test or branch as intentionally passing, and
+            <code>Ensure.Fail()</code> to force a failure with an optional message — similar to NUnit’s
+            <code>Assert.Succeed</code> / <code>Assert.Fail</code>.
+          </p>
+        </article>
       </div>
 
       <div class="callout warning">
@@ -691,7 +699,8 @@ public class UserTests
         <p class="section-intro">
           Fluent assertions begin with <code>.Must()</code> on any value. Nullable subjects use
           <code>.VerifyNullable()</code>. Exception testing uses extension methods on <code>Action</code>,
-          <code>Func&lt;Task&gt;</code>, or the static <code>Ensure.Throws&lt;T&gt;()</code> helper.
+          <code>Func&lt;Task&gt;</code>, or the static <code>Ensure.Throws&lt;T&gt;()</code> helper. For explicit
+          pass/fail control, use <code>Ensure.Succeed()</code> and <code>Ensure.Fail()</code>.
         </p>
       </div>
 
@@ -820,6 +829,31 @@ isValid.Must().BeTrue();
 // Expression — best for compound conditions with rich diagnostics
 (x &gt; 0 &amp;&amp; count &lt; limit).VerifyExpression();</code></pre>
       </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Explicit outcomes: <code>Ensure.Succeed()</code> and <code>Ensure.Fail()</code></h4>
+        <p>
+          Static helpers for tests that need an intentional pass marker or a forced failure without asserting on a
+          subject value. Useful for placeholder tests, documented no-ops, unreachable branches, and
+          framework-agnostic equivalents of NUnit’s <code>Assert.Succeed</code> / <code>Assert.Fail</code>.
+        </p>
+        <pre><code class="language-csharp">// Mark a test as intentionally passing (no checks performed)
+Ensure.Succeed();
+
+// Force failure with default message: "Verification failed: explicit failure."
+Ensure.Fail();
+
+// Force failure with a custom message (prefix added when omitted)
+Ensure.Fail("not implemented yet");
+// → "Verification failed: not implemented yet"
+
+// Message already prefixed is used as-is
+Ensure.Fail("Verification failed: custom wording");</code></pre>
+        <ul class="method-list">
+          <li><code>Ensure.Succeed()</code> — completes without throwing; performs no verification</li>
+          <li><code>Ensure.Fail(message?)</code> — throws <code>OmniAssertionException</code> immediately, unless an enclosing <code>AssertionScope</code> is collecting failures</li>
+        </ul>
+      </article>
     </section>
 
     <section class="section" id="advanced">
@@ -829,10 +863,45 @@ isValid.Must().BeTrue();
           <h2>Real-world test patterns</h2>
         </div>
         <p class="section-intro">
-          Soft assertions, deep object comparison, predicate-based collection checks, async exception testing, and
-          compile-time boolean operand capture.
+          Soft assertions, explicit pass/fail outcomes, deep object comparison, predicate-based collection checks, async
+          exception testing, and compile-time boolean operand capture.
         </p>
       </div>
+
+      <h3>Explicit outcomes with <code>Ensure.Succeed()</code> and <code>Ensure.Fail()</code></h3>
+      <p>
+        Use <code>Ensure.Succeed()</code> when a test must pass without performing checks — for example a placeholder
+        while behaviour is still being defined, or a branch that documents intentional no-op behaviour. Use
+        <code>Ensure.Fail()</code> when a code path should never run, or when you need to abort a test with a clear
+        message before v3-style guard assertions exist.
+      </p>
+      <pre><code class="language-csharp">[Fact]
+public void Placeholder_until_feature_lands()
+{
+    // Documents that the test harness is wired; replace with real checks later.
+    Ensure.Succeed();
+}
+
+[Fact]
+public void Should_reject_unsupported_platform()
+{
+    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+    {
+        Ensure.Fail("This integration test runs on Linux CI agents only.");
+    }
+
+    service.RunLinuxOnlyWorkflow();
+}</code></pre>
+      <p>
+        Inside an <code>AssertionScope</code>, <code>Ensure.Fail()</code> is collected like any other failure and
+        reported when the scope is disposed — it does not throw immediately.
+      </p>
+      <pre><code class="language-csharp">using (new AssertionScope())
+{
+    customer.Id.Must().BeGreaterThan(0);
+    Ensure.Fail("billing address not yet validated");
+    // Both failures are reported together when the scope ends
+}</code></pre>
 
       <h3>Soft assertions with <code>AssertionScope</code></h3>
       <pre><code class="language-csharp">using (new AssertionScope())
@@ -944,6 +1013,10 @@ callback.Must().HaveHost("github.com");</code></pre>
           <strong><code>Expect.Throws&lt;T&gt;(...)</code></strong>
           <span><code>Ensure.Throws&lt;T&gt;(...)</code> or <code>(...).Throws&lt;T&gt;()</code></span>
         </div>
+        <div class="migration-row">
+          <strong><code>Assert.Succeed()</code> / <code>Assert.Fail(...)</code></strong>
+          <span><code>Ensure.Succeed()</code> / <code>Ensure.Fail(...)</code></span>
+        </div>
       </div>
 
       <p style="margin-top: 1rem; color: var(--muted);">
@@ -993,6 +1066,7 @@ user.Email.Must().Contain("@");</code></pre>
         <li>File/directory helpers — <code>"path".FileExists().HaveContent(...)</code></li>
         <li><code>AssertionScope</code> — soft assertions behave the same</li>
         <li><code>WithMessage</code> / <code>WithInnerException&lt;T&gt;</code> — exception chaining</li>
+        <li><code>Ensure.Succeed()</code> / <code>Ensure.Fail(...)</code> — explicit pass and forced failure (new in v2; legacy <code>Assert.Succeed</code> / <code>Assert.Fail</code> delegate to these)</li>
       </ul>
 
       <h3>Automated migration (Roslyn analyzers)</h3>
@@ -1134,6 +1208,17 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
           <p>
             Legacy <code>Verify()</code> and <code>To*</code> APIs are marked obsolete in v2. Apply the OA001–OA003 code
             fixes or follow the <a href="#migration">migration guide</a>. Legacy syntax will be removed in v3.
+          </p>
+        </details>
+
+        <details>
+          <summary>When should I use <code>Ensure.Succeed()</code> or <code>Ensure.Fail()</code>?</summary>
+          <p>
+            Use <code>Ensure.Succeed()</code> for intentional no-op or placeholder tests where no subject value is under
+            verification. Use <code>Ensure.Fail()</code> to abort a test with a message — for example an unsupported
+            platform branch or a path that should be unreachable. Prefer fluent <code>.Must()</code> assertions when you
+            have a value to check. If you used NUnit’s <code>Assert.Succeed</code> / <code>Assert.Fail</code>, switch to
+            the <code>Ensure</code> equivalents to avoid clashing with NUnit’s <code>Assert</code> type.
           </p>
         </details>
       </div>
