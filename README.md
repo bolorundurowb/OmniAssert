@@ -25,15 +25,16 @@ frameworks while adding powerful compile-time features that help you write bette
 
 > **Provenance:** OmniAssert was built with **substantial help from AI-assisted coding tools**. If you are evaluating it for production, security-sensitive, or compliance-heavy use, apply the same scrutiny you would to any rapidly authored codebase: read critical paths, run your own tests, and satisfy your organisation’s review and supply-chain policies.
 
+> **Upgrading from v1?** See **[MIGRATION.md](MIGRATION.md)** for the `Ensure` / `Must()` / `Be*` API and automated Roslyn migration.
 
-At its core, OmniAssert provides an expressive, natural-language API for assertions: `Verify(user.Email).ToContain("@")`
+At its core, OmniAssert provides an expressive, natural-language API for assertions: `user.Email.Must().Contain("@")`
 reads like plain English. When assertions fail, you get rich, detailed error messages that include the actual and
 expected values, the expression that failed, and contextual information about what went wrong—making debugging faster
 and less frustrating.
 
 ### What sets OmniAssert apart
 
-- **Deep object comparison**: The `ToBeEquivalentTo` assertion performs intelligent structural comparison of complex
+- **Deep object comparison**: The `BeEquivalentTo` assertion performs intelligent structural comparison of complex
   object graphs, recursively comparing public properties, handling collections as unordered multisets, and safely
   navigating circular references. When objects don't match, you get a clear, hierarchical diff showing exactly where
   they diverge.
@@ -46,6 +47,9 @@ and less frustrating.
   expressions. When `VerifyExpression(x > 0 && count < limit)` fails, you see not just "condition was false" but the
   actual values of `x`, `count`, and `limit`. An advanced rewrite mode can even capture intermediate sub-expression
   values for complex logical conditions.
+
+- **Automated migration from v1**: Bundled Roslyn analyzers (OA001–OA003) detect legacy `Assert` / `Verify()` / `To*`
+  syntax and offer code fixes, including **Fix all occurrences in Solution**. See [MIGRATION.md](MIGRATION.md).
 
 - **Comprehensive API coverage**: From basic equality and comparison checks to collection assertions, exception
   testing (sync and async), type checks, string pattern matching, date/time comparisons, nullable handling, and more—all
@@ -65,7 +69,7 @@ clearly and diagnose failures quickly.
 ## Requirements
 
 - **Runtime**: projects targeting **.NET 10** (or a compatible TFM) can reference the **`OmniAssert`** NuGet package. The runtime assembly name is **`OmniAssert.Core`**.
-- **Optional interceptors**: **.NET 10 SDK**, **C# 14**, and the MSBuild properties in [Optional: richer boolean failures with interceptors](#optional-richer-boolean-failures-with-interceptors). Interceptors only affect `VerifyExpression(bool, string?)` (the `string` is normally supplied by `[CallerArgumentExpression]`).
+- **Optional interceptors**: **.NET 10 SDK**, **C# 14**, and the MSBuild properties in [Compile-time boolean diagnostics (interceptors)](#compile-time-boolean-diagnostics-interceptors). Interceptors only affect `VerifyExpression(bool, string?)` (the `string` is normally supplied by `[CallerArgumentExpression]`).
 
 ## Install
 
@@ -73,7 +77,7 @@ Add the package to your test project:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="1.3.0" />
+  <PackageReference Include="OmniAssert" Version="2.0.0" />
 </ItemGroup>
 ```
 
@@ -82,7 +86,7 @@ If you are building from this repository or a fork (project references instead o
 ## Quick start
 
 1. Reference **`OmniAssert`** (see [Install](#install)).
-2. Write `.Verify(…)` on any value or expression.
+2. Write `.Must()` on any value or expression.
 3. For booleans, you can also use `.VerifyExpression()`.
 
 ```csharp
@@ -91,92 +95,92 @@ using OmniAssert;
 [Fact]
 public void Should_validate_user()
 {
-    user.Id.Verify().ToBeGreaterThan(0);
-    user.Email.Verify().ToContain("@");
-    user.IsActive.Verify().ToBeTrue();
+    user.Id.Must().BeGreaterThan(0);
+    user.Email.Must().Contain("@");
+    user.IsActive.Must().BeTrue();
 }
 ```
 
 ## Assertion Types
 
-OmniAssert provides a rich set of extension methods for various types. All assertions begin with `.Verify()` or specialized methods like `.VerifyNullable()`.
+OmniAssert provides a rich set of extension methods for various types. Fluent assertions begin with `.Must()`; nullable
+subjects use `.VerifyNullable()`.
 
 ### Basic Values & Numeric
 Assertions for all standard numeric types (including `BigInteger`).
 
 ```csharp
-answer.Verify().ToBe(42);
-count.Verify().ToBeGreaterThan(0);
-price.Verify().ToBeApproximately(9.99, 0.01);
-score.Verify().ToBeOneOf(10, 20, 30);
+answer.Must().Be(42);
+count.Must().BeGreaterThan(0);
+price.Must().BeApproximately(9.99, 0.01);
+score.Must().BeOneOf(10, 20, 30);
 ```
 
-- `ToBe(expected)` / `NotToBe(unexpected)`
-- `ToBeGreaterThan(threshold)` / `ToBeGreaterThanOrEqualTo(threshold)`
-- `ToBeLessThan(threshold)` / `ToBeLessThanOrEqualTo(threshold)`
-- `ToBeInRange(min, max)`
-- `ToBeApproximately(expected, precision)`
-- `ToBeOneOf(values...)`
+- `Be(expected)` / `NotBe(unexpected)`
+- `BeGreaterThan(threshold)` / `BeGreaterThanOrEqualTo(threshold)`
+- `BeLessThan(threshold)` / `BeLessThanOrEqualTo(threshold)`
+- `BeInRange(min, max)`
+- `BeApproximately(expected, precision)`
+- `BeOneOf(values...)`
 
 ### Strings
 Fluent assertions for text analysis.
 
 ```csharp
-name.Verify().ToStartWith("John");
-email.Verify().ToMatch(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-bio.Verify().ToHaveLengthGreaterThan(10);
-role.Verify().ToBeIgnoringCase("admin");
+name.Must().StartWith("John");
+email.Must().Match(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+bio.Must().HaveLengthGreaterThan(10);
+role.Must().BeIgnoringCase("admin");
 ```
 
-- `ToContain(substring)` / `NotToContain(substring)`
-- `ToStartWith(prefix)` / `ToEndWith(suffix)` / `NotToEndWith(suffix)`
-- `ToMatch(regex)`
-- `ToBeIgnoringCase(expected)` / `ToBeOneOf(values...)`
-- `ToBeNull()` / `NotToBeNull()`
-- `ToBeEmpty()` / `NotToBeEmpty()`
-- `ToBeNullOrEmpty()` / `NotToBeNullOrEmpty()`
-- `ToBeNullOrWhiteSpace()` / `NotToBeNullOrWhiteSpace()`
-- `ToBeWhiteSpace()` / `NotToBeWhiteSpace()`
-- `ToHaveLength(expected)` / `ToHaveLengthGreaterThan(n)` / `ToHaveLengthLessThan(n)`
+- `Contain(substring)` / `NotContain(substring)`
+- `StartWith(prefix)` / `EndWith(suffix)` / `NotEndWith(suffix)`
+- `Match(regex)`
+- `BeIgnoringCase(expected)` / `BeOneOf(values...)`
+- `BeNull()` / `NotBeNull()`
+- `BeEmpty()` / `NotBeEmpty()`
+- `BeNullOrEmpty()` / `NotBeNullOrEmpty()`
+- `BeNullOrWhiteSpace()` / `NotBeNullOrWhiteSpace()`
+- `BeWhiteSpace()` / `NotBeWhiteSpace()`
+- `HaveLength(expected)` / `HaveLengthGreaterThan(n)` / `HaveLengthLessThan(n)`
 
 ### Collections & Dictionaries
 Deep verification for sequences and key-value pairs.
 
 ```csharp
-users.Verify().ToHaveCount(3);
-items.Verify().ToContain(targetItem);
-results.Verify().ToBeUnique();
-settings.Verify().ContainKey("Theme");
+users.Must().HaveCount(3);
+items.Must().Contain(targetItem);
+results.Must().BeUnique();
+settings.Must().ContainKey("Theme");
 ```
 
-- `ToHaveCount(n)`
-- `ToHaveCountGreaterThan(n)` / `ToHaveCountLessThan(n)`
-- `ToHaveCountMatching(n, predicate)`
-- `ToBeEmpty()` / `NotToBeEmpty()`
-- `ToContain(item)` / `NotToContain(item)`
-- `ToContain(predicate)` / `AllSatisfy(predicate)` / `AnySatisfy(predicate)` / `NoneSatisfy(predicate)`
-- `ToBeUnique()` / `ToHaveUniqueCount(n)`
-- `ToBeInAscendingOrder()` / `ToBeInDescendingOrder()`
-- `ToBeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
-- `ToBeSequenceEqual(other)` (Exact sequence equivalence—same elements in same order)
-- `ToContainInOrder(items...)` (Verifies items appear in the given order, not necessarily consecutively)
-- `ToBeNull()` / `NotToBeNull()`
-- `ToHaveCount(n)`
+- `HaveCount(n)`
+- `HaveCountGreaterThan(n)` / `HaveCountLessThan(n)`
+- `HaveCountMatching(n, predicate)`
+- `BeEmpty()` / `NotBeEmpty()`
+- `Contain(item)` / `NotContain(item)`
+- `Contain(predicate)` / `AllSatisfy(predicate)` / `AnySatisfy(predicate)` / `NoneSatisfy(predicate)`
+- `BeUnique()` / `HaveUniqueCount(n)`
+- `BeInAscendingOrder()` / `BeInDescendingOrder()`
+- `BeEquivalentTo(other)` (Multiset equivalence—same elements, order ignored)
+- `BeSequenceEqual(other)` (Exact sequence equivalence—same elements in same order)
+- `ContainInOrder(items...)` (Verifies items appear in the given order, not necessarily consecutively)
+- `BeNull()` / `NotBeNull()`
 - `ContainKey(key)` / `NotContainKey(key)` / `ContainValue(value)` / `NotContainValue(value)` / `HaveValue(key, value)`
 
 ### Objects & Equivalence
 Verify object identity, types, and structural equality.
 
 ```csharp
-instance.Verify().ToBeOfType<MyClass>();
-actualDto.Verify().ToBeEquivalentTo(expectedDto);
+instance.Must().BeOfType<MyClass>();
+actualDto.Must().BeEquivalentTo(expectedDto);
 ```
 
-- `ToBe(expected)` (Reference equality)
-- `ToBeNull()` / `NotToBeNull()`
-- `ToBeOfType<T>()` / `NotToBeOfType<T>()`
-- `ToBeAssignableTo<T>()` / `NotToBeAssignableTo<T>()`
-- `ToBeEquivalentTo(expected)` (Recursive property comparison with diff)
+- `Be(expected)` (Reference equality)
+- `BeNull()` / `NotBeNull()`
+- `BeOfType<T>()` / `NotBeOfType<T>()`
+- `BeAssignableTo<T>()` / `NotBeAssignableTo<T>()`
+- `BeEquivalentTo(expected)` (Recursive property comparison with diff)
 
 ### Exceptions & Tasks
 Verify synchronous and asynchronous code behavior.
@@ -205,17 +209,17 @@ await TimeSpan.FromSeconds(2).CompleteWithin(() => longRunningTask);
 Assertions for temporal types, GUIDs, Enums, and URIs.
 
 ```csharp
-dateTime.Verify().ToBeAfter(yesterday);
-timeSpan.Verify().ToBePositive();
-guid.Verify().NotToBeEmpty();
-uri.Verify().HaveHost("github.com");
+dateTime.Must().BeAfter(yesterday);
+timeSpan.Must().BePositive();
+guid.Must().NotBeEmpty();
+uri.Must().HaveHost("github.com");
 ```
 
-- `DateTime` / `DateTimeOffset`: `ToBeBefore`, `ToBeAfter`, `ToBeWithin`
-- `DateOnly` / `TimeOnly`: `ToBeBefore`, `ToBeAfter`
-- `TimeSpan`: `ToBePositive`, `ToBeNegative`
-- `Guid`: `ToBeEmpty`, `NotToBeEmpty`
-- `Enum`: `ToBe`, `ToBeOneOf`
+- `DateTime` / `DateTimeOffset`: `BeBefore`, `BeAfter`, `BeWithin`
+- `DateOnly` / `TimeOnly`: `BeBefore`, `BeAfter`
+- `TimeSpan`: `BePositive`, `BeNegative`
+- `Guid`: `BeEmpty`, `NotBeEmpty`
+- `Enum`: `Be`, `BeOneOf`
 - `Uri`: `HaveScheme`, `HaveHost`, `HavePath`, `HaveQuery`
 
 ### File System
@@ -236,22 +240,22 @@ Use `AssertionScope` to collect multiple failures and report them all at once wh
 ```csharp
 using (new AssertionScope())
 {
-    user.Name.Verify().ToBe("John");
-    user.Age.Verify().ToBe(30);
-    user.Email.Verify().ToContain("@");
+    user.Name.Must().Be("John");
+    user.Age.Must().Be(30);
+    user.Email.Must().Contain("@");
 }
 ```
 
-## Booleans: `Verify()` vs `VerifyExpression()`
+## Booleans: `Must()` vs `VerifyExpression()`
 
 OmniAssert provides two ways to assert boolean conditions:
 
-1. **Fluent style**: `flag.Verify().ToBeTrue()` - consistent with other assertions.
-2. **Expression style**: `condition.VerifyExpression()` - best for complex logical conditions.
+1. **Fluent style**: `flag.Must().BeTrue()` — consistent with other assertions.
+2. **Expression style**: `condition.VerifyExpression()` — best for complex logical conditions.
 
 ```csharp
 // Fluent
-isValid.Verify().ToBeTrue();
+isValid.Must().BeTrue();
 
 // Expression (with rich diagnostics via bundled interceptors)
 (x > 0 && count < limit).VerifyExpression();
@@ -279,7 +283,7 @@ To opt out, add the following to your test project:
 > ```
 
 When active:
-- `flag.VerifyExpression()` (bare identifier) becomes `flag.Verify(expression).ToBeTrue()`.
+- `flag.VerifyExpression()` (bare identifier) becomes `flag.Must(expression).BeTrue()`.
 - `(complexExpr).VerifyExpression()` captures all operands so failure messages show each value.
 
 ---

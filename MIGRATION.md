@@ -1,0 +1,191 @@
+# Migrating from OmniAssert v1 to v2
+
+OmniAssert v2 modernises the fluent API, avoids naming clashes with other test frameworks (such as NUnit's `Assert`), and ships Roslyn analyzers to automate migration.
+
+Legacy v1 syntax **still compiles** in v2 but is marked `[Obsolete]` and surfaces compiler warnings. Plan to migrate before v3, when obsolete APIs will be removed.
+
+## Summary of changes
+
+| v1 (legacy)                                   | v2 (recommended)                               |
+|-----------------------------------------------|------------------------------------------------|
+| `Assert` static entry point                   | `Ensure`                                       |
+| `.Verify()`                                   | `.Must()`                                      |
+| `.ToBeTrue()`, `.ToBe(42)`, `.ToContain("x")` | `.BeTrue()`, `.Be(42)`, `.Contain("x")`        |
+| `.NotToBe(...)`, `.NotToBeNull()`             | `.NotBe(...)`, `.NotBeNull()`                  |
+| `.ToHaveCount(3)`, `.ToBeGreaterThan(0)`      | `.HaveCount(3)`, `.BeGreaterThan(0)`           |
+| `Expect.Throws<T>(...)` (optional)            | `Ensure.Throws<T>(...)` or `(...).Throws<T>()` |
+
+Methods that never used a `To` prefix in v1 are unchanged—for example `ContainKey`, `HaveHost`, `AllSatisfy`, and file helpers like `HaveContent`.
+
+## Entry point: `Assert` → `Ensure`
+
+v1 used a static class named `Assert`, which conflicts with NUnit, xUnit, and other frameworks.
+
+```csharp
+// v1
+using OmniAssert;
+OmniAssert.Assert.VerifyExpression(condition);
+
+// v2
+using OmniAssert;
+Ensure.VerifyExpression(condition);
+```
+
+Extension-based assertions do not require a class prefix:
+
+```csharp
+// v1
+user.Email.Verify().ToContain("@");
+
+// v2
+user.Email.Must().Contain("@");
+```
+
+## Fluent chain: `Verify()` → `Must()`
+
+Replace every fluent entry call:
+
+```csharp
+// v1
+count.Verify().ToBeGreaterThan(0);
+
+// v2
+count.Must().BeGreaterThan(0);
+```
+
+## Assertion grammar: drop the `To` prefix
+
+v2 uses direct, sentence-like method names. The general rules are:
+
+- `ToXxx(...)` → `Xxx(...)` — e.g. `ToBeFalse()` → `BeFalse()`, `ToHaveCount(3)` → `HaveCount(3)`
+- `NotToXxx(...)` → `NotXxx(...)` — e.g. `NotToBeNull()` → `NotBeNull()`, `NotToContain(x)` → `NotContain(x)`
+
+### Common mappings
+
+| v1                                     | v2                                 |
+|----------------------------------------|------------------------------------|
+| `ToBeTrue()` / `ToBeFalse()`           | `BeTrue()` / `BeFalse()`           |
+| `ToBe(expected)`                       | `Be(expected)`                     |
+| `NotToBe(unexpected)`                  | `NotBe(unexpected)`                |
+| `ToBeNull()` / `NotToBeNull()`         | `BeNull()` / `NotBeNull()`         |
+| `ToBeEmpty()` / `NotToBeEmpty()`       | `BeEmpty()` / `NotBeEmpty()`       |
+| `ToContain(...)` / `NotToContain(...)` | `Contain(...)` / `NotContain(...)` |
+| `ToBeGreaterThan(...)`                 | `BeGreaterThan(...)`               |
+| `ToBeEquivalentTo(...)`                | `BeEquivalentTo(...)`              |
+| `ToBeOfType<T>()`                      | `BeOfType<T>()`                    |
+
+Apply the same pattern to other `To*` / `NotTo*` methods on assertion types.
+
+## What did not change
+
+These APIs keep their v1 names in v2:
+
+- **`VerifyExpression(...)`** — boolean expression assertions and optional compile-time interceptors
+- **`VerifyNullable(...)`** — nullable reference/value entry point (e.g. `value.VerifyNullable().BeNull()`)
+- **Exception extensions** — `(...).Throws<T>()`, `NotThrow()`, `ThrowsAsync<T>()`, etc. (now resolved via `Ensure`, not `Assert`)
+- **File/directory helpers** — `"path".FileExists().HaveContent(...)`, `"dir".DirectoryExists().BeEmpty()`
+- **`AssertionScope`** — soft assertions behave the same
+- **`WithMessage` / `WithInnerException<T>`** — exception assertion chaining
+
+## Booleans: `Must()` vs `VerifyExpression()`
+
+Both styles remain supported; only the fluent path uses the new names:
+
+```csharp
+// Fluent (v2)
+isValid.Must().BeTrue();
+
+// Expression style (unchanged name; best for compound conditions)
+(x > 0 && count < limit).VerifyExpression();
+```
+
+When interceptors are enabled, a bare identifier such as `flag.VerifyExpression()` is rewritten at compile time to `flag.Must(expression).BeTrue()`.
+
+## Automated migration (Roslyn analyzers)
+
+Starting in v2, the **`OmniAssert`** NuGet package includes **`OmniAssert.Analyzers.dll`** alongside the existing source generator. No extra package reference is required.
+
+### Diagnostic rules
+
+| ID        | Detects                                                       | Suggested fix                                |
+|-----------|---------------------------------------------------------------|----------------------------------------------|
+| **OA001** | Use of legacy `OmniAssert.Assert`                             | Replace with `Ensure`                        |
+| **OA002** | `.Verify()` fluent entry                                      | Replace with `.Must()`                       |
+| **OA003** | Legacy `To*` / `NotTo*` assertion methods after a fluent root | Replace with `Be*` / `Not*` / `Have*` / etc. |
+
+### Applying fixes
+
+In Visual Studio, Rider, or VS Code with C# Dev Kit:
+
+1. Build the solution so analyzers load from the package.
+2. Open a file with legacy syntax (light bulb / squiggle on OA001–OA003).
+3. Choose **Migrate to Ensure/Must/Be* syntax**, or **Fix all occurrences in Solution** for batch migration.
+
+Example transformations:
+
+```csharp
+Assert.Throws<InvalidOperationException>(() => act());
+// → Ensure.Throws<InvalidOperationException>(() => act());
+
+value.Verify().ToBeFalse();
+// → value.Must().BeFalse();
+
+items.Verify().NotToBeNull();
+// → items.Must().NotBeNull();
+```
+
+## Framework name collisions
+
+If you previously used **`Expect`** to avoid clashing with NUnit's `Assert`, prefer **`Ensure`** in v2:
+
+```csharp
+// v1
+Expect.Throws<ArgumentException>(() => act());
+
+// v2
+Ensure.Throws<ArgumentException>(() => act());
+// or
+((Action)act).Throws<ArgumentException>();
+```
+
+The `Expect` type remains as a thin wrapper but is no longer necessary for most projects.
+
+## Nullable assertions
+
+```csharp
+// v1
+maybeUser.VerifyNullable().NotToBeNull();
+
+// v2
+maybeUser.VerifyNullable().NotBeNull();
+```
+
+Only the assertion method names change; the entry point is still `VerifyNullable()`.
+
+## Compile-time interceptors
+
+Interceptor behaviour is unchanged. Opt-out and `InterceptorsNamespaces` settings are the same as v1—see the [README](README.md#compile-time-boolean-diagnostics-interceptors).
+
+Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** instead of `Assert.Verify(...).ToBeTrue()`.
+
+## Recommended migration steps
+
+1. **Upgrade** the `OmniAssert` package to v2.x.
+2. **Build** and review OA001–OA003 warnings.
+3. **Run code fixes** (per file or fix all in solution).
+4. **Search** for any remaining `.Verify()`, `.ToBe`, or `OmniAssert.Assert` usages your IDE may have missed.
+5. **Run tests** and confirm failure messages still read as expected.
+6. **Treat warnings as errors** (optional) to prevent reintroducing legacy syntax:
+
+   ```xml
+   <PropertyGroup>
+     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+     <WarningsNotAsErrors>OA001;OA002;OA003</WarningsNotAsErrors>
+   </PropertyGroup>
+   ```
+
+   Remove `WarningsNotAsErrors` once migration is complete to enforce the new API strictly.
+
+## Need help?
+
+Open an [issue](https://github.com/bolorundurowb/OmniAssert/issues) with a minimal repro if a code fix does not apply cleanly or if you find a v1 pattern with no v2 equivalent.
