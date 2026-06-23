@@ -2,7 +2,20 @@
 
 OmniAssert v2 modernises the fluent API, avoids naming clashes with other test frameworks (such as NUnit's `Assert`), and ships Roslyn analyzers to automate migration.
 
-Legacy v1 syntax **still compiles** in v2 but is marked `[Obsolete]` and surfaces compiler warnings. Plan to migrate before v3, when obsolete APIs will be removed.
+Legacy v1 syntax **still compiles** in v2 but is marked `[Obsolete]` and surfaces compiler warnings.
+
+## Deprecation timeline
+
+The following **will be removed in OmniAssert v3.0** (the next major release after v2):
+
+- The **`Assert`** static class and all **`Assert.*`** entry points
+- The **`.Verify()`** fluent extension (replaced by **`.Must()`**)
+- All legacy **`To*`** / **`NotTo*`** assertion methods (replaced by **`Be*`** / **`Not*`** / **`Have*`** / etc.)
+- The **`Expect`** compatibility wrapper (use **`Ensure`** instead)
+
+There is no planned removal date for **`VerifyExpression`**, **`VerifyNullable`**, exception extensions, file/directory helpers, or other APIs that were not renamed in v2.
+
+Migrate to v2 syntax before upgrading to v3. After v3, code that still uses deprecated members will fail to compile.
 
 ## Summary of changes
 
@@ -148,7 +161,7 @@ Ensure.Throws<ArgumentException>(() => act());
 ((Action)act).Throws<ArgumentException>();
 ```
 
-The `Expect` type remains as a thin wrapper but is no longer necessary for most projects.
+The `Expect` type remains as a thin wrapper in v2 but **will be removed in v3.0**; prefer `Ensure` for new code.
 
 ## Nullable assertions
 
@@ -189,7 +202,4 @@ Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** instead o
 ## Need help?
 
 Open an [issue](https://github.com/bolorundurowb/OmniAssert/issues) with a minimal repro if a code fix does not apply cleanly or if you find a v1 pattern with no v2 equivalent.
-
-The full migration guide — API changes, Roslyn analyzer code fixes, and step-by-step instructions — lives in the
-**[OmniAssert documentation](https://bolorundurowb.github.io/OmniAssert/#migration)**.
 
