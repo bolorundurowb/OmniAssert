@@ -3,7 +3,7 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for enum subjects from <see cref="Assert.Verify{T}(T, string?)"/>.</summary>
+/// <summary>Assertions for enum subjects from <see cref="Ensure.Must{T}(T, string?)"/>.</summary>
 /// <typeparam name="T">Backed enum type.</typeparam>
 public readonly struct EnumAssertions<T> where T : struct, Enum
 {
@@ -19,7 +19,7 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
     /// <summary>Verifies that the enum value is equal to the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The expected enum value.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (EqualityComparer<T>.Default.Equals(_actual, expected))
             return;
@@ -31,7 +31,7 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
     /// <summary>Verifies that the enum value is not equal to the <paramref name="unexpected"/> value.</summary>
     /// <param name="unexpected">The unexpected enum value.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
-    public void NotToBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (!EqualityComparer<T>.Default.Equals(_actual, unexpected))
             return;
@@ -42,7 +42,7 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
 
     /// <summary>Verifies that the enum value matches one of the provided <paramref name="expected"/> values.</summary>
     /// <param name="expected">Allowed enum values.</param>
-    public void ToBeOneOf(params T[] expected)
+    public void BeOneOf(params T[] expected)
     {
         if (expected is not null)
         {
@@ -75,4 +75,10 @@ public readonly struct EnumAssertions<T> where T : struct, Enum
         sb.Append(AnsiColour.Actual(actual.ToString()));
         return sb.ToString();
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOneOf(params T[] expected) => BeOneOf(expected);
 }

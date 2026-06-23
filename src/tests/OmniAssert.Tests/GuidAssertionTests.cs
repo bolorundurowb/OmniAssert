@@ -5,39 +5,39 @@ public class GuidAssertionTests
     [Fact]
     public void ToBeEmpty_WhenGuidIsEmpty_ShouldSucceed()
     {
-        (Guid.Empty).Verify().ToBeEmpty();
+        (Guid.Empty).Must().BeEmpty();
     }
 
     [Fact]
     public void ToBeEmpty_WhenGuidIsNotEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.NewGuid()).Verify().ToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.NewGuid()).Must().BeEmpty());
     }
 
     [Fact]
     public void NotToBeEmpty_WhenGuidIsNotEmpty_ShouldSucceed()
     {
-        (Guid.NewGuid()).Verify().NotToBeEmpty();
+        (Guid.NewGuid()).Must().NotBeEmpty();
     }
 
     [Fact]
     public void NotToBeEmpty_WhenGuidIsEmpty_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.Empty).Verify().NotToBeEmpty());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Guid.Empty).Must().NotBeEmpty());
     }
 
     [Fact]
     public void ToBeOneOf_WhenGuidIsInSet_ShouldSucceed()
     {
         var expected = Guid.NewGuid();
-        (expected).Verify().ToBeOneOf(Guid.NewGuid(), expected);
+        (expected).Must().BeOneOf(Guid.NewGuid(), expected);
     }
 
     [Fact]
     public void ToBeOneOf_WhenGuidIsNotInSet_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (Guid.NewGuid()).Verify().ToBeOneOf(Guid.NewGuid(), Guid.NewGuid()));
+            (Guid.NewGuid()).Must().BeOneOf(Guid.NewGuid(), Guid.NewGuid()));
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class GuidAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (Guid.NewGuid()).Verify().ToBeEmpty();
+            (Guid.NewGuid()).Must().BeEmpty();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -57,8 +57,8 @@ public class GuidAssertionTests
         var ex = Xunit.Assert.Throws<AggregateException>(() =>
         {
             using var scope = new AssertionScope();
-            (Guid.Empty).Verify().NotToBeEmpty();
-            (Guid.Empty).Verify().NotToBeEmpty();
+            (Guid.Empty).Must().NotBeEmpty();
+            (Guid.Empty).Must().NotBeEmpty();
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }

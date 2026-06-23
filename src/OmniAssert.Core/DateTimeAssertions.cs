@@ -17,7 +17,7 @@ public readonly struct DateTimeAssertions
     /// <summary>Verifies that the date/time is after the <paramref name="expected"/> date/time.</summary>
     /// <param name="expected">The date/time to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeAfter(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeAfter(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
             return;
@@ -28,7 +28,7 @@ public readonly struct DateTimeAssertions
     /// <summary>Verifies that the date/time is before the <paramref name="expected"/> date/time.</summary>
     /// <param name="expected">The date/time to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeBefore(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeBefore(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
             return;
@@ -40,7 +40,7 @@ public readonly struct DateTimeAssertions
     /// <param name="precision">The maximum allowed difference.</param>
     /// <param name="expected">The expected date/time.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeWithin(TimeSpan precision, DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeWithin(TimeSpan precision, DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (Math.Abs((_actual - expected).Ticks) <= precision.Ticks)
             return;
@@ -51,7 +51,7 @@ public readonly struct DateTimeAssertions
     /// <summary>Verifies that the date/time is exactly equal to the <paramref name="expected"/> date/time.</summary>
     /// <param name="expected">The expected date/time.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -62,7 +62,7 @@ public readonly struct DateTimeAssertions
     /// <summary>Verifies that the date/time is not equal to the <paramref name="unexpected"/> date/time.</summary>
     /// <param name="unexpected">The unexpected date/time.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
-    public void NotToBe(DateTime unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(DateTime unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (_actual != unexpected)
             return;
@@ -80,6 +80,16 @@ public readonly struct DateTimeAssertions
         sb.Append(AnsiColour.Actual(actual.ToString("O")));
         return sb.ToString();
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeAfter(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeAfter(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeBefore(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeBefore(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeWithin(TimeSpan precision, DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeWithin(precision, expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(DateTime unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
 }
 
 /// <summary>Assertions for <see cref="DateTimeOffset"/> subjects (includes offset in comparisons).</summary>
@@ -97,7 +107,7 @@ public readonly struct DateTimeOffsetAssertions
     /// <summary>Verifies that the date/time offset is after the <paramref name="expected"/> date/time offset.</summary>
     /// <param name="expected">The date/time offset to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeAfter(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeAfter(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
             return;
@@ -108,7 +118,7 @@ public readonly struct DateTimeOffsetAssertions
     /// <summary>Verifies that the date/time offset is before the <paramref name="expected"/> date/time offset.</summary>
     /// <param name="expected">The date/time offset to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeBefore(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeBefore(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
             return;
@@ -120,7 +130,7 @@ public readonly struct DateTimeOffsetAssertions
     /// <param name="precision">The maximum allowed difference.</param>
     /// <param name="expected">The expected date/time offset.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeWithin(TimeSpan precision, DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeWithin(TimeSpan precision, DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (Math.Abs((_actual - expected).Ticks) <= precision.Ticks)
             return;
@@ -131,7 +141,7 @@ public readonly struct DateTimeOffsetAssertions
     /// <summary>Verifies that the date/time offset is exactly equal to the <paramref name="expected"/> date/time offset.</summary>
     /// <param name="expected">The expected date/time offset.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -142,7 +152,7 @@ public readonly struct DateTimeOffsetAssertions
     /// <summary>Verifies that the date/time offset is not equal to the <paramref name="unexpected"/> date/time offset.</summary>
     /// <param name="unexpected">The unexpected date/time offset.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
-    public void NotToBe(DateTimeOffset unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(DateTimeOffset unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (_actual != unexpected)
             return;
@@ -160,4 +170,14 @@ public readonly struct DateTimeOffsetAssertions
         sb.Append(AnsiColour.Actual(actual.ToString("O")));
         return sb.ToString();
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeAfter(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeAfter(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeBefore(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeBefore(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeWithin(TimeSpan precision, DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeWithin(precision, expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(DateTimeOffset unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
 }

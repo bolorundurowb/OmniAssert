@@ -12,20 +12,20 @@ public class EnumAssertionTests
     [Fact]
     public void ToBe_WhenValuesEqual_ShouldSucceed()
     {
-        (TestEnum.First).Verify().ToBe(TestEnum.First);
+        (TestEnum.First).Must().Be(TestEnum.First);
     }
 
     [Fact]
     public void ToBe_WhenValuesDiffer_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (TestEnum.First).Verify().ToBe(TestEnum.Second));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (TestEnum.First).Must().Be(TestEnum.Second));
     }
 
     [Fact]
     public void ToBe_WhenValuesDiffer_MessageContainsExpectedAndActual()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (TestEnum.First).Verify().ToBe(TestEnum.Second));
+            (TestEnum.First).Must().Be(TestEnum.Second));
         Xunit.Assert.Contains("Second", ex.Message, StringComparison.Ordinal);
         Xunit.Assert.Contains("First", ex.Message, StringComparison.Ordinal);
     }
@@ -36,7 +36,7 @@ public class EnumAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (TestEnum.First).Verify().ToBe(TestEnum.Second);
+            (TestEnum.First).Must().Be(TestEnum.Second);
         });
         Xunit.Assert.Contains("Second", ex.Message, StringComparison.Ordinal);
     }
@@ -44,20 +44,20 @@ public class EnumAssertionTests
     [Fact]
     public void NotToBe_WhenValuesDiffer_ShouldSucceed()
     {
-        (TestEnum.First).Verify().NotToBe(TestEnum.Second);
+        (TestEnum.First).Must().NotBe(TestEnum.Second);
     }
 
     [Fact]
     public void NotToBe_WhenValuesEqual_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => (TestEnum.First).Verify().NotToBe(TestEnum.First));
+        Xunit.Assert.Throws<OmniAssertionException>(() => (TestEnum.First).Must().NotBe(TestEnum.First));
     }
 
     [Fact]
     public void NotToBe_WhenValuesEqual_MessageContainsValue()
     {
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (TestEnum.Third).Verify().NotToBe(TestEnum.Third));
+            (TestEnum.Third).Must().NotBe(TestEnum.Third));
         Xunit.Assert.Contains("Third", ex.Message, StringComparison.Ordinal);
     }
 
@@ -67,7 +67,7 @@ public class EnumAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (TestEnum.First).Verify().NotToBe(TestEnum.First);
+            (TestEnum.First).Must().NotBe(TestEnum.First);
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -75,13 +75,13 @@ public class EnumAssertionTests
     [Fact]
     public void ToBeOneOf_WhenValueIsInSet_ShouldSucceed()
     {
-        (TestEnum.Second).Verify().ToBeOneOf(TestEnum.First, TestEnum.Second);
+        (TestEnum.Second).Must().BeOneOf(TestEnum.First, TestEnum.Second);
     }
 
     [Fact]
     public void ToBeOneOf_WhenValueIsNotInSet_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (TestEnum.Third).Verify().ToBeOneOf(TestEnum.First, TestEnum.Second));
+            (TestEnum.Third).Must().BeOneOf(TestEnum.First, TestEnum.Second));
     }
 }

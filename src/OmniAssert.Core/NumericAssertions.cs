@@ -20,7 +20,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is equal to the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The expected value.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)
             return;
@@ -32,7 +32,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is not equal to the <paramref name="unexpected"/> value.</summary>
     /// <param name="unexpected">The value that the actual value should not be.</param>
     /// <param name="unexpectedExpression">The expression for the unexpected value (automatically captured).</param>
-    public void NotToBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
+    public void NotBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null)
     {
         if (_actual != unexpected)
             return;
@@ -43,7 +43,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
 
     /// <summary>Verifies that the numeric value matches one of the provided <paramref name="expected"/> values.</summary>
     /// <param name="expected">Allowed values.</param>
-    public void ToBeOneOf(params T[] expected)
+    public void BeOneOf(params T[] expected)
     {
         if (expected is not null)
         {
@@ -64,7 +64,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is greater than the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The value to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeGreaterThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeGreaterThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual > expected)
             return;
@@ -76,7 +76,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is greater than or equal to the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The value to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeGreaterThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeGreaterThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual >= expected)
             return;
@@ -88,7 +88,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is less than the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The value to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeLessThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeLessThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual < expected)
             return;
@@ -100,7 +100,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <summary>Verifies that the numeric value is less than or equal to the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The value to compare against.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBeLessThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void BeLessThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual <= expected)
             return;
@@ -114,7 +114,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <param name="max">The maximum inclusive value.</param>
     /// <param name="minExpr">The expression for the minimum value (automatically captured).</param>
     /// <param name="maxExpr">The expression for the maximum value (automatically captured).</param>
-    public void ToBeInRange(T min, T max, [CallerArgumentExpression(nameof(min))] string? minExpr = null, [CallerArgumentExpression(nameof(max))] string? maxExpr = null)
+    public void BeInRange(T min, T max, [CallerArgumentExpression(nameof(min))] string? minExpr = null, [CallerArgumentExpression(nameof(max))] string? maxExpr = null)
     {
         if (_actual >= min && _actual <= max)
             return;
@@ -127,7 +127,7 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     /// <param name="expected">The expected value.</param>
     /// <param name="precision">The maximum allowed difference.</param>
     /// <param name="expectedExpr">The expression for the expected value (automatically captured).</param>
-    public void ToBeApproximately(T expected, T precision, [CallerArgumentExpression(nameof(expected))] string? expectedExpr = null)
+    public void BeApproximately(T expected, T precision, [CallerArgumentExpression(nameof(expected))] string? expectedExpr = null)
     {
         if (precision < T.Zero)
         {
@@ -170,4 +170,22 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
     }
 
     private static string FormatValue(T value) => value.ToString(null, System.Globalization.CultureInfo.InvariantCulture);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBe(T unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOneOf(params T[] expected) => BeOneOf(expected);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeGreaterThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeGreaterThan(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeGreaterThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeGreaterThanOrEqualTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeLessThan(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeLessThan(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeLessThanOrEqualTo(T expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => BeLessThanOrEqualTo(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeInRange(T min, T max, [CallerArgumentExpression(nameof(min))] string? minExpr = null, [CallerArgumentExpression(nameof(max))] string? maxExpr = null) => BeInRange(min, max, minExpr, maxExpr);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeApproximately(T expected, T precision, [CallerArgumentExpression(nameof(expected))] string? expectedExpr = null) => BeApproximately(expected, precision, expectedExpr);
 }

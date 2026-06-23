@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for dictionary subjects from <see cref="Assert.Verify{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, string?)"/>.</summary>
+/// <summary>Assertions for dictionary subjects from <see cref="Ensure.Must{TKey, TValue}(IReadOnlyDictionary{TKey, TValue}, string?)"/>.</summary>
 /// <typeparam name="TKey">Dictionary key type.</typeparam>
 /// <typeparam name="TValue">Dictionary value type.</typeparam>
 public readonly struct DictionaryAssertions<TKey, TValue>
@@ -19,7 +19,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     /// <summary>Verifies that the dictionary is the same instance as <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected dictionary instance.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
-    public void ToBe(IReadOnlyDictionary<TKey, TValue>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(IReadOnlyDictionary<TKey, TValue>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (ReferenceEquals(_actual, expected))
             return;
@@ -121,7 +121,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     }
 
     /// <summary>Verifies that the dictionary is <c>null</c>.</summary>
-    public void ToBeNull()
+    public void BeNull()
     {
         if (_actual is null)
             return;
@@ -132,7 +132,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     }
 
     /// <summary>Verifies that the dictionary is not <c>null</c>.</summary>
-    public void NotToBeNull()
+    public void NotBeNull()
     {
         if (_actual is not null)
             return;
@@ -145,7 +145,7 @@ public readonly struct DictionaryAssertions<TKey, TValue>
     /// <summary>Verifies that the dictionary has exactly <paramref name="expectedCount"/> entries.</summary>
     /// <param name="expectedCount">The expected number of entries.</param>
     /// <param name="countExpression">The expression for the expected count (automatically captured).</param>
-    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
+    public void HaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null)
     {
         EnsureActualNotNull();
         var actualCount = _actual.Count;
@@ -169,4 +169,12 @@ public readonly struct DictionaryAssertions<TKey, TValue>
             $"Verification failed: expected {_expression} not to be null, but it was.",
             _expression);
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(IReadOnlyDictionary<TKey, TValue>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToHaveCount(int expectedCount, [CallerArgumentExpression(nameof(expectedCount))] string? countExpression = null) => HaveCount(expectedCount, countExpression);
 }

@@ -68,7 +68,7 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
 
                     if (!byTree.TryGetValue(tree, out var list))
                     {
-                        list = new List<InterceptorCandidate>();
+                        list = [];
                         byTree[tree] = list;
                     }
 
@@ -202,11 +202,11 @@ public sealed class OmniAssertIncrementalGenerator : IIncrementalGenerator
             sb.AppendLine("        {");
             if (candidate.SimpleIdentifierPath)
             {
-                sb.AppendLine("            global::OmniAssert.Assert.Verify(condition, expression).ToBeTrue();");
+                sb.AppendLine("            global::OmniAssert.Ensure.Must(condition, expression).BeTrue();");
             }
             else
             {
-                sb.AppendLine("            global::OmniAssert.Assert.VerifyExpression(condition, expression);");
+                sb.AppendLine("            global::OmniAssert.Ensure.VerifyExpression(condition, expression);");
             }
 
             sb.AppendLine("        }");

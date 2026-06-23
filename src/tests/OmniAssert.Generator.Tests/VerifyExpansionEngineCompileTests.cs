@@ -28,7 +28,7 @@ public static class T
 
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -68,7 +68,7 @@ public static class T
 
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionOrTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -108,7 +108,7 @@ public static class Wrapped
         var wrappedTree = CSharpSyntaxTree.ParseText(wrapped, path: "Wrapped.cs");
         var wrappedCompilation = CSharpCompilation.Create(
             "WrappedAsm",
-            new[] { wrappedTree },
+            [wrappedTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -140,7 +140,7 @@ public static class T
         var refs = MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionLiteralTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -178,7 +178,7 @@ public static class T
         var refs = MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionAndTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -216,7 +216,7 @@ public static class T
         var refs = MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionNotTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -252,7 +252,7 @@ public static class T
         var refs = MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionStaticTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -291,7 +291,7 @@ public static class T
         var refs = MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyExpansionDupKeyTest",
-            new[] { syntaxTree },
+            [syntaxTree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

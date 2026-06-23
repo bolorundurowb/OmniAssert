@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for arbitrary <see cref="object"/> (or boxed) subjects from <see cref="Assert.Verify(object?, string?)"/>.</summary>
+/// <summary>Assertions for arbitrary <see cref="object"/> (or boxed) subjects from <see cref="Ensure.Must(object?, string?)"/>.</summary>
 public readonly struct ObjectAssertions
 {
     private readonly object? _actual;
@@ -17,7 +17,7 @@ public readonly struct ObjectAssertions
     /// <summary>Verifies that the object is equal to the <paramref name="expected"/> object using <see cref="object.Equals(object?, object?)"/>.</summary>
     /// <param name="expected">The expected object.</param>
     /// <param name="expectedExpression">The expression for the expected object (automatically captured).</param>
-    public void ToBe(object? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(object? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (Equals(_actual, expected))
             return;
@@ -28,7 +28,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the runtime type is exactly <typeparamref name="T"/> (not a derived type).</summary>
-    public void ToBeOfType<T>()
+    public void BeOfType<T>()
     {
         if (_actual is T && _actual.GetType() == typeof(T))
             return;
@@ -38,7 +38,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the subject is assignable to <typeparamref name="T"/> (including derived instances).</summary>
-    public void ToBeAssignableTo<T>()
+    public void BeAssignableTo<T>()
     {
         if (_actual is T)
             return;
@@ -48,7 +48,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the runtime type is not exactly <typeparamref name="T"/>.</summary>
-    public void NotToBeOfType<T>()
+    public void NotBeOfType<T>()
     {
         if (_actual is not T || _actual.GetType() != typeof(T))
             return;
@@ -57,7 +57,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the subject is not assignable to <typeparamref name="T"/>.</summary>
-    public void NotToBeAssignableTo<T>()
+    public void NotBeAssignableTo<T>()
     {
         if (_actual is not T)
             return;
@@ -67,7 +67,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the object is <c>null</c>; fails when it has a value.</summary>
-    public void ToBeNull()
+    public void BeNull()
     {
         if (_actual is null)
             return;
@@ -76,7 +76,7 @@ public readonly struct ObjectAssertions
     }
 
     /// <summary>Asserts the object is not <c>null</c>; fails when it is null.</summary>
-    public void NotToBeNull()
+    public void NotBeNull()
     {
         if (_actual is not null)
             return;
@@ -88,7 +88,7 @@ public readonly struct ObjectAssertions
     /// Deep structural comparison: walks public instance properties and sequences, then reports a coloured diff on mismatch.
     /// </summary>
     /// <param name="expected">Expected graph (order of enumerable elements must match).</param>
-    public void ToBeEquivalentTo(object? expected)
+    public void BeEquivalentTo(object? expected)
     {
         var diff = ObjectDiffWalker.Diff(expected, _actual, _expression);
         if (diff is null)
@@ -106,4 +106,20 @@ public readonly struct ObjectAssertions
 
         throw ex;
     }
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(object? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeOfType<T>() => BeOfType<T>();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeAssignableTo<T>() => BeAssignableTo<T>();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeOfType<T>() => NotBeOfType<T>();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeAssignableTo<T>() => NotBeAssignableTo<T>();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeEquivalentTo(object? expected) => BeEquivalentTo(expected);
 }

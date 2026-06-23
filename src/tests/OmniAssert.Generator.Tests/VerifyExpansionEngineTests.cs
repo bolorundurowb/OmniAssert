@@ -11,7 +11,7 @@ public class VerifyExpansionEngineTests
     private static VerifyExpansionEngine CreateEngine()
     {
         var tree = CSharpSyntaxTree.ParseText("public static class _Stub {}", path: "Stub.cs");
-        var compilation = CSharpCompilation.Create("StubAsm", new[] { tree });
+        var compilation = CSharpCompilation.Create("StubAsm", [tree]);
         return new VerifyExpansionEngine(compilation.GetSemanticModel(tree));
     }
 
@@ -42,7 +42,7 @@ public class VerifyExpansionEngineTests
             SyntaxFactory.ArgumentList());
 
         var tree = CSharpSyntaxTree.ParseText("public static class _Stub {}", path: "Stub.cs");
-        var compilation = CSharpCompilation.Create("StubAsm", new[] { tree });
+        var compilation = CSharpCompilation.Create("StubAsm", [tree]);
         var model = compilation.GetSemanticModel(tree);
         var engine = new VerifyExpansionEngine(model);
 

@@ -8,14 +8,14 @@ public class ObjectAssertionTests
     [Fact]
     public void ToBeNull_WhenObjectIsNull_ShouldSucceed()
     {
-        ((object?)null).Verify().ToBeNull();
+        ((object?)null).Must().BeNull();
     }
 
     [Fact]
     public void ToBeNull_WhenObjectIsNotNull_ShouldThrow()
     {
         object obj = "hello";
-        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().ToBeNull());
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Must().BeNull());
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            obj.Verify().ToBeNull();
+            obj.Must().BeNull();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -34,13 +34,13 @@ public class ObjectAssertionTests
     public void NotToBeNull_WhenObjectIsNotNull_ShouldSucceed()
     {
         object obj = "hello";
-        obj.Verify().NotToBeNull();
+        obj.Must().NotBeNull();
     }
 
     [Fact]
     public void NotToBeNull_WhenObjectIsNull_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Verify().NotToBeNull());
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Must().NotBeNull());
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            ((object?)null).Verify().NotToBeNull();
+            ((object?)null).Must().NotBeNull();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -58,21 +58,21 @@ public class ObjectAssertionTests
     public void ToBeOfType_WhenExactTypeMatches_ShouldSucceed()
     {
         object obj = "hello";
-        (obj).Verify().ToBeOfType<string>();
+        (obj).Must().BeOfType<string>();
     }
 
     [Fact]
     public void ToBeOfType_WhenTypeDiffers_ShouldThrow()
     {
         object obj = 42;
-        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Verify().ToBeOfType<string>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Must().BeOfType<string>());
     }
 
     [Fact]
     public void ToBeOfType_WhenSubtypeProvided_ShouldThrow()
     {
         object obj = new Dog();
-        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Verify().ToBeOfType<Animal>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Must().BeOfType<Animal>());
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (obj).Verify().ToBeOfType<string>();
+            (obj).Must().BeOfType<string>();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -91,28 +91,28 @@ public class ObjectAssertionTests
     public void ToBeAssignableTo_WhenExactTypeMatches_ShouldSucceed()
     {
         object obj = "hello";
-        (obj).Verify().ToBeAssignableTo<string>();
+        (obj).Must().BeAssignableTo<string>();
     }
 
     [Fact]
     public void ToBeAssignableTo_WhenSubtypeMatches_ShouldSucceed()
     {
         object obj = new Dog();
-        (obj).Verify().ToBeAssignableTo<Animal>();
+        (obj).Must().BeAssignableTo<Animal>();
     }
 
     [Fact]
     public void ToBeAssignableTo_WhenInterfaceMatches_ShouldSucceed()
     {
         object obj = "hello";
-        (obj).Verify().ToBeAssignableTo<IEnumerable<char>>();
+        (obj).Must().BeAssignableTo<IEnumerable<char>>();
     }
 
     [Fact]
     public void ToBeAssignableTo_WhenNotAssignable_ShouldThrow()
     {
         object obj = 42;
-        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Verify().ToBeAssignableTo<IEnumerable<int>>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => (obj).Must().BeAssignableTo<IEnumerable<int>>());
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (obj).Verify().ToBeAssignableTo<string>();
+            (obj).Must().BeAssignableTo<string>();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -131,21 +131,21 @@ public class ObjectAssertionTests
     public void NotToBeOfType_WhenTypeDiffers_ShouldSucceed()
     {
         object obj = 42;
-        obj.Verify().NotToBeOfType<string>();
+        obj.Must().NotBeOfType<string>();
     }
 
     [Fact]
     public void NotToBeOfType_WhenExactTypeMatches_ShouldThrow()
     {
         object obj = "hello";
-        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeOfType<string>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Must().NotBeOfType<string>());
     }
 
     [Fact]
     public void NotToBeOfType_WhenSubtypeProvided_ShouldSucceed()
     {
         object obj = new Dog();
-        obj.Verify().NotToBeOfType<Animal>();
+        obj.Must().NotBeOfType<Animal>();
     }
 
     [Fact]
@@ -155,7 +155,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            obj.Verify().NotToBeOfType<string>();
+            obj.Must().NotBeOfType<string>();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -164,21 +164,21 @@ public class ObjectAssertionTests
     public void NotToBeAssignableTo_WhenNotAssignable_ShouldSucceed()
     {
         object obj = 42;
-        obj.Verify().NotToBeAssignableTo<string>();
+        obj.Must().NotBeAssignableTo<string>();
     }
 
     [Fact]
     public void NotToBeAssignableTo_WhenExactTypeMatches_ShouldThrow()
     {
         object obj = "hello";
-        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeAssignableTo<string>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Must().NotBeAssignableTo<string>());
     }
 
     [Fact]
     public void NotToBeAssignableTo_WhenSubtypeMatches_ShouldThrow()
     {
         object obj = new Dog();
-        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Verify().NotToBeAssignableTo<Animal>());
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Must().NotBeAssignableTo<Animal>());
     }
 
     [Fact]
@@ -188,7 +188,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            obj.Verify().NotToBeAssignableTo<string>();
+            obj.Must().NotBeAssignableTo<string>();
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -198,7 +198,7 @@ public class ObjectAssertionTests
     {
         var a = new { Name = "Alice", Age = 30 };
         var b = new { Name = "Alice", Age = 30 };
-        ((object)a).Verify().ToBeEquivalentTo(b);
+        ((object)a).Must().BeEquivalentTo(b);
     }
 
     [Fact]
@@ -206,19 +206,19 @@ public class ObjectAssertionTests
     {
         var a = new { Name = "Alice" };
         var b = new { Name = "Bob" };
-        Xunit.Assert.Throws<OmniAssertionException>(() => ((object)a).Verify().ToBeEquivalentTo(b));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object)a).Must().BeEquivalentTo(b));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenActualIsNull_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Verify().ToBeEquivalentTo(new { A = 1 }));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object?)null).Must().BeEquivalentTo(new { A = 1 }));
     }
 
     [Fact]
     public void ToBeEquivalentTo_WhenExpectedIsNull_ShouldThrow()
     {
-        Xunit.Assert.Throws<OmniAssertionException>(() => ((object)new { A = 1 }).Verify().ToBeEquivalentTo(null));
+        Xunit.Assert.Throws<OmniAssertionException>(() => ((object)new { A = 1 }).Must().BeEquivalentTo(null));
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class ObjectAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            ((object)a).Verify().ToBeEquivalentTo(b);
+            ((object)a).Must().BeEquivalentTo(b);
         });
         Xunit.Assert.NotNull(ex);
     }

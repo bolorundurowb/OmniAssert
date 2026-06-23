@@ -14,8 +14,8 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        // `left && Right()` is false with short-circuit; negate so (...).Verify().ToBeTrue() sees true while RHS stays unevaluated.
-        (!(left && Right())).Verify().ToBeTrue();
+        // `left && Right()` is false with short-circuit; negate so (...).Must().BeTrue() sees true while RHS stays unevaluated.
+        (!(left && Right())).Must().BeTrue();
         Xunit.Assert.False(rightInvoked);
     }
 
@@ -30,7 +30,7 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        (left && Right()).Verify().ToBeTrue();
+        (left && Right()).Must().BeTrue();
         Xunit.Assert.True(rightInvoked);
     }
 
@@ -45,7 +45,7 @@ public class VerifyInterceptorShortCircuitTests
             return false;
         }
 
-        (left || Right()).Verify().ToBeTrue();
+        (left || Right()).Must().BeTrue();
         Xunit.Assert.False(rightInvoked);
     }
 
@@ -60,7 +60,7 @@ public class VerifyInterceptorShortCircuitTests
             return true;
         }
 
-        (left || Right()).Verify().ToBeTrue();
+        (left || Right()).Must().BeTrue();
         Xunit.Assert.True(rightInvoked);
     }
 

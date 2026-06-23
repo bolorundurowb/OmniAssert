@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>OmniAssert.Generator.Tests</RootNamespace>
+    <RootNamespace>OmniAssert.Analyzers.Tests</RootNamespace>
     <LangVersion>13</LangVersion>
   </PropertyGroup>
 
@@ -25,8 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\OmniAssert.Analyzers\OmniAssert.Analyzers.csproj" />
     <ProjectReference Include="..\..\OmniAssert.Core\OmniAssert.Core.csproj" />
-    <ProjectReference Include="..\..\OmniAssert.Generator\OmniAssert.Generator.csproj" />
   </ItemGroup>
-
 </Project>

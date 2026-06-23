@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace OmniAssert;
 
-/// <summary>Assertions for <see cref="Uri"/> subjects from <see cref="Assert.Verify(Uri?, string?)"/>.</summary>
+/// <summary>Assertions for <see cref="Uri"/> subjects from <see cref="Ensure.Must(Uri?, string?)"/>.</summary>
 public readonly struct UriAssertions
 {
     private readonly Uri? _actual;
@@ -17,7 +17,7 @@ public readonly struct UriAssertions
     /// <summary>Verifies that the URI is equal to the <paramref name="expected"/> URI.</summary>
     /// <param name="expected">The expected URI.</param>
     /// <param name="expectedExpression">The expression for the expected URI (automatically captured).</param>
-    public void ToBe(Uri? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    public void Be(Uri? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (Equals(_actual, expected))
             return;
@@ -86,4 +86,6 @@ public readonly struct UriAssertions
 
     private static string NormalizeQuery(string query) =>
         query.StartsWith('?') ? query[1..] : query;
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBe(Uri? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
 }

@@ -10,7 +10,8 @@ public class VerifyLoweringFactsTests
     [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(); } }", true)]
     [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(\"hint\"); } }", true)]
     [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true); } }", true)]
-    [InlineData("public static class T { public static void M() { OmniAssert.Assert.VerifyExpression(true, null); } }", true)]
+    [InlineData("public static class T { public static void M() { OmniAssert.Ensure.VerifyExpression(true); } }", true)]
+    [InlineData("public static class T { public static void M() { OmniAssert.Ensure.VerifyExpression(true, null); } }", true)]
     [InlineData("""
 public static class T
 {
@@ -38,7 +39,7 @@ public static class T
         var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
         var compilation = CSharpCompilation.Create(
             "VerifyLoweringFactsAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -82,7 +83,7 @@ public static class T
         };
         var compilation = CSharpCompilation.Create(
             "ZeroParamAsm",
-            new[] { tree },
+            [tree],
             refs,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

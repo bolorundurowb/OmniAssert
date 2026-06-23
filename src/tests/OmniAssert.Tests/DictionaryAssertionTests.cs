@@ -5,88 +5,88 @@ public class DictionaryAssertionTests
     [Fact]
     public void ContainKey_WhenPresent_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ContainKey("a");
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Must().ContainKey("a");
     }
 
     [Fact]
     public void ContainKey_WhenMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainKey("b"));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().ContainKey("b"));
     }
 
     [Fact]
     public void NotContainKey_WhenMissing_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainKey("b");
+        (new Dictionary<string, int> { ["a"] = 1 }).Must().NotContainKey("b");
     }
 
     [Fact]
     public void NotContainKey_WhenPresent_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainKey("a"));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().NotContainKey("a"));
     }
 
     [Fact]
     public void ContainValue_WhenPresent_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ContainValue(2);
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Must().ContainValue(2);
     }
 
     [Fact]
     public void ContainValue_WhenMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainValue(2));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().ContainValue(2));
     }
 
     [Fact]
     public void HaveValue_WhenKeyAndValueMatch_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("a", 1);
+        (new Dictionary<string, int> { ["a"] = 1 }).Must().HaveValue("a", 1);
     }
 
     [Fact]
     public void HaveValue_WhenKeyMissing_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("b", 1));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().HaveValue("b", 1));
     }
 
     [Fact]
     public void HaveValue_WhenValueDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("a", 2));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().HaveValue("a", 2));
     }
 
     [Fact]
     public void DictionaryAssertions_WhenTypedAsIReadOnlyDictionary_ShouldUseDictionaryAssertions()
     {
         IReadOnlyDictionary<string, int> actual = new Dictionary<string, int> { ["x"] = 10 };
-        (actual).Verify().ContainKey("x");
-        (actual).Verify().ContainValue(10);
+        (actual).Must().ContainKey("x");
+        (actual).Must().ContainValue(10);
     }
 
     [Fact]
     public void NotContainValue_WhenMissing_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainValue(99);
+        (new Dictionary<string, int> { ["a"] = 1 }).Must().NotContainValue(99);
     }
 
     [Fact]
     public void NotContainValue_WhenPresent_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotContainValue(1));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().NotContainValue(1));
     }
 
     [Fact]
     public void ContainKey_WithNullKey_ShouldSucceed()
     {
         var dict = new DictionaryWithNullKey();
-        (dict).Verify().ContainKey(null);
+        (dict).Must().ContainKey(null);
     }
 
     private class DictionaryWithNullKey : IReadOnlyDictionary<string?, int>
@@ -116,20 +116,20 @@ public class DictionaryAssertionTests
     [Fact]
     public void ContainValue_WithNullValue_ShouldSucceed()
     {
-        (new Dictionary<string, string?> { ["a"] = null }).Verify().ContainValue(null);
+        (new Dictionary<string, string?> { ["a"] = null }).Must().ContainValue(null);
     }
 
     [Fact]
     public void HaveValue_WithNullValue_ShouldSucceed()
     {
-        (new Dictionary<string, string?> { ["a"] = null }).Verify().HaveValue("a", null);
+        (new Dictionary<string, string?> { ["a"] = null }).Must().HaveValue("a", null);
     }
 
     [Fact]
     public void HaveValue_WithNullValueMismatch_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, string?> { ["a"] = null }).Verify().HaveValue("a", "expected"));
+            (new Dictionary<string, string?> { ["a"] = null }).Must().HaveValue("a", "expected"));
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public class DictionaryAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainKey("missing");
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().ContainKey("missing");
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -149,7 +149,7 @@ public class DictionaryAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ContainValue(99);
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().ContainValue(99);
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -160,7 +160,7 @@ public class DictionaryAssertionTests
         var ex = Xunit.Assert.Throws<OmniAssertionException>(() =>
         {
             using var scope = new AssertionScope();
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().HaveValue("a", 99);
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().HaveValue("a", 99);
         });
         Xunit.Assert.NotNull(ex);
     }
@@ -168,46 +168,46 @@ public class DictionaryAssertionTests
     [Fact]
     public void ToBeNull_WhenNull_ShouldSucceed()
     {
-        ((IReadOnlyDictionary<string, int>?)null).Verify().ToBeNull();
+        ((IReadOnlyDictionary<string, int>?)null).Must().BeNull();
     }
 
     [Fact]
     public void ToBeNull_WhenNotNull_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ToBeNull());
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().BeNull());
     }
 
     [Fact]
     public void NotToBeNull_WhenNotNull_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1 }).Verify().NotToBeNull();
+        (new Dictionary<string, int> { ["a"] = 1 }).Must().NotBeNull();
     }
 
     [Fact]
     public void NotToBeNull_WhenNull_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            ((IReadOnlyDictionary<string, int>?)null).Verify().NotToBeNull());
+            ((IReadOnlyDictionary<string, int>?)null).Must().NotBeNull());
     }
 
     [Fact]
     public void ToHaveCount_WhenCountMatches_ShouldSucceed()
     {
-        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Verify().ToHaveCount(2);
+        (new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 }).Must().HaveCount(2);
     }
 
     [Fact]
     public void ToHaveCount_WhenCountDiffers_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            (new Dictionary<string, int> { ["a"] = 1 }).Verify().ToHaveCount(3));
+            (new Dictionary<string, int> { ["a"] = 1 }).Must().HaveCount(3));
     }
 
     [Fact]
     public void ToHaveCount_WhenNull_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() =>
-            ((IReadOnlyDictionary<string, int>?)null).Verify().ToHaveCount(0));
+            ((IReadOnlyDictionary<string, int>?)null).Must().HaveCount(0));
     }
 }
