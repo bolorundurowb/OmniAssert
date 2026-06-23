@@ -499,4 +499,104 @@ public class CollectionAssertionTests
     {
         Array.Empty<int>().Must().BeSequenceEqual(Array.Empty<int>());
     }
+
+    [Fact]
+    public void NotContain_WithNonICollectionEnumerable_WhenItemAbsent_ShouldSucceed()
+    {
+        static IEnumerable<int> Yield123()
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+
+        (Yield123()).Must().NotContain(4);
+    }
+
+    [Fact]
+    public void NotContain_WithNonICollectionEnumerable_WhenItemPresent_ShouldThrow()
+    {
+        static IEnumerable<int> Yield123()
+        {
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+
+        Xunit.Assert.Throws<OmniAssertionException>(() => (Yield123()).Must().NotContain(2));
+    }
+
+    [Fact]
+    public void Be_WhenSameReference_ShouldSucceed()
+    {
+        IEnumerable<int> arr = new[] { 1, 2, 3 };
+        arr.Must().Be(arr);
+    }
+
+    [Fact]
+    public void Be_WhenDifferentReference_ShouldThrow()
+    {
+        IEnumerable<int> arr1 = new[] { 1, 2, 3 };
+        IEnumerable<int> arr2 = new[] { 1, 2, 3 };
+        Xunit.Assert.Throws<OmniAssertionException>(() => arr1.Must().Be(arr2));
+    }
+
+    [Fact]
+    public void BeEquivalentTo_WhenElementCountDiffers_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new[] { 1, 1, 2 }).Must().BeEquivalentTo(new[] { 1, 2, 3 }));
+    }
+
+    [Fact]
+    public void NotBeEmpty_NonICollection_WhenEmpty_ShouldThrow()
+    {
+        static IEnumerable<int> YieldNone()
+        {
+            yield break;
+        }
+
+        Xunit.Assert.Throws<OmniAssertionException>(() => (YieldNone()).Must().NotBeEmpty());
+    }
+
+    [Fact]
+    public void NotBeEmpty_NonICollection_WhenNotEmpty_ShouldSucceed()
+    {
+        static IEnumerable<int> Yield1()
+        {
+            yield return 1;
+        }
+
+        (Yield1()).Must().NotBeEmpty();
+    }
+
+    [Fact]
+    public void HaveCountLessThan_WhenCountIsGreater_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (new[] { 1, 2, 3 }).Must().HaveCountLessThan(2));
+    }
+
+    [Fact]
+    public void BeInAscendingOrder_WithEmptyCollection_ShouldSucceed()
+    {
+        Array.Empty<int>().Must().BeInAscendingOrder();
+    }
+
+    [Fact]
+    public void BeInDescendingOrder_WithEmptyCollection_ShouldSucceed()
+    {
+        Array.Empty<int>().Must().BeInDescendingOrder();
+    }
+
+    [Fact]
+    public void BeInAscendingOrder_WithKeySelector_WithEmptyCollection_ShouldSucceed()
+    {
+        Array.Empty<(int Age, string Name)>().Must().BeInAscendingOrder(x => x.Age);
+    }
+
+    [Fact]
+    public void BeInDescendingOrder_WithKeySelector_WithEmptyCollection_ShouldSucceed()
+    {
+        Array.Empty<(int Age, string Name)>().Must().BeInDescendingOrder(x => x.Age);
+    }
 }

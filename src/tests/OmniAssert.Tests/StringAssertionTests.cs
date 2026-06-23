@@ -498,4 +498,146 @@ public class StringAssertionTests
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Must().NotEndWith(""));
     }
+
+    [Fact]
+    public void Contain_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().Contain("x"));
+    }
+
+    [Fact]
+    public void BeEmpty_WhenActualIsNull_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Must().BeEmpty();
+    }
+
+    [Fact]
+    public void NotBeEmpty_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().NotBeEmpty());
+    }
+
+    [Fact]
+    public void BeNullOrEmpty_WhenEmpty_ShouldSucceed()
+    {
+        ("").Must().BeNullOrEmpty();
+    }
+
+    [Fact]
+    public void BeNullOrWhiteSpace_WhenEmpty_ShouldSucceed()
+    {
+        ("").Must().BeNullOrWhiteSpace();
+    }
+
+    [Fact]
+    public void Be_WithStringComparison_WhenMatch_ShouldSucceed()
+    {
+        ("hello").Must().Be("HELLO", StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Be_WithStringComparison_WhenMismatch_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ("abc").Must().Be("XYZ", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Be_WhenActualIsNullAndExpectedIsNull_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Must().Be(null);
+    }
+
+    [Fact]
+    public void Be_WhenActualIsNullAndExpectedIsNotNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().Be("hello"));
+    }
+
+    [Fact]
+    public void Be_WhenActualIsNotNullAndExpectedIsNull_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Must().Be(null));
+    }
+
+    [Fact]
+    public void NotBe_WhenActualIsNullAndExpectedIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().NotBe(null));
+    }
+
+    [Fact]
+    public void Contain_WithComparison_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (s).Must().Contain("x", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void StartWith_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().StartWith("x"));
+    }
+
+    [Fact]
+    public void EndWith_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().EndWith("x"));
+    }
+
+    [Fact]
+    public void Match_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().Match(".*"));
+    }
+
+    [Fact]
+    public void HaveLength_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().HaveLength(0));
+    }
+
+    [Fact]
+    public void HaveLengthGreaterThan_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().HaveLengthGreaterThan(0));
+    }
+
+    [Fact]
+    public void HaveLengthLessThan_WhenActualIsNull_ShouldThrow()
+    {
+        string? s = null;
+        Xunit.Assert.Throws<OmniAssertionException>(() => (s).Must().HaveLengthLessThan(1));
+    }
+
+    [Fact]
+    public void BeOneOf_WhenNullExpected_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Must().BeOneOf(null!));
+    }
+
+    [Fact]
+    public void BeOneOf_WhenEmptyExpected_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("hello").Must().BeOneOf());
+    }
+
+    [Fact]
+    public void BeOneOf_WhenActualNullMatchesNullInSet_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Must().BeOneOf(null, "a", "b");
+    }
 }

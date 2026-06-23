@@ -349,4 +349,145 @@ public class NumericAssertionTests
         });
         Xunit.Assert.Equal(2, ex.InnerExceptions.Count);
     }
+
+    [Fact]
+    public void BeGreaterThanOrEqualTo_WithDouble_WhenLess_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (1.5).Must().BeGreaterThanOrEqualTo(2.5));
+        Xunit.Assert.Contains("greater than or equal to", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BeLessThanOrEqualTo_WithDouble_WhenGreater_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (5.0).Must().BeLessThanOrEqualTo(3.0));
+        Xunit.Assert.Contains("less than or equal to", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BeApproximately_WithDouble_WhenOutsideTolerance_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => (10.0).Must().BeApproximately(20.0, 0.5));
+        Xunit.Assert.Contains("approximately", ex.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void BeApproximately_WithFloat_WhenWithinTolerance_ShouldSucceed()
+    {
+        (1.0f).Must().BeApproximately(1.001f, 0.01f);
+    }
+
+    [Fact]
+    public void BeApproximately_WithFloat_WhenOutsideTolerance_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1.0f).Must().BeApproximately(2.0f, 0.5f));
+    }
+
+    [Fact]
+    public void BeApproximately_WithDecimal_WhenWithinTolerance_ShouldSucceed()
+    {
+        (1.0m).Must().BeApproximately(1.001m, 0.01m);
+    }
+
+    [Fact]
+    public void BeApproximately_WithDecimal_WhenOutsideTolerance_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1.0m).Must().BeApproximately(2.0m, 0.5m));
+    }
+
+    [Fact]
+    public void BeApproximately_WithLong_WhenWithinTolerance_ShouldSucceed()
+    {
+        (100L).Must().BeApproximately(102L, 5L);
+    }
+
+    [Fact]
+    public void BeApproximately_WithLong_WhenOutsideTolerance_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (100L).Must().BeApproximately(200L, 5L));
+    }
+
+    [Fact]
+    public void BeOneOf_WithEmptyArray_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1).Must().BeOneOf(Array.Empty<int>()));
+    }
+
+    [Fact]
+    public void BeGreaterThanOrEqualTo_WithFloat_WhenGreater_ShouldSucceed()
+    {
+        (5.0f).Must().BeGreaterThanOrEqualTo(4.0f);
+    }
+
+    [Fact]
+    public void BeGreaterThanOrEqualTo_WithFloat_WhenLess_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1.0f).Must().BeGreaterThanOrEqualTo(2.0f));
+    }
+
+    [Fact]
+    public void BeLessThanOrEqualTo_WithFloat_WhenLess_ShouldSucceed()
+    {
+        (1.0f).Must().BeLessThanOrEqualTo(2.0f);
+    }
+
+    [Fact]
+    public void BeLessThanOrEqualTo_WithFloat_WhenGreater_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (5.0f).Must().BeLessThanOrEqualTo(3.0f));
+    }
+
+    [Fact]
+    public void BeGreaterThanOrEqualTo_WithDecimal_WhenGreater_ShouldSucceed()
+    {
+        (5.0m).Must().BeGreaterThanOrEqualTo(4.0m);
+    }
+
+    [Fact]
+    public void BeGreaterThanOrEqualTo_WithDecimal_WhenLess_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1.0m).Must().BeGreaterThanOrEqualTo(2.0m));
+    }
+
+    [Fact]
+    public void BeLessThanOrEqualTo_WithDecimal_WhenLess_ShouldSucceed()
+    {
+        (1.0m).Must().BeLessThanOrEqualTo(2.0m);
+    }
+
+    [Fact]
+    public void BeLessThanOrEqualTo_WithDecimal_WhenGreater_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (5.0m).Must().BeLessThanOrEqualTo(3.0m));
+    }
+
+    [Fact]
+    public void BeInRange_WithDouble_WhenOutOfRange_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (100.0).Must().BeInRange(0.0, 10.0));
+    }
+
+    [Fact]
+    public void BeInRange_WithDouble_WhenBelowLowerBound_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (-1.0).Must().BeInRange(0.0, 10.0));
+    }
+
+    [Fact]
+    public void NotBe_WithLong_WhenEqual_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (7L).Must().NotBe(7L));
+    }
+
+    [Fact]
+    public void BeGreaterThan_WithLong_WhenNotGreater_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (1L).Must().BeGreaterThan(2L));
+    }
+
+    [Fact]
+    public void BeLessThan_WithLong_WhenNotLess_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => (5L).Must().BeLessThan(1L));
+    }
 }
