@@ -140,4 +140,10 @@ public static partial class Assert
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public static ObjectAssertions Verify(this object? actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         Ensure.Must(actual, expression);
+
+    [Obsolete("Use Ensure.Succeed() instead.", false)]
+    public static void Succeed() => Ensure.Succeed();
+
+    [Obsolete("Use Ensure.Fail() instead.", false)]
+    public static void Fail(string? message = null) => Ensure.Fail(message);
 }

@@ -24,6 +24,7 @@
     - Added OmniAssert.Analyzers with OA001–OA003 diagnostics and code fixes to migrate Assert → Ensure, .Verify() → .Must(), and legacy fluent names automatically.
     - Updated the compile-time interceptor source generator to emit Ensure.Must(...).BeTrue() instead of Assert.Verify(...).ToBeTrue().
     - VerifyExpression, VerifyNullable, exception extensions, file/directory helpers, and AssertionScope are unchanged in v2.
+    - Added Ensure.Succeed() and Ensure.Fail() for explicit pass/no-op and forced failure scenarios (NUnit-style Assert.Succeed / Assert.Fail).
 
     v1.3.0
     - Added direct equality assertions ToBe and NotToBe to DateTimeAssertions and DateTimeOffsetAssertions.
