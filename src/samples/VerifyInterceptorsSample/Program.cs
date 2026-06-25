@@ -11,6 +11,6 @@ public static class Program
         var y = 3;
         var z = 10;
         InterceptorSmoke.Run();
-        (z > 10 || x > y).VerifyExpression();
+        Ensure.Expression(z > 10 || x > y);
     }
 }
