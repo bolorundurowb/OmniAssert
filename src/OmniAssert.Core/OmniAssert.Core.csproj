@@ -15,47 +15,15 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <PackageVersion>2.1.0</PackageVersion>
-    <PackageReleaseNotes>v2.0.0
-    - Introduced Ensure as the primary static entry point; legacy Assert remains as an obsolete compatibility wrapper.
-    - Replaced fluent .Verify() with .Must(); assertion grammar now uses Be*, Not*, Have*, and related names instead of To* / NotTo* (for example BeTrue(), NotBeNull(), HaveCount()).
-    - Legacy v1 syntax still compiles in v2 with [Obsolete] warnings; Assert, .Verify(), To* / NotTo* wrappers, and Expect will be removed in v3.0. See MIGRATION.md (included in the package).
-    - Added OmniAssert.Analyzers with OA001–OA004 diagnostics and code fixes to migrate Assert → Ensure, .Verify() → .Must(), legacy fluent names, and VerifyExpression → Ensure.Expression(...) automatically.
-    - Updated the compile-time interceptor source generator to emit Ensure.Must(...).BeTrue() and Ensure.Expression(...) instead of legacy Assert/VerifyExpression paths.
-    - Introduced static Ensure.Expression(...) for boolean expression assertions; extension VerifyExpression(...) remains as an obsolete compatibility shim until v3.0.
-    - VerifyNullable, exception extensions, file/directory helpers, and AssertionScope are unchanged in v2.
-    - Added Ensure.Succeed() and Ensure.Fail() for explicit pass/no-op and forced failure scenarios (NUnit-style Assert.Succeed / Assert.Fail).
-
-    v1.3.0
-    - Added direct equality assertions ToBe and NotToBe to DateTimeAssertions and DateTimeOffsetAssertions.
-    - Added bool ToBe(expected) overload to BoolAssertions for universal ShouldBe-style ergonomics.
-    - Added Func&lt;object?&gt; and Func&lt;Task&lt;object?&gt;&gt; overloads for Throws/NotThrow/ThrowsAsync/NotThrowAsync so expression-bodied lambdas that return values work without statement-body casts.
-    - Added Expect static class as an alternative, NUnit-friendly entry point for exception assertions when Assert is ambiguous or shadowed.
-
-    v1.2.0
-    - Added ToBeWhiteSpace, NotToBeWhiteSpace, NotToBeNullOrWhiteSpace, and NotToBeNullOrEmpty to StringAssertions.
-
-    v1.1.2
-    - Added ToBeNull() and NotToBeNull() assertions to DictionaryAssertions.
-    - Added ToHaveCount(n) assertion to DictionaryAssertions.
-
-    v1.1.1
-    - Added NotContainValue to the Dictionary assertions
-    - Fix float numeric comparisons
-
-    v1.1.0
-    - Added ToBeNull() and NotToBeNull() assertions to ObjectAssertions.
-    - Added NotToBeOfType&lt;T&gt;() and NotToBeAssignableTo&lt;T&gt;() assertions to ObjectAssertions.
-
-    v1.0.1
-    - Added ToBe(expected) for identity/reference equality checks to Collection, Dictionary, Guid, Uri, and Object assertions.
-    - Enhanced null safety in CollectionAssertions and DictionaryAssertions to provide descriptive failures instead of NullReferenceException.
-    - Added WithMessageIgnoringCase to ExceptionAssertions for flexible message verification.
-    - Improved failure diagnostics with recursive collection content formatting (up to 10 items) in OmniAssertionException.
-    - Standardized ANSI color highlighting across all numeric, date, and time assertions for consistent terminal output.
-    - Unified VerifyExpression failure path with fluent assertions via VerificationFlow.Fail.
-    - Optimized source generator by removing unreachable code and reducing redundant parentheses in rewritten expressions.</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.1.0
+    - Deprecated extension VerifyExpression() in favor of static Ensure.Expression(...); the extension remains functional with [Obsolete] warnings until v3.0.
+    - Updated the compile-time interceptor source generator to emit Ensure.Expression(...) and to intercept static Ensure.Expression call sites in addition to legacy VerifyExpression paths.
+    - Added OA005–OA007 analyzers: OA005 rewrites comparison-in-bool patterns such as (a &lt; b).Must().BeTrue() to subject-first a.Must().BeLessThan(b); OA006 suggests BeEmpty() instead of HaveCount(0); OA007 flags redundant NotBeNull() after new expressions.
+    - Added BeNull(), NotBeNull(), and NotBe(expected) to CollectionAssertions for null and reference-inequality checks.
+    - Added NotContain(substring) to StringAssertions with ordinal and StringComparison overloads.
+    - Updated PackageProjectUrl to https://bolorundurowb.github.io/OmniAssert/.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
