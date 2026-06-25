@@ -599,4 +599,40 @@ public class CollectionAssertionTests
     {
         Array.Empty<(int Age, string Name)>().Must().BeInDescendingOrder(x => x.Age);
     }
+
+    [Fact]
+    public void BeNull_WhenNull_ShouldSucceed()
+    {
+        List<int>? list = null;
+        list.Must().BeNull();
+    }
+
+    [Fact]
+    public void BeNull_WhenNotNull_ShouldThrow()
+    {
+        List<int>? list = [1, 2, 3];
+        Xunit.Assert.Throws<OmniAssertionException>(() => list.Must().BeNull());
+    }
+
+    [Fact]
+    public void NotBeNull_WhenNotNull_ShouldSucceed()
+    {
+        List<int>? list = [1, 2, 3];
+        list.Must().NotBeNull();
+    }
+
+    [Fact]
+    public void NotBeNull_WhenNull_ShouldThrow()
+    {
+        List<int>? list = null;
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => list.Must().NotBeNull());
+        Xunit.Assert.Contains("not to be null", ex.Message);
+    }
+
+    [Fact]
+    public void BeNull_WithNullableIEnumerable_ShouldSucceedWithoutObjectCast()
+    {
+        IEnumerable<int>? items = null;
+        items.Must().BeNull();
+    }
 }
