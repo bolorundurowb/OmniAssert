@@ -10,7 +10,7 @@ namespace OmniAssert;
 /// </summary>
 /// <remarks>
 /// <para>Use <see cref="AssertionScope"/> to defer failures until the scope is disposed (soft asserts).</para>
-/// <para><see cref="VerifyExpression(bool, string?)"/> call sites are enhanced at compile time by the bundled Roslyn generator unless <c>OmniAssertDisableVerifyInterceptors</c> is set to <c>true</c>—see the README.</para>
+/// <para><see cref="Expression(bool, string?)"/> call sites are enhanced at compile time by the bundled Roslyn generator unless <c>OmniAssertDisableVerifyInterceptors</c> is set to <c>true</c>—see the README.</para>
 /// </remarks>
 public static partial class Ensure
 {
@@ -29,22 +29,43 @@ public static partial class Ensure
     /// <param name="condition">The boolean value to be verified.</param>
     /// <param name="expression">The caller’s expression text, supplied automatically by the compiler.</param>
     /// <exception cref="OmniAssertionException">Thrown when the condition is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
-    public static void VerifyExpression(this bool condition,
+    public static void Expression(bool condition,
         [CallerArgumentExpression(nameof(condition))] string? expression = null) =>
-        VerifyExpression(condition, new AssertionCapture(expression ?? "condition", null));
+        Expression(condition, new AssertionCapture(expression ?? "condition", null));
 
     /// <summary>
     /// Verifies that <paramref name="condition"/> is true using an explicit <see cref="AssertionCapture"/> (source text and optional operand snapshots).
-    /// Intended for boolean-expression lowering in tooling; ordinary call sites should use <see cref="VerifyExpression(bool, string?)"/>.
+    /// Intended for boolean-expression lowering in tooling; ordinary call sites should use <see cref="Expression(bool, string?)"/>.
     /// </summary>
     /// <exception cref="OmniAssertionException">Thrown when <paramref name="condition"/> is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
-    public static void VerifyExpression(this bool condition, AssertionCapture capture)
+    public static void Expression(bool condition, AssertionCapture capture)
     {
         if (condition)
             return;
 
         VerificationFlow.Fail(OmniAssertionException.ForBooleanFailure(in capture));
     }
+
+    /// <summary>
+    /// Verifies that a boolean condition is true. If the condition is false, it generates an assertion failure
+    /// with diagnostic information about the evaluated expression.
+    /// </summary>
+    /// <param name="condition">The boolean value to be verified.</param>
+    /// <param name="expression">The caller’s expression text, supplied automatically by the compiler.</param>
+    /// <exception cref="OmniAssertionException">Thrown when the condition is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
+    [Obsolete("Use Ensure.Expression(...) instead of VerifyExpression().", false)]
+    public static void VerifyExpression(this bool condition,
+        [CallerArgumentExpression(nameof(condition))] string? expression = null) =>
+        Expression(condition, expression);
+
+    /// <summary>
+    /// Verifies that <paramref name="condition"/> is true using an explicit <see cref="AssertionCapture"/> (source text and optional operand snapshots).
+    /// Intended for boolean-expression lowering in tooling; ordinary call sites should use <see cref="Expression(bool, string?)"/>.
+    /// </summary>
+    /// <exception cref="OmniAssertionException">Thrown when <paramref name="condition"/> is false and no enclosing <see cref="AssertionScope"/> is collecting failures.</exception>
+    [Obsolete("Use Ensure.Expression(...) instead of VerifyExpression().", false)]
+    public static void VerifyExpression(this bool condition, AssertionCapture capture) =>
+        Expression(condition, capture);
 
     /// <summary>Begins verifying a double subject.</summary>
     /// <param name="actual">The value to verify.</param>

@@ -66,7 +66,7 @@ public readonly struct BoolAssertions
         VerificationFlow.Fail(msg.ToString(), _expression);
     }
 
-    /// <summary>Operand snapshots from lowered <c>VerifyExpression</c>; unused on the default <c>Verify(bool)</c> path.</summary>
+    /// <summary>Operand snapshots from lowered <c>Expression</c> / legacy <c>VerifyExpression</c>; unused on the default <c>Must(bool)</c> path.</summary>
     private void AppendOperandContext(StringBuilder msg)
     {
         if (_capturedValues is not { Count: > 0 })

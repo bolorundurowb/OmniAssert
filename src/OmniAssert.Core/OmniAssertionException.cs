@@ -54,7 +54,7 @@ public sealed class OmniAssertionException(string message, AssertionCapture capt
         return sb.ToString();
     }
 
-    /// <summary>Builds an exception for a failed <see cref="Assert.VerifyExpression"/> path.</summary>
+    /// <summary>Builds an exception for a failed boolean <see cref="Ensure.Expression"/> path.</summary>
     internal static OmniAssertionException ForBooleanFailure(in AssertionCapture capture)
     {
         var message = FormatBooleanFailure(capture);
