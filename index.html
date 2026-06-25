@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="OmniAssert is a modern fluent assertion library for .NET 10 and C# 14 with readable tests, rich diagnostics, soft assertions, object diffing, and optional compile-time boolean expression capture.">
+  <meta name="description" content="OmniAssert 2.1 — fluent assertions for .NET 10 and C# 14. Ensure.Must() API, Ensure.Expression() boolean diagnostics, soft assertions, object diffing, Roslyn migration analyzers OA001–OA007, and compile-time interceptors.">
   <title>OmniAssert Documentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -443,6 +443,7 @@
         <a href="#quick-start">Quick start</a>
         <a href="#api-reference">API</a>
         <a href="#advanced">Advanced</a>
+        <a href="#assertion-style">Style</a>
         <a href="#migration">Migration</a>
         <a href="#faq">FAQ</a>
         <a href="https://github.com/bolorundurowb/OmniAssert">GitHub</a>
@@ -471,12 +472,12 @@
           <div class="logo-wrap">
             <img src="assets/omni-assert-logo.svg" alt="OmniAssert shield logo">
           </div>
-          <h2>OmniAssert 2.0.0</h2>
+          <h2>OmniAssert 2.1.0</h2>
           <p>
             A GPL-3.0-only package for test projects targeting .NET 10. The runtime assembly is
             <code>OmniAssert.Core</code>. Roslyn generators and analyzers ship in the same NuGet package.
           </p>
-          <div class="command">dotnet add package OmniAssert --version 2.0.0</div>
+          <div class="command">dotnet add package OmniAssert --version 2.1.0</div>
           <div class="stats" aria-label="Key capabilities">
             <div class="stat">
               <strong>.NET 10</strong>
@@ -528,8 +529,8 @@
         <article class="card">
           <h3>Modern diagnostics</h3>
           <p>
-            The bundled Roslyn generator can rewrite <code>VerifyExpression()</code> call sites at compile time so failed
-            boolean expressions report operand values, not just “condition was false”.
+            The bundled Roslyn generator can rewrite <code>Ensure.Expression(...)</code> call sites at compile time so
+            failed boolean expressions report operand values, not just “condition was false”.
           </p>
         </article>
       </div>
@@ -566,9 +567,16 @@
       </div>
 
       <div class="callout">
+        <strong>What's new in 2.1:</strong> <code>Ensure.Expression(...)</code> replaces deprecated
+        <code>VerifyExpression()</code>; new analyzers OA005–OA007 for subject-first comparisons, <code>BeEmpty()</code>
+        over <code>HaveCount(0)</code>, and redundant <code>NotBeNull()</code> after <code>new</code>; collection
+        <code>BeNull()</code> / <code>NotBeNull()</code> / <code>NotBe(...)</code>; string <code>NotContain(...)</code>.
+      </div>
+
+      <div class="callout">
         <strong>Upgrading from v1?</strong> Legacy <code>Verify()</code> / <code>To*</code> syntax still compiles in v2
-        but is obsolete. See the <a href="#migration">migration guide</a> and bundled Roslyn analyzers OA001–OA003 for
-        automated fixes.
+        but is obsolete. See the <a href="#migration">migration guide</a> and bundled Roslyn analyzers OA001–OA007 for
+        migration and style guidance.
       </div>
     </section>
 
@@ -613,21 +621,21 @@
         </div>
         <p class="section-intro">
           Add the package to your test project, import <code>OmniAssert</code>, then write assertions with
-          <code>.Must()</code>, <code>.VerifyNullable()</code>, <code>.VerifyExpression()</code>, and the exception and
-          file helpers.
+          <code>.Must()</code>, <code>.VerifyNullable()</code>, <code>Ensure.Expression(...)</code>, and the exception
+          and file helpers.
         </p>
       </div>
 
       <div class="steps">
         <article class="step">
           <h3>Add the NuGet package</h3>
-          <pre><code class="language-bash">dotnet add package OmniAssert --version 2.0.0</code></pre>
+          <pre><code class="language-bash">dotnet add package OmniAssert --version 2.1.0</code></pre>
         </article>
 
         <article class="step">
           <h3>Or add the package reference manually</h3>
           <pre><code class="language-xml">&lt;ItemGroup&gt;
-  &lt;PackageReference Include="OmniAssert" Version="2.0.0" /&gt;
+  &lt;PackageReference Include="OmniAssert" Version="2.1.0" /&gt;
 &lt;/ItemGroup&gt;</code></pre>
         </article>
 
@@ -685,9 +693,31 @@ public class UserTests
       <div class="callout">
         <strong>How to read the API:</strong> start with the value under test, call <code>Must()</code>, then choose the
         assertion that describes the expected behaviour. For nullable subjects use <code>VerifyNullable()</code>. For
-        boolean conditions use either <code>flag.Must().BeTrue()</code> or
-        <code>(count &gt; 0).VerifyExpression()</code>.
+        simple booleans use <code>flag.Must().BeTrue()</code>. For compound conditions use
+        <code>Ensure.Expression(x &gt; 0 &amp;&amp; count &lt; limit)</code>.
       </div>
+
+      <h3>Assertions and exceptions together</h3>
+      <p>
+        Combine value checks with exception assertions on the same test. Failure messages include the expression under
+        test and the actual value.
+      </p>
+      <pre><code class="language-csharp">using OmniAssert;
+
+public class OrderServiceTests
+{
+    [Fact]
+    public void CreateOrder_with_invalid_email_fails()
+    {
+        var email = "not-an-email";
+
+        email.Must().NotBeNullOrEmpty();
+        email.Must().Contain("@");
+
+        var ex = (() =&gt; OrderService.Create(email)).Throws&lt;ArgumentException&gt;();
+        ex.WithMessageContaining("invalid email");
+    }
+}</code></pre>
     </section>
 
     <section class="section" id="api-reference">
@@ -725,10 +755,10 @@ score.Must().BeOneOf(10, 20, 30);</code></pre>
         <h4>Strings</h4>
         <pre><code class="language-csharp">name.Must().StartWith("John");
 email.Must().Match(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-bio.Must().HaveLengthGreaterThan(10);
-role.Must().BeIgnoringCase("admin");</code></pre>
+path.Must().NotContain("/");
+bio.Must().HaveLengthGreaterThan(10);</code></pre>
         <ul class="method-list">
-          <li><code>Contain(substring)</code> / <code>NotContain(substring)</code></li>
+          <li><code>Contain(substring)</code> / <code>NotContain(substring)</code> — ordinal by default; <code>NotContain(substring, StringComparison)</code> overload available</li>
           <li><code>StartWith(prefix)</code> / <code>EndWith(suffix)</code> / <code>NotEndWith(suffix)</code></li>
           <li><code>Match(regex)</code></li>
           <li><code>BeIgnoringCase(expected)</code> / <code>BeOneOf(values...)</code></li>
@@ -745,9 +775,11 @@ role.Must().BeIgnoringCase("admin");</code></pre>
         <h4>Collections and dictionaries</h4>
         <pre><code class="language-csharp">users.Must().HaveCount(3);
 items.Must().Contain(targetItem);
-results.Must().BeUnique();
+items.Must().NotBe(otherItems);
+results.Must().BeEmpty();
 settings.Must().ContainKey("Theme");</code></pre>
         <ul class="method-list">
+          <li><code>Be(expected)</code> / <code>NotBe(expected)</code> — reference equality on the collection instance</li>
           <li><code>HaveCount(n)</code>, <code>HaveCountGreaterThan(n)</code>, <code>HaveCountLessThan(n)</code></li>
           <li><code>HaveCountMatching(n, predicate)</code></li>
           <li><code>BeEmpty()</code> / <code>NotBeEmpty()</code></li>
@@ -822,12 +854,19 @@ uri.Must().HaveHost("github.com");</code></pre>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
-        <h4>Booleans: <code>Must()</code> vs <code>VerifyExpression()</code></h4>
+        <h4>Booleans: <code>Must()</code> vs <code>Ensure.Expression()</code></h4>
         <pre><code class="language-csharp">// Fluent — consistent with other assertions
 isValid.Must().BeTrue();
 
-// Expression — best for compound conditions with rich diagnostics
-(x &gt; 0 &amp;&amp; count &lt; limit).VerifyExpression();</code></pre>
+// Subject-first comparison (preferred over wrapping comparisons in BeTrue)
+count.Must().BeLessThan(limit);
+
+// Expression — compound boolean logic with rich diagnostics
+Ensure.Expression(x &gt; 0 &amp;&amp; count &lt; limit);</code></pre>
+        <p style="margin-top: 0.75rem; color: var(--muted);">
+          The legacy extension <code>(condition).VerifyExpression()</code> still works in v2.1 but is deprecated; use
+          <code>Ensure.Expression(condition)</code> for new code. It will be removed in v3.
+        </p>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
@@ -951,15 +990,16 @@ await TimeSpan.FromSeconds(2).CompleteWithin(
 
       <h3>Compile-time boolean diagnostics</h3>
       <p>
-        The bundled Roslyn generator rewrites supported <code>VerifyExpression()</code> call sites at compile time. When
-        active, a bare identifier such as <code>flag.VerifyExpression()</code> becomes
-        <code>flag.Must(expression).BeTrue()</code>, and compound expressions capture operand snapshots on failure.
+        The bundled Roslyn generator rewrites supported <code>Ensure.Expression(...)</code> call sites at compile time.
+        Legacy <code>VerifyExpression()</code> call sites are still intercepted for compatibility. When active, a bare
+        identifier such as <code>Ensure.Expression(flag)</code> becomes <code>flag.Must(expression).BeTrue()</code>, and
+        compound expressions capture operand snapshots on failure.
       </p>
       <pre><code class="language-csharp">var count = orders.Count;
 var limit = 10;
 var hasPriorityOrder = orders.Any(o =&gt; o.Priority == Priority.High);
 
-(count &gt; 0 &amp;&amp; count &lt;= limit &amp;&amp; hasPriorityOrder).VerifyExpression();</code></pre>
+Ensure.Expression(count &gt; 0 &amp;&amp; count &lt;= limit &amp;&amp; hasPriorityOrder);</code></pre>
 
       <h3>File system and URI checks</h3>
       <pre><code class="language-csharp">"appsettings.test.json".FileExists().HaveContent(expectedJson);
@@ -970,10 +1010,93 @@ callback.Must().HaveScheme("https");
 callback.Must().HaveHost("github.com");</code></pre>
     </section>
 
+    <section class="section" id="assertion-style">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">07. Assertion style</p>
+          <h2>Write clearer tests with analyzers</h2>
+        </div>
+        <p class="section-intro">
+          OmniAssert ships Roslyn analyzers that migrate legacy v1 syntax (OA001–OA004) and suggest clearer,
+          subject-first patterns (OA005–OA007). All rules are bundled in the NuGet package.
+        </p>
+      </div>
+
+      <div class="api-table" aria-label="OmniAssert analyzer rules">
+        <div class="api-row">
+          <strong>OA001</strong>
+          <span>Warning — legacy <code>Assert.*</code> entry point → use <code>Ensure.*</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA002</strong>
+          <span>Warning — legacy <code>.Verify()</code> fluent root → use <code>.Must()</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA003</strong>
+          <span>Warning — legacy <code>To*</code> / <code>NotTo*</code> grammar → use <code>Be*</code> / <code>Not*</code> / <code>Have*</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA004</strong>
+          <span>Warning — legacy <code>VerifyExpression(...)</code> → use <code>Ensure.Expression(...)</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA005</strong>
+          <span>Warning — <code>(a &lt; b).Must().BeTrue()</code> / <code>BeFalse()</code> → rewrite as <code>a.Must().BeLessThan(b)</code> (numeric / <code>TimeSpan</code> only)</span>
+        </div>
+        <div class="api-row">
+          <strong>OA006</strong>
+          <span>Warning — <code>collection.Must().HaveCount(0)</code> → use <code>collection.Must().BeEmpty()</code></span>
+        </div>
+        <div class="api-row">
+          <strong>OA007</strong>
+          <span>Info — <code>new Widget().Must().NotBeNull()</code> is redundant (a <code>new</code> expression cannot be null)</span>
+        </div>
+      </div>
+
+      <h3>Preferred patterns</h3>
+      <div class="grid two">
+        <article class="card">
+          <h4>Subject-first comparisons</h4>
+          <pre><code class="language-csharp">// Avoid
+(count &lt; limit).Must().BeTrue();
+
+// Prefer
+count.Must().BeLessThan(limit);</code></pre>
+        </article>
+        <article class="card">
+          <h4>Empty collections</h4>
+          <pre><code class="language-csharp">// Avoid
+results.Must().HaveCount(0);
+
+// Prefer
+results.Must().BeEmpty();</code></pre>
+        </article>
+        <article class="card">
+          <h4>String negation</h4>
+          <pre><code class="language-csharp">// Avoid
+(path.Contains('/')).Must().BeFalse();
+
+// Prefer
+path.Must().NotContain('/');</code></pre>
+        </article>
+        <article class="card">
+          <h4>Compound boolean logic</h4>
+          <pre><code class="language-csharp">// When a single comparison assertion does not apply
+Ensure.Expression(x &gt; 0 &amp;&amp; count &lt; limit &amp;&amp; hasPriority);</code></pre>
+          <p>OA005 suggests <code>Ensure.Expression(...)</code> when the left-hand side is not a numeric or <code>TimeSpan</code> subject.</p>
+        </article>
+      </div>
+
+      <ul class="check-list" style="margin-top: 1rem;">
+        <li>Nullable collections: <code>list.Must().BeNull()</code> or <code>list.Must().NotBeNull()</code> — no <code>(object?)</code> cast needed.</li>
+        <li>Apply OA001–OA004 code fixes via the light bulb, or <strong>Fix all occurrences in Solution</strong> for batch migration.</li>
+      </ul>
+    </section>
+
     <section class="section" id="migration">
       <div class="section-header">
         <div>
-          <p class="section-kicker">07. Migration</p>
+          <p class="section-kicker">08. Migration</p>
           <h2>Upgrading from v1.x to v2</h2>
         </div>
         <p class="section-intro">
@@ -981,6 +1104,14 @@ callback.Must().HaveHost("github.com");</code></pre>
           Roslyn analyzers to automate migration. Legacy v1 syntax still compiles but is <code>[Obsolete]</code> — plan
           to migrate before v3 removes it.
         </p>
+      </div>
+
+      <div class="callout warning">
+        <strong>v3.0 removal plan:</strong> The following will be removed in the next major release:
+        <code>Assert</code>, <code>.Verify()</code>, all <code>To*</code> / <code>NotTo*</code> methods, the
+        <code>Expect</code> wrapper, and extension <code>VerifyExpression(...)</code>. Use
+        <code>Ensure.Expression(...)</code> instead. <code>VerifyNullable</code>, exception extensions, and file helpers
+        are not scheduled for removal.
       </div>
 
       <h3>Summary of changes</h3>
@@ -1017,6 +1148,10 @@ callback.Must().HaveHost("github.com");</code></pre>
           <strong><code>Assert.Succeed()</code> / <code>Assert.Fail(...)</code></strong>
           <span><code>Ensure.Succeed()</code> / <code>Ensure.Fail(...)</code></span>
         </div>
+        <div class="migration-row">
+          <strong><code>(condition).VerifyExpression()</code></strong>
+          <span><code>Ensure.Expression(condition)</code></span>
+        </div>
       </div>
 
       <p style="margin-top: 1rem; color: var(--muted);">
@@ -1029,8 +1164,11 @@ callback.Must().HaveHost("github.com");</code></pre>
       <pre><code class="language-csharp">// v1
 OmniAssert.Assert.VerifyExpression(condition);
 
-// v2
-Ensure.VerifyExpression(condition);</code></pre>
+// v2 (legacy extension — still works with warnings)
+Ensure.VerifyExpression(condition);
+
+// v2 (recommended)
+Ensure.Expression(condition);</code></pre>
 
       <h3>Fluent chain: <code>Verify()</code> → <code>Must()</code></h3>
       <pre><code class="language-csharp">// v1
@@ -1060,7 +1198,6 @@ user.Email.Must().Contain("@");</code></pre>
 
       <h3>What did not change</h3>
       <ul class="check-list">
-        <li><code>VerifyExpression(...)</code> — boolean expression assertions and interceptors</li>
         <li><code>VerifyNullable(...)</code> — nullable entry point (e.g. <code>value.VerifyNullable().BeNull()</code>)</li>
         <li>Exception extensions — <code>(...).Throws&lt;T&gt;()</code>, <code>NotThrow()</code>, <code>ThrowsAsync&lt;T&gt;()</code></li>
         <li>File/directory helpers — <code>"path".FileExists().HaveContent(...)</code></li>
@@ -1068,6 +1205,21 @@ user.Email.Must().Contain("@");</code></pre>
         <li><code>WithMessage</code> / <code>WithInnerException&lt;T&gt;</code> — exception chaining</li>
         <li><code>Ensure.Succeed()</code> / <code>Ensure.Fail(...)</code> — explicit pass and forced failure (new in v2; legacy <code>Assert.Succeed</code> / <code>Assert.Fail</code> delegate to these)</li>
       </ul>
+
+      <h3>Booleans: <code>Must()</code> vs <code>Ensure.Expression()</code></h3>
+      <pre><code class="language-csharp">// Fluent (v2)
+isValid.Must().BeTrue();
+
+// Expression style (recommended for compound conditions)
+Ensure.Expression(x &gt; 0 &amp;&amp; count &lt; limit);
+
+// Legacy extension (deprecated — removed in v3)
+(x &gt; 0 &amp;&amp; count &lt; limit).VerifyExpression();</code></pre>
+      <p style="color: var(--muted);">
+        When interceptors are enabled, <code>Ensure.Expression(flag)</code> is rewritten at compile time to
+        <code>flag.Must(expression).BeTrue()</code>. Legacy <code>VerifyExpression()</code> call sites are still
+        intercepted for compatibility.
+      </p>
 
       <h3>Automated migration (Roslyn analyzers)</h3>
       <p>
@@ -1088,12 +1240,20 @@ user.Email.Must().Contain("@");</code></pre>
           <strong>OA003</strong>
           <span>Legacy <code>To*</code> / <code>NotTo*</code> methods → replace with <code>Be*</code> / <code>Not*</code> / <code>Have*</code></span>
         </div>
+        <div class="api-row">
+          <strong>OA004</strong>
+          <span>Legacy <code>VerifyExpression(...)</code> → rewrite to <code>Ensure.Expression(...)</code></span>
+        </div>
       </div>
+
+      <p style="margin-top: 1rem; color: var(--muted);">
+        Style analyzers OA005–OA007 are documented in the <a href="#assertion-style">assertion style</a> section.
+      </p>
 
       <h4>Applying fixes</h4>
       <ol class="feature-list">
         <li>Build the solution so analyzers load from the package.</li>
-        <li>Open a file with legacy syntax (light bulb on OA001–OA003).</li>
+        <li>Open a file with legacy syntax (light bulb on OA001–OA004).</li>
         <li>Choose <strong>Migrate to Ensure/Must/Be* syntax</strong>, or <strong>Fix all occurrences in Solution</strong>.</li>
       </ol>
 
@@ -1101,14 +1261,16 @@ user.Email.Must().Contain("@");</code></pre>
 Assert.Throws&lt;InvalidOperationException&gt;(() =&gt; act());
 value.Verify().ToBeFalse();
 items.Verify().NotToBeNull();
+(x &gt; y).VerifyExpression();
 
 // After
 Ensure.Throws&lt;InvalidOperationException&gt;(() =&gt; act());
 value.Must().BeFalse();
-items.Must().NotBeNull();</code></pre>
+items.Must().NotBeNull();
+Ensure.Expression(x &gt; y);</code></pre>
 
       <h3>Framework name collisions</h3>
-      <p>If you used <code>Expect</code> to avoid clashing with NUnit’s <code>Assert</code>, prefer <code>Ensure</code> in v2:</p>
+      <p>If you used <code>Expect</code> to avoid clashing with NUnit’s <code>Assert</code>, prefer <code>Ensure</code> in v2. The <code>Expect</code> wrapper remains in v2 but will be removed in v3.</p>
       <pre><code class="language-csharp">// v1
 Expect.Throws&lt;ArgumentException&gt;(() =&gt; act());
 
@@ -1119,17 +1281,17 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
 
       <h3>Recommended migration steps</h3>
       <ol class="feature-list">
-        <li>Upgrade the <code>OmniAssert</code> package to v2.x.</li>
-        <li>Build and review OA001–OA003 warnings.</li>
+        <li>Upgrade the <code>OmniAssert</code> package to v2.x (latest: 2.1.0).</li>
+        <li>Build and review OA001–OA004 warnings.</li>
         <li>Run code fixes (per file or fix all in solution).</li>
-        <li>Search for remaining <code>.Verify()</code>, <code>.ToBe</code>, or <code>OmniAssert.Assert</code> usages.</li>
+        <li>Search for remaining <code>.Verify()</code>, <code>.ToBe</code>, <code>VerifyExpression</code>, or <code>OmniAssert.Assert</code> usages.</li>
         <li>Run tests and confirm failure messages still read as expected.</li>
         <li>Optionally treat warnings as errors until migration is complete.</li>
       </ol>
 
       <pre><code class="language-xml">&lt;PropertyGroup&gt;
   &lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;
-  &lt;WarningsNotAsErrors&gt;OA001;OA002;OA003&lt;/WarningsNotAsErrors&gt;
+  &lt;WarningsNotAsErrors&gt;OA001;OA002;OA003;OA004&lt;/WarningsNotAsErrors&gt;
 &lt;/PropertyGroup&gt;</code></pre>
 
       <div class="callout">
@@ -1142,7 +1304,7 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
     <section class="section" id="faq">
       <div class="section-header">
         <div>
-          <p class="section-kicker">08. Troubleshooting</p>
+          <p class="section-kicker">09. Troubleshooting</p>
           <h2>Frequently asked questions</h2>
         </div>
         <p class="section-intro">
@@ -1169,11 +1331,12 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
         </details>
 
         <details>
-          <summary>Should I use <code>Must().BeTrue()</code> or <code>VerifyExpression()</code>?</summary>
+          <summary>Should I use <code>Must().BeTrue()</code> or <code>Ensure.Expression()</code>?</summary>
           <p>
-            Use <code>Must().BeTrue()</code> for simple boolean values and consistency with other fluent assertions.
-            Use <code>VerifyExpression()</code> when a compound condition benefits from expression capture and richer
-            diagnostics.
+            Use <code>Must().BeTrue()</code> for simple boolean values. Prefer subject-first comparisons such as
+            <code>count.Must().BeLessThan(limit)</code> over <code>(count &lt; limit).Must().BeTrue()</code> (OA005).
+            Use <code>Ensure.Expression(...)</code> when a compound condition cannot be expressed as a single comparison
+            assertion. The legacy <code>VerifyExpression()</code> extension is deprecated.
           </p>
         </details>
 
@@ -1206,8 +1369,9 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
         <details>
           <summary>I upgraded from v1 — why do I see compiler warnings?</summary>
           <p>
-            Legacy <code>Verify()</code> and <code>To*</code> APIs are marked obsolete in v2. Apply the OA001–OA003 code
-            fixes or follow the <a href="#migration">migration guide</a>. Legacy syntax will be removed in v3.
+            Legacy <code>Verify()</code>, <code>To*</code>, and <code>VerifyExpression</code> APIs are marked obsolete in
+            v2. Apply the OA001–OA004 code fixes or follow the <a href="#migration">migration guide</a>. Legacy syntax
+            will be removed in v3.
           </p>
         </details>
 
@@ -1227,7 +1391,7 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
     <section class="section" id="contributing">
       <div class="section-header">
         <div>
-          <p class="section-kicker">09. Contributing</p>
+          <p class="section-kicker">10. Contributing</p>
           <h2>Contributing and support</h2>
         </div>
         <p class="section-intro">
@@ -1263,7 +1427,7 @@ dotnet test src/OmniAssert.slnx /p:CollectCoverage=true</code></pre>
 
   <footer class="footer">
     <div class="footer-inner">
-      <span>OmniAssert documentation · v2.0.0</span>
+      <span>OmniAssert documentation · v2.1.0</span>
       <span>
         <a href="https://github.com/bolorundurowb/OmniAssert">GitHub</a>
         ·
