@@ -60,7 +60,7 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.Contains("VerifyExpression", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
+        Xunit.Assert.Contains("Ensure.Expression", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -184,6 +184,27 @@ public static class T
 
         var text = generatedSources.First(s => s.HintName.Contains("VerifyInterceptors")).SourceText.ToString();
         Xunit.Assert.Contains("this bool condition", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Generator_WithStaticEnsureExpression_ShouldProduceInterceptorSource()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y)
+    {
+        Ensure.Expression(x > y);
+    }
+}
+""";
+        var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
+
+        var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
+        Xunit.Assert.NotNull(interceptor);
+        Xunit.Assert.Contains("Ensure.Expression", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
+        Xunit.Assert.Contains("(bool condition", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

@@ -1,5 +1,7 @@
 namespace OmniAssert.Tests;
 
+#pragma warning disable OA004 // Legacy VerifyExpression() under test
+
 /// <summary>Boolean short-circuit evaluation with fluent <see cref="Assert.Verify(bool)"/> and expression failures via <see cref="Assert.VerifyExpression"/>.</summary>
 public class VerifyInterceptorShortCircuitTests
 {

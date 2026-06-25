@@ -96,4 +96,39 @@ public static class T
         Xunit.Assert.NotNull(sym);
         Xunit.Assert.False(VerifyLoweringFacts.IsAssertVerifyExpression(sym!));
     }
+
+    [Theory]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { Ensure.Expression(true); } }", true, true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M(int x, int y) { Ensure.Expression(x > y); } }", true, true)]
+    [InlineData("using OmniAssert;\npublic static class T { public static void M() { true.VerifyExpression(); } }", true, false)]
+    [InlineData("""
+namespace Other { public static class Ensure { public static void Expression(bool b) { } } }
+public static class T { public static void M() { Other.Ensure.Expression(true); } }
+""", false, false)]
+    public void IsInterceptableBooleanExpression_MatchesExpected(string source, bool interceptable, bool isEnsureExpression)
+    {
+        var tree = CSharpSyntaxTree.ParseText(source, path: "T.cs");
+        var refs = VerifyExpansionEngineCompileTests.MetadataReferencesForOmniAssertConsumer().ToList();
+        var compilation = CSharpCompilation.Create(
+            "InterceptableExpressionAsm",
+            [tree],
+            refs,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
+        if (errors.Count > 0)
+        {
+            Xunit.Assert.Fail(string.Join("\n", errors.Select(e => e.ToString())));
+        }
+
+        var model = compilation.GetSemanticModel(tree);
+        var invocation = tree.GetRoot().DescendantNodes()
+            .OfType<InvocationExpressionSyntax>()
+            .Single(i => i.Expression is MemberAccessExpressionSyntax { Name.Identifier.Text: "Expression" or "VerifyExpression" });
+
+        var sym = model.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
+        Xunit.Assert.NotNull(sym);
+        Xunit.Assert.Equal(interceptable, VerifyLoweringFacts.IsInterceptableBooleanExpression(sym!));
+        Xunit.Assert.Equal(isEnsureExpression, VerifyLoweringFacts.IsEnsureExpression(sym!));
+    }
 }

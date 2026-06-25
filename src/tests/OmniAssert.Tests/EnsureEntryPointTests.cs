@@ -219,18 +219,55 @@ public class EnsureEntryPointTests
     }
 
     [Fact]
-    public void VerifyExpression_with_AssertionCapture_WhenTrue_ShouldSucceed()
+    public void Expression_with_AssertionCapture_WhenTrue_ShouldSucceed()
     {
         var capture = new AssertionCapture("1 + 1 == 2", null);
+        Ensure.Expression(true, capture);
+    }
+
+    [Fact]
+    public void Expression_with_AssertionCapture_WhenFalse_ShouldThrow()
+    {
+        var capture = new AssertionCapture("1 + 1 == 3", null);
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Ensure.Expression(false, capture));
+    }
+
+    [Fact]
+    public void Expression_and_VerifyExpression_produce_identical_outcomes()
+    {
+#pragma warning disable CS0618
+#pragma warning disable OA004
+        var capture = new AssertionCapture("flag", null);
+        Ensure.Expression(true, capture);
         Ensure.VerifyExpression(true, capture);
+        Xunit.Assert.Throws<OmniAssertionException>(() => Ensure.Expression(false, capture));
+        Xunit.Assert.Throws<OmniAssertionException>(() => Ensure.VerifyExpression(false, capture));
+#pragma warning restore OA004
+#pragma warning restore CS0618
+    }
+
+    [Fact]
+    public void VerifyExpression_with_AssertionCapture_WhenTrue_ShouldSucceed()
+    {
+#pragma warning disable CS0618
+#pragma warning disable OA004
+        var capture = new AssertionCapture("1 + 1 == 2", null);
+        Ensure.VerifyExpression(true, capture);
+#pragma warning restore OA004
+#pragma warning restore CS0618
     }
 
     [Fact]
     public void VerifyExpression_with_AssertionCapture_WhenFalse_ShouldThrow()
     {
+#pragma warning disable CS0618
+#pragma warning disable OA004
         var capture = new AssertionCapture("1 + 1 == 3", null);
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             Ensure.VerifyExpression(false, capture));
+#pragma warning restore OA004
+#pragma warning restore CS0618
     }
 
     [Fact]

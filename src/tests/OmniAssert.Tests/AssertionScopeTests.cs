@@ -1,5 +1,7 @@
 namespace OmniAssert.Tests;
 
+#pragma warning disable OA004 // Legacy VerifyExpression() under test
+
 public class AssertionScopeTests
 {
     [Fact]
