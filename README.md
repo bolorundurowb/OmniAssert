@@ -35,7 +35,7 @@ For installation, the full assertion API, soft assertions, object diffing, compi
 - **Deep object comparison** — `BeEquivalentTo` compares object graphs recursively with hierarchical diffs
 - **Soft assertions** — `AssertionScope` collects multiple failures and reports them together
 - **Compile-time diagnostics** — optional Roslyn interceptors capture operand values when boolean expressions fail
-- **Automated v1 migration** — bundled analyzers (OA001–OA004) with code fixes and fix-all-in-solution support
+- **Automated v1 migration** — bundled analyzers (OA001–OA007) with code fixes and fix-all-in-solution support
 
 ## Quick start
 
@@ -84,6 +84,31 @@ When an assertion fails, the message includes the expression under test (for exa
 
 For requirements, every assertion type, exception testing, interceptors, and upgrading from v1, see the
 [documentation](https://bolorundurowb.github.io/OmniAssert/).
+
+## Assertion style
+
+OmniAssert ships analyzers that nudge tests toward the clearest, subject-first form. The rules below are
+grouped as legacy migration (OA001–OA004) and style suggestions (OA005–OA007).
+
+| Rule  | Severity | Detects                                 | Suggested fix                                                 |
+|-------|----------|-----------------------------------------|---------------------------------------------------------------|
+| OA001 | Warning  | Legacy `Assert.*` entry point           | Use `Ensure.*`                                                |
+| OA002 | Warning  | Legacy `.Verify()` fluent root          | Use `.Must()`                                                 |
+| OA003 | Warning  | Legacy `To*`/`NotTo*` grammar           | Use `Be*`/`NotBe*`                                            |
+| OA004 | Warning  | Legacy `VerifyExpression(...)`          | Use `Ensure.Expression(...)`                                  |
+| OA005 | Warning  | `(a < b).Must().BeTrue()` / `BeFalse()` | Rewrite as `a.Must().BeLessThan(b)` (numeric/`TimeSpan` only) |
+| OA006 | Warning  | `collection.Must().HaveCount(0)`        | Replace with `collection.Must().BeEmpty()`                    |
+| OA007 | Info     | `new Widget().Must().NotBeNull()`       | Remove the redundant assertion                                |
+
+Preferred patterns:
+
+- Prefer `value.Must().BeLessThan(limit)` over `(value < limit).Must().BeTrue()`.
+- Prefer `collection.Must().BeEmpty()` over `collection.Must().HaveCount(0)`.
+- Nullable collections: `list.Must().BeNull()` or `list.Must().NotBeNull()` (no `(object?)` cast needed).
+- Use `Ensure.Expression(...)` only for multi-operand boolean logic that cannot be expressed as a single
+  comparison assertion; OA005 leaves a suggestion in its message for unsupported (non-numeric/`TimeSpan`) types.
+- `path.Must().NotContain('/')` is the inverse of `Contain` and avoids `(path.Contains('/')).Must().BeFalse()`.
+- `new Foo().Must().NotBeNull()` is redundant — a `new` expression can never be null (OA007, Info).
 
 ## Contributing
 
