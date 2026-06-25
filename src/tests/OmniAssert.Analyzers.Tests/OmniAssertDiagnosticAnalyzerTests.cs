@@ -20,7 +20,7 @@ public static class T
     }
 
     [Fact]
-    public async Task LegacyAssert_member_access_reports_OA001()
+    public async Task LegacyAssert_member_access_reports_OA001_and_OA004()
     {
         var source = """
 public static class T
@@ -31,6 +31,52 @@ public static class T
 
         var diagnostics = await AnalyzerTestHelper.GetOmniAssertAnalyzerDiagnosticsAsync(source);
         Xunit.Assert.Contains(diagnostics, d => d.Id == OmniAssertDiagnosticAnalyzer.LegacyAssertId);
+        Xunit.Assert.Contains(diagnostics, d => d.Id == OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId);
+    }
+
+    [Fact]
+    public async Task LegacyVerifyExpression_extension_reports_OA004()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y) { (x > y).VerifyExpression(); }
+}
+""";
+
+        var diagnostics = await AnalyzerTestHelper.GetOmniAssertAnalyzerDiagnosticsAsync(source);
+        Xunit.Assert.Contains(diagnostics, d => d.Id == OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId);
+    }
+
+    [Fact]
+    public async Task LegacyVerifyExpression_static_style_reports_OA004()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y) { Ensure.VerifyExpression(x > y); }
+}
+""";
+
+        var diagnostics = await AnalyzerTestHelper.GetOmniAssertAnalyzerDiagnosticsAsync(source);
+        Xunit.Assert.Contains(diagnostics, d => d.Id == OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId);
+    }
+
+    [Fact]
+    public async Task Ensure_Expression_reports_no_legacy_diagnostics()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y) { Ensure.Expression(x > y); }
+}
+""";
+
+        var diagnostics = await AnalyzerTestHelper.GetOmniAssertAnalyzerDiagnosticsAsync(source);
+        Xunit.Assert.Empty(diagnostics);
     }
 
     [Fact]

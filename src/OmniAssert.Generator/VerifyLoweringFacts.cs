@@ -2,16 +2,30 @@ using Microsoft.CodeAnalysis;
 
 namespace OmniAssert.Generator;
 
-/// <summary>Identifies <c>Ensure.VerifyExpression(bool, string?)</c> (and legacy <c>Assert.VerifyExpression</c>) for the incremental generator.</summary>
+/// <summary>
+/// Identifies interceptable <c>Ensure.Expression(bool, string?)</c>, legacy extension
+/// <c>VerifyExpression(bool, string?)</c>, and obsolete <c>Assert.VerifyExpression</c> for the incremental generator.
+/// </summary>
 internal static class VerifyLoweringFacts
 {
     /// <summary>Returns whether <paramref name="sym"/> is the public boolean <c>VerifyExpression</c> overload on <c>Ensure</c> or obsolete <c>Assert</c>.</summary>
-    public static bool IsAssertVerifyExpression(IMethodSymbol sym)
+    public static bool IsAssertVerifyExpression(IMethodSymbol sym) =>
+        IsInterceptableBooleanExpression(sym) && sym.Name == "VerifyExpression";
+
+    /// <summary>Returns whether <paramref name="sym"/> is the static boolean <c>Expression</c> overload on <c>Ensure</c>.</summary>
+    public static bool IsEnsureExpression(IMethodSymbol sym) =>
+        IsInterceptableBooleanExpression(sym) && sym.Name == "Expression";
+
+    /// <summary>Returns whether <paramref name="sym"/> is an interceptable boolean expression assertion entry point.</summary>
+    public static bool IsInterceptableBooleanExpression(IMethodSymbol sym)
     {
-        if (sym.Name != "VerifyExpression")
+        if (sym.Name is not ("Expression" or "VerifyExpression"))
             return false;
 
         if (sym.ContainingType?.Name is not ("Assert" or "Ensure") || sym.ContainingNamespace?.Name != "OmniAssert")
+            return false;
+
+        if (sym.Name == "Expression" && sym.ContainingType.Name != "Ensure")
             return false;
 
         // When called in extension-method form (receiver.VerifyExpression()), Roslyn provides the

@@ -3,6 +3,7 @@ namespace OmniAssert.Tests;
 #pragma warning disable OA001 // Legacy Assert entry point under test
 #pragma warning disable OA002 // Legacy Verify() under test
 #pragma warning disable OA003 // Legacy To*/NotTo* under test
+#pragma warning disable OA004 // Legacy VerifyExpression() under test
 
 /// <summary>
 /// Ensures obsolete v1 entry points and grammar still behave like their v2 replacements until removal in v3.
@@ -278,6 +279,7 @@ public class LegacyApiCompatibilityTests
 #pragma warning restore CS0618
     }
 }
+#pragma warning restore OA004
 #pragma warning restore OA003
 #pragma warning restore OA002
 #pragma warning restore OA001

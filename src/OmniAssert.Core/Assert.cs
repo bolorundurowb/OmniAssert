@@ -12,14 +12,14 @@ public static partial class Assert
     public static BoolAssertions Verify(this bool actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>
         Ensure.Must(actual, expression);
 
-    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    [Obsolete("Use Ensure.Expression(...) instead of VerifyExpression().", false)]
     public static void VerifyExpression(bool condition,
         [CallerArgumentExpression(nameof(condition))] string? expression = null) =>
-        Ensure.VerifyExpression(condition, expression);
+        Ensure.Expression(condition, expression);
 
-    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    [Obsolete("Use Ensure.Expression(...) instead of VerifyExpression().", false)]
     public static void VerifyExpression(bool condition, AssertionCapture capture) =>
-        Ensure.VerifyExpression(condition, capture);
+        Ensure.Expression(condition, capture);
 
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public static NumericAssertions<double> Verify(this double actual, [CallerArgumentExpression(nameof(actual))] string? expression = null) =>

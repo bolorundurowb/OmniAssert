@@ -1,5 +1,8 @@
 namespace OmniAssert.Tests;
 
+#pragma warning disable CS0618
+#pragma warning disable OA004
+
 public class AssertionCaptureWithOperandsTests
 {
     [Fact]
