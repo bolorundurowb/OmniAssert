@@ -16,7 +16,7 @@
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Version>2.0.0</Version>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.0.1</PackageVersion>
     <PackageReleaseNotes>v2.0.0
     - Introduced Ensure as the primary static entry point; legacy Assert remains as an obsolete compatibility wrapper.
     - Replaced fluent .Verify() with .Must(); assertion grammar now uses Be*, Not*, Have*, and related names instead of To* / NotTo* (for example BeTrue(), NotBeNull(), HaveCount()).
@@ -56,7 +56,7 @@
     - Unified VerifyExpression failure path with fluent assertions via VerificationFlow.Fail.
     - Optimized source generator by removing unreachable code and reducing redundant parentheses in rewritten expressions.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
-    <PackageProjectUrl>https://github.com/bolorundurowb/OmniAssert</PackageProjectUrl>
+    <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
