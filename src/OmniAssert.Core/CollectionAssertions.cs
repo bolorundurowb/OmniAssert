@@ -15,6 +15,28 @@ public readonly struct CollectionAssertions<T>
         _expression = expression;
     }
 
+    /// <summary>Verifies that the collection is <c>null</c>.</summary>
+    public void BeNull()
+    {
+        if (_actual is null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be null, but was {OmniAssertionException.FormatValueForMessage(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the collection is not <c>null</c>.</summary>
+    public void NotBeNull()
+    {
+        if (_actual is not null)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be null, but it was.",
+            _expression);
+    }
+
     /// <summary>Verifies that the collection is the same instance as <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected collection instance.</param>
     /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
@@ -627,6 +649,10 @@ public readonly struct CollectionAssertions<T>
     }
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public void ToBe(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null) => Be(expected, expectedExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void ToBeNull() => BeNull();
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToBeNull() => NotBeNull();
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public void ToContain(T item, [CallerArgumentExpression(nameof(item))] string? itemExpression = null) => Contain(item, itemExpression);
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]

@@ -218,6 +218,52 @@ public class StringAssertionTests
     }
 
     [Fact]
+    public void NotContain_WhenSubstringAbsent_ShouldSucceed()
+    {
+        ("abc").Must().NotContain("z");
+    }
+
+    [Fact]
+    public void NotContain_WhenSubstringPresent_ShouldThrow()
+    {
+        var ex = Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Must().NotContain("b"));
+        Xunit.Assert.Contains("not to contain", ex.Message);
+    }
+
+    [Fact]
+    public void NotContain_WithEmptySubstring_WhenStringNotEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => ("abc").Must().NotContain(string.Empty));
+    }
+
+    [Fact]
+    public void NotContain_WithOrdinalIgnoreCaseComparison_WhenAbsent_ShouldSucceed()
+    {
+        ("ABC").Must().NotContain("xyz", StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void NotContain_WithOrdinalIgnoreCaseComparison_WhenPresent_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            ("AbC").Must().NotContain("bc", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void NotContain_WhenActualIsNull_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Must().NotContain("x");
+    }
+
+    [Fact]
+    public void NotContain_WithComparison_WhenActualIsNull_ShouldSucceed()
+    {
+        string? s = null;
+        (s).Must().NotContain("x", StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ToContain_WithEmptySubstringAndComparison_ShouldSucceed()
     {
         ("abc").Must().Contain(string.Empty, StringComparison.Ordinal);

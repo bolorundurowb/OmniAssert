@@ -53,6 +53,19 @@ public readonly struct StringAssertions
             _expression);
     }
 
+    /// <summary>Verifies that the string does not contain the specified <paramref name="substring"/> using ordinal comparison.</summary>
+    /// <param name="substring">The substring expected to be absent.</param>
+    /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
+    public void NotContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
+    {
+        if (_actual is null || !_actual.Contains(substring, StringComparison.Ordinal))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to contain {substringExpression ?? "substring"} ({Quote(substring)}), but it did.",
+            _expression);
+    }
+
     /// <summary>Verifies that the string is empty.</summary>
     public void BeEmpty()
     {
@@ -294,6 +307,20 @@ public readonly struct StringAssertions
             _expression);
     }
 
+    /// <summary>Verifies that the string does not contain the specified <paramref name="substring"/> using the specified <paramref name="comparison"/>.</summary>
+    /// <param name="substring">The substring expected to be absent.</param>
+    /// <param name="comparison">The string comparison culture/options.</param>
+    /// <param name="substringExpression">The expression for the substring (automatically captured).</param>
+    public void NotContain(string substring, StringComparison comparison, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null)
+    {
+        if (_actual is null || !_actual.Contains(substring, comparison))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to contain {substringExpression ?? "substring"} ({Quote(substring)}), but it did.",
+            _expression);
+    }
+
     private static string FormatStrings(string relation, string? expected, string expectedLabel, string? actual, string actualLabel)
     {
         if (relation == "not to be")
@@ -387,6 +414,8 @@ public readonly struct StringAssertions
     public void NotToBe(string? unexpected, [CallerArgumentExpression(nameof(unexpected))] string? unexpectedExpression = null) => NotBe(unexpected, unexpectedExpression);
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public void ToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null) => Contain(substring, substringExpression);
+    [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
+    public void NotToContain(string substring, [CallerArgumentExpression(nameof(substring))] string? substringExpression = null) => NotContain(substring, substringExpression);
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
     public void ToBeEmpty() => BeEmpty();
     [Obsolete("Use the Ensure, Must(), and Be* fluent syntax instead.", false)]
