@@ -12,10 +12,11 @@ public sealed class OmniAssertDiagnosticAnalyzer : DiagnosticAnalyzer
     public const string LegacyAssertId = "OA001";
     public const string LegacyVerifyId = "OA002";
     public const string LegacyFluentGrammarId = "OA003";
+    public const string LegacyVerifyExpressionId = "OA004";
 
     private static readonly LocalizableString Title = "OmniAssert legacy API usage";
     private static readonly LocalizableString MessageFormat = "{0}";
-    private static readonly LocalizableString Description = "Migrate to Ensure, Must(), and Be* fluent syntax.";
+    private static readonly LocalizableString Description = "Migrate to Ensure, Must(), Be*, and Expression syntax.";
 
     private static readonly DiagnosticDescriptor LegacyAssertRule = new(
         LegacyAssertId, Title, MessageFormat, "Usage", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
@@ -26,8 +27,11 @@ public sealed class OmniAssertDiagnosticAnalyzer : DiagnosticAnalyzer
     private static readonly DiagnosticDescriptor LegacyFluentGrammarRule = new(
         LegacyFluentGrammarId, Title, MessageFormat, "Usage", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
 
+    private static readonly DiagnosticDescriptor LegacyVerifyExpressionRule = new(
+        LegacyVerifyExpressionId, Title, MessageFormat, "Usage", DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        [LegacyAssertRule, LegacyVerifyRule, LegacyFluentGrammarRule];
+        [LegacyAssertRule, LegacyVerifyRule, LegacyFluentGrammarRule, LegacyVerifyExpressionRule];
 
     public override void Initialize(AnalysisContext context)
     {
@@ -51,11 +55,26 @@ public sealed class OmniAssertDiagnosticAnalyzer : DiagnosticAnalyzer
                     LegacyAssertRule,
                     memberAccess.Name.GetLocation(),
                     $"Use Ensure.{memberAccess.Name.Identifier.ValueText} instead of legacy Assert.{memberAccess.Name.Identifier.ValueText}."));
-                return;
+                if (memberAccess.Name.Identifier.ValueText != "VerifyExpression")
+                    return;
             }
         }
 
         var name = memberAccess.Name.Identifier.ValueText;
+
+        if (name == "VerifyExpression")
+        {
+            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess, context.CancellationToken).Symbol;
+            if (IsOmniAssertVerifyExpressionMethod(symbol))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(
+                    LegacyVerifyExpressionRule,
+                    memberAccess.Name.GetLocation(),
+                    "Use Ensure.Expression(...) instead of the legacy VerifyExpression()."));
+            }
+
+            return;
+        }
 
         if (name == "Verify")
         {
@@ -177,4 +196,17 @@ public sealed class OmniAssertDiagnosticAnalyzer : DiagnosticAnalyzer
 
     private static bool IsOmniAssertNamespace(INamespaceSymbol ns) =>
         ns.ToDisplayString() == "OmniAssert";
+
+    private static bool IsOmniAssertVerifyExpressionMethod(ISymbol? symbol)
+    {
+        if (symbol is not IMethodSymbol method || method.Name != "VerifyExpression")
+            return false;
+
+        if (method.ContainingType.Name is not ("Assert" or "Ensure") || !IsOmniAssertNamespace(method.ContainingNamespace))
+            return false;
+
+        var original = method.ReducedFrom ?? method;
+        return original.Parameters.Length >= 1 &&
+               original.Parameters[0].Type.SpecialType == SpecialType.System_Boolean;
+    }
 }

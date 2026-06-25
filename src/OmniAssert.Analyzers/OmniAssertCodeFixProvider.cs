@@ -15,7 +15,8 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
     [
         OmniAssertDiagnosticAnalyzer.LegacyAssertId,
             OmniAssertDiagnosticAnalyzer.LegacyVerifyId,
-            OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId
+            OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId,
+            OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId
     ];
 
     public sealed override FixAllProvider GetFixAllProvider() =>
@@ -36,9 +37,15 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
             }
 
             var node = root.FindNode(diagnostic.Location.SourceSpan);
+            var title = diagnostic.Id switch
+            {
+                OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId => "Migrate to Ensure.Expression(...)",
+                _ => "Migrate to Ensure/Must/Be* syntax"
+            };
+
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: "Migrate to Ensure/Must/Be* syntax",
+                    title: title,
                     createChangedDocument: c => ApplyFixAsync(context.Document, node, diagnostic.Id, c),
                     equivalenceKey: diagnostic.Id),
                 diagnostic);
@@ -60,6 +67,7 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
             OmniAssertDiagnosticAnalyzer.LegacyAssertId => ReplaceLegacyAssert(root, node),
             OmniAssertDiagnosticAnalyzer.LegacyVerifyId => ReplaceLegacyVerify(root, node),
             OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId => ReplaceLegacyFluentMethod(root, node),
+            OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId => ReplaceLegacyVerifyExpression(root, node),
             _ => null
         };
 
@@ -112,6 +120,45 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
         var legacyName = identifier.Identifier.ValueText;
         var newName = OmniAssertDiagnosticAnalyzer.SuggestNewFluentName(legacyName);
         return root.ReplaceNode(identifier, identifier.WithIdentifier(SyntaxFactory.Identifier(newName)));
+    }
+
+    private static SyntaxNode ReplaceLegacyVerifyExpression(SyntaxNode root, SyntaxNode node)
+    {
+        var invocation = node.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+        if (invocation?.Expression is not MemberAccessExpressionSyntax memberAccess ||
+            memberAccess.Name.Identifier.ValueText != "VerifyExpression")
+        {
+            return root;
+        }
+
+        ExpressionSyntax condition;
+        SeparatedSyntaxList<ArgumentSyntax> trailingArgs;
+
+        if (invocation.ArgumentList.Arguments.Count == 0)
+        {
+            condition = memberAccess.Expression;
+            trailingArgs = default;
+        }
+        else
+        {
+            condition = invocation.ArgumentList.Arguments[0].Expression;
+            trailingArgs = invocation.ArgumentList.Arguments.Count > 1
+                ? invocation.ArgumentList.Arguments.RemoveAt(0)
+                : default;
+        }
+
+        var argumentNodes = new List<ArgumentSyntax> { SyntaxFactory.Argument(condition) };
+        if (trailingArgs.Count > 0)
+            argumentNodes.AddRange(trailingArgs);
+
+        var newInvocation = SyntaxFactory.InvocationExpression(
+            SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                SyntaxFactory.IdentifierName("Ensure"),
+                SyntaxFactory.IdentifierName("Expression")),
+            SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(argumentNodes)));
+
+        return root.ReplaceNode(invocation, newInvocation);
     }
 
     private static IdentifierNameSyntax? FindIdentifier(SyntaxNode node) =>
