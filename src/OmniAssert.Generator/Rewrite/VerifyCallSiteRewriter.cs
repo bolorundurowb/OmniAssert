@@ -51,7 +51,7 @@ internal sealed class VerifyCallSiteRewriter(SemanticModel model, CancellationTo
         if (model.GetSymbolInfo(inv, cancellationToken).Symbol is not IMethodSymbol method)
             return false;
 
-        if (!VerifyLoweringFacts.IsAssertVerifyExpression(method))
+        if (!VerifyLoweringFacts.IsInterceptableBooleanExpression(method))
             return false;
 
         var expanded = _engine.TryExpandVerifyInvocation(inv, cancellationToken);
