@@ -28,6 +28,21 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>
+    /// Verifies that the collection does not reference the same instance as the specified <paramref name="expected"/> collection.
+    /// </summary>
+    /// <param name="expected">The expected collection instance.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void NotBe(IEnumerable<T>? expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (!ReferenceEquals(_actual, expected))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} not to be {expectedExpression ?? "expected"} (reference equality), but they were the same instance.",
+            _expression);
+    }
+
     /// <summary>Verifies that the collection contains the specified <paramref name="item"/>.</summary>
     /// <param name="item">The item expected to be in the collection.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
