@@ -14,9 +14,12 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
     public sealed override ImmutableArray<string> FixableDiagnosticIds { get; } =
     [
         OmniAssertDiagnosticAnalyzer.LegacyAssertId,
-            OmniAssertDiagnosticAnalyzer.LegacyVerifyId,
-            OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId,
-            OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId
+        OmniAssertDiagnosticAnalyzer.LegacyVerifyId,
+        OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId,
+        OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId,
+        OmniAssertDiagnosticAnalyzer.ComparisonInBoolAssertId,
+        OmniAssertDiagnosticAnalyzer.HaveCountZeroId,
+        OmniAssertDiagnosticAnalyzer.RedundantNotNullAfterNewId
     ];
 
     public sealed override FixAllProvider GetFixAllProvider() =>
@@ -40,13 +43,16 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
             var title = diagnostic.Id switch
             {
                 OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId => "Migrate to Ensure.Expression(...)",
+                OmniAssertDiagnosticAnalyzer.ComparisonInBoolAssertId => "Rewrite as subject-first comparison assertion",
+                OmniAssertDiagnosticAnalyzer.HaveCountZeroId => "Replace HaveCount(0) with BeEmpty()",
+                OmniAssertDiagnosticAnalyzer.RedundantNotNullAfterNewId => "Remove redundant NotBeNull()",
                 _ => "Migrate to Ensure/Must/Be* syntax"
             };
 
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: title,
-                    createChangedDocument: c => ApplyFixAsync(context.Document, node, diagnostic.Id, c),
+                    createChangedDocument: c => ApplyFixAsync(context.Document, node, diagnostic, c),
                     equivalenceKey: diagnostic.Id),
                 diagnostic);
         }
@@ -55,19 +61,22 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
     private static async Task<Document> ApplyFixAsync(
         Document document,
         SyntaxNode node,
-        string diagnosticId,
+        Diagnostic diagnostic,
         CancellationToken cancellationToken)
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
         if (root is null)
             return document;
 
-        SyntaxNode? newRoot = diagnosticId switch
+        SyntaxNode? newRoot = diagnostic.Id switch
         {
             OmniAssertDiagnosticAnalyzer.LegacyAssertId => ReplaceLegacyAssert(root, node),
             OmniAssertDiagnosticAnalyzer.LegacyVerifyId => ReplaceLegacyVerify(root, node),
             OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId => ReplaceLegacyFluentMethod(root, node),
             OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId => ReplaceLegacyVerifyExpression(root, node),
+            OmniAssertDiagnosticAnalyzer.ComparisonInBoolAssertId => ReplaceComparisonInBoolAssert(root, node, diagnostic),
+            OmniAssertDiagnosticAnalyzer.HaveCountZeroId => ReplaceHaveCountZero(root, node),
+            OmniAssertDiagnosticAnalyzer.RedundantNotNullAfterNewId => RemoveRedundantNotNullAfterNew(root, node),
             _ => null
         };
 
@@ -159,6 +168,79 @@ public sealed class OmniAssertCodeFixProvider : CodeFixProvider
             SyntaxFactory.ArgumentList(SyntaxFactory.SeparatedList(argumentNodes)));
 
         return root.ReplaceNode(invocation, newInvocation);
+    }
+
+    private static SyntaxNode? ReplaceComparisonInBoolAssert(SyntaxNode root, SyntaxNode node, Diagnostic diagnostic)
+    {
+        if (!diagnostic.Properties.TryGetValue("assertionMethod", out var targetMethod) || string.IsNullOrEmpty(targetMethod))
+            return null;
+        var method = targetMethod!;
+
+        if (node is not InvocationExpressionSyntax invocation)
+            return null;
+
+        if (invocation.Expression is not MemberAccessExpressionSyntax outerMember)
+            return null;
+        if (outerMember.Expression is not InvocationExpressionSyntax mustInvocation)
+            return null;
+        if (mustInvocation.Expression is not MemberAccessExpressionSyntax mustMember)
+            return null;
+
+        var receiver = mustMember.Expression;
+        while (receiver is ParenthesizedExpressionSyntax p)
+            receiver = p.Expression;
+
+        if (receiver is not BinaryExpressionSyntax binary)
+            return null;
+
+        var newSubject = binary.Left;
+        var newArgument = binary.Right;
+
+        var newMustInvocation = SyntaxFactory.InvocationExpression(
+            SyntaxFactory.MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                newSubject,
+                SyntaxFactory.IdentifierName("Must")));
+
+        var newMemberAccess = SyntaxFactory.MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            newMustInvocation,
+            SyntaxFactory.IdentifierName(method));
+
+        var newInvocation = SyntaxFactory.InvocationExpression(
+            newMemberAccess,
+            SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(newArgument))));
+
+        return root.ReplaceNode(invocation, newInvocation);
+    }
+
+    private static SyntaxNode? ReplaceHaveCountZero(SyntaxNode root, SyntaxNode node)
+    {
+        if (node is not InvocationExpressionSyntax invocation)
+            return null;
+        if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+            return null;
+
+        var newMemberAccess = memberAccess.WithName(SyntaxFactory.IdentifierName("BeEmpty"));
+        var newInvocation = invocation
+            .WithExpression(newMemberAccess)
+            .WithArgumentList(SyntaxFactory.ArgumentList());
+
+        return root.ReplaceNode(invocation, newInvocation);
+    }
+
+    private static SyntaxNode? RemoveRedundantNotNullAfterNew(SyntaxNode root, SyntaxNode node)
+    {
+        var invocation = node as InvocationExpressionSyntax
+            ?? node.AncestorsAndSelf().OfType<InvocationExpressionSyntax>().FirstOrDefault();
+        if (invocation is null)
+            return null;
+
+        var statement = invocation.AncestorsAndSelf().OfType<ExpressionStatementSyntax>().FirstOrDefault();
+        if (statement is null)
+            return null;
+
+        return root.RemoveNode(statement, SyntaxRemoveOptions.KeepNoTrivia);
     }
 
     private static IdentifierNameSyntax? FindIdentifier(SyntaxNode node) =>
