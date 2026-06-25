@@ -12,8 +12,11 @@ The following **will be removed in OmniAssert v3.0** (the next major release aft
 - The **`.Verify()`** fluent extension (replaced by **`.Must()`**)
 - All legacy **`To*`** / **`NotTo*`** assertion methods (replaced by **`Be*`** / **`Not*`** / **`Have*`** / etc.)
 - The **`Expect`** compatibility wrapper (use **`Ensure`** instead)
+- Extension **`VerifyExpression(...)`** (replaced by static **`Ensure.Expression(...)`**)
 
-There is no planned removal date for **`VerifyExpression`**, **`VerifyNullable`**, exception extensions, file/directory helpers, or other APIs that were not renamed in v2.
+There is no planned removal date for **`VerifyNullable`**, exception extensions, file/directory helpers, or other APIs that were not renamed in v2.
+
+**Note:** Extension **`VerifyExpression(...)`** remains fully functional in v2 (warning only) but is deprecated; use static **`Ensure.Expression(...)`** for new code.
 
 Migrate to v2 syntax before upgrading to v3. After v3, code that still uses deprecated members will fail to compile.
 
@@ -27,6 +30,8 @@ Migrate to v2 syntax before upgrading to v3. After v3, code that still uses depr
 | `.NotToBe(...)`, `.NotToBeNull()`             | `.NotBe(...)`, `.NotBeNull()`                  |
 | `.ToHaveCount(3)`, `.ToBeGreaterThan(0)`      | `.HaveCount(3)`, `.BeGreaterThan(0)`           |
 | `Expect.Throws<T>(...)` (optional)            | `Ensure.Throws<T>(...)` or `(...).Throws<T>()` |
+| `(condition).VerifyExpression()`              | `Ensure.Expression(condition)`                 |
+| `Assert.VerifyExpression(condition)`          | `Ensure.Expression(condition)`                 |
 
 Methods that never used a `To` prefix in v1 are unchanged—for example `ContainKey`, `HaveHost`, `AllSatisfy`, and file helpers like `HaveContent`.
 
@@ -39,9 +44,11 @@ v1 used a static class named `Assert`, which conflicts with NUnit, xUnit, and ot
 using OmniAssert;
 OmniAssert.Assert.VerifyExpression(condition);
 
-// v2
-using OmniAssert;
+// v2 (legacy extension — still works with warnings)
 Ensure.VerifyExpression(condition);
+
+// v2 (recommended)
+Ensure.Expression(condition);
 ```
 
 Extension-based assertions do not require a class prefix:
@@ -93,26 +100,31 @@ Apply the same pattern to other `To*` / `NotTo*` methods on assertion types.
 
 These APIs keep their v1 names in v2:
 
-- **`VerifyExpression(...)`** — boolean expression assertions and optional compile-time interceptors
 - **`VerifyNullable(...)`** — nullable reference/value entry point (e.g. `value.VerifyNullable().BeNull()`)
 - **Exception extensions** — `(...).Throws<T>()`, `NotThrow()`, `ThrowsAsync<T>()`, etc. (now resolved via `Ensure`, not `Assert`)
 - **File/directory helpers** — `"path".FileExists().HaveContent(...)`, `"dir".DirectoryExists().BeEmpty()`
 - **`AssertionScope`** — soft assertions behave the same
 - **`WithMessage` / `WithInnerException<T>`** — exception assertion chaining
 
-## Booleans: `Must()` vs `VerifyExpression()`
+## Booleans: `Must()` vs `Ensure.Expression()`
 
-Both styles remain supported; only the fluent path uses the new names:
+Both styles remain supported for boolean assertions:
 
 ```csharp
 // Fluent (v2)
 isValid.Must().BeTrue();
 
-// Expression style (unchanged name; best for compound conditions)
-(x > 0 && count < limit).VerifyExpression();
+// Expression style (recommended for compound conditions)
+Ensure.Expression(x > 0 && count < limit);
 ```
 
-When interceptors are enabled, a bare identifier such as `flag.VerifyExpression()` is rewritten at compile time to `flag.Must(expression).BeTrue()`.
+Legacy extension syntax still works with compiler and analyzer warnings:
+
+```csharp
+(x > 0 && count < limit).VerifyExpression(); // deprecated
+```
+
+When interceptors are enabled, a bare identifier such as `Ensure.Expression(flag)` is rewritten at compile time to `Ensure.Must(flag, expression).BeTrue()`. Legacy `(flag).VerifyExpression()` call sites are still intercepted and emit `Ensure.Expression` at runtime.
 
 ## Automated migration (Roslyn analyzers)
 
@@ -125,13 +137,14 @@ Starting in v2, the **`OmniAssert`** NuGet package includes **`OmniAssert.Analyz
 | **OA001** | Use of legacy `OmniAssert.Assert`                             | Replace with `Ensure`                        |
 | **OA002** | `.Verify()` fluent entry                                      | Replace with `.Must()`                       |
 | **OA003** | Legacy `To*` / `NotTo*` assertion methods after a fluent root | Replace with `Be*` / `Not*` / `Have*` / etc. |
+| **OA004** | Legacy `VerifyExpression(...)` on `Ensure` or `Assert`        | Rewrite to **`Ensure.Expression(...)`**        |
 
 ### Applying fixes
 
 In Visual Studio, Rider, or VS Code with C# Dev Kit:
 
 1. Build the solution so analyzers load from the package.
-2. Open a file with legacy syntax (light bulb / squiggle on OA001–OA003).
+2. Open a file with legacy syntax (light bulb / squiggle on OA001–OA004).
 3. Choose **Migrate to Ensure/Must/Be* syntax**, or **Fix all occurrences in Solution** for batch migration.
 
 Example transformations:
@@ -145,6 +158,9 @@ value.Verify().ToBeFalse();
 
 items.Verify().NotToBeNull();
 // → items.Must().NotBeNull();
+
+(x > y).VerifyExpression();
+// → Ensure.Expression(x > y);
 ```
 
 ## Framework name collisions
@@ -179,12 +195,12 @@ Only the assertion method names change; the entry point is still `VerifyNullable
 
 Interceptor behaviour is unchanged. Opt-out and `InterceptorsNamespaces` settings are the same as v1—see the [README](README.md#compile-time-boolean-diagnostics-interceptors).
 
-Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** instead of `Assert.Verify(...).ToBeTrue()`.
+Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** and **`Ensure.Expression(...)`** instead of legacy `Assert.Verify(...).ToBeTrue()` / `VerifyExpression(...)`.
 
 ## Recommended migration steps
 
 1. **Upgrade** the `OmniAssert` package to v2.x.
-2. **Build** and review OA001–OA003 warnings.
+2. **Build** and review OA001–OA004 warnings.
 3. **Run code fixes** (per file or fix all in solution).
 4. **Search** for any remaining `.Verify()`, `.ToBe`, or `OmniAssert.Assert` usages your IDE may have missed.
 5. **Run tests** and confirm failure messages still read as expected.
@@ -193,7 +209,7 @@ Generated interceptor code now targets **`Ensure.Must(...).BeTrue()`** instead o
    ```xml
    <PropertyGroup>
      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-     <WarningsNotAsErrors>OA001;OA002;OA003</WarningsNotAsErrors>
+     <WarningsNotAsErrors>OA001;OA002;OA003;OA004</WarningsNotAsErrors>
    </PropertyGroup>
    ```
 

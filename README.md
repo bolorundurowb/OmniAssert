@@ -35,7 +35,7 @@ For installation, the full assertion API, soft assertions, object diffing, compi
 - **Deep object comparison** — `BeEquivalentTo` compares object graphs recursively with hierarchical diffs
 - **Soft assertions** — `AssertionScope` collects multiple failures and reports them together
 - **Compile-time diagnostics** — optional Roslyn interceptors capture operand values when boolean expressions fail
-- **Automated v1 migration** — bundled analyzers (OA001–OA003) with code fixes and fix-all-in-solution support
+- **Automated v1 migration** — bundled analyzers (OA001–OA004) with code fixes and fix-all-in-solution support
 
 ## Quick start
 

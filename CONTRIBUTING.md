@@ -16,8 +16,8 @@ The codebase was bootstrapped with **significant AI assistance**; treat contribu
 | Path | Role |
 |------|------|
 | `src/OmniAssert.Core` | Runtime: `Assert`, fluent assertion structs, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`, plus internal diff and colour helpers. |
-| `src/OmniAssert.Generator` | Roslyn incremental generator: `VerifyExpression(bool, string?)` interceptors (on by default, opt out with `OmniAssertDisableVerifyInterceptors`); optional operand-capture rewrite via `AdditionalFiles`. |
-| `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `VerifyExpression(bool, AssertionCapture)` for tests and tooling. |
+| `src/OmniAssert.Generator` | Roslyn incremental generator: `Ensure.Expression(bool, string?)` and legacy `VerifyExpression` interceptors (on by default, opt out with `OmniAssertDisableVerifyInterceptors`); optional operand-capture rewrite via `AdditionalFiles`. |
+| `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `Expression(bool, AssertionCapture)` for tests and tooling. |
 | `src/tests/OmniAssert.Tests` | Main tests (interceptors enabled). |
 | `src/tests/OmniAssert.Generator.Tests` | Generator and lowering compile tests. |
 | `src/samples/VerifyInterceptorsSample` | Minimal project showing interceptor and rewrite MSBuild wiring. |
@@ -68,4 +68,4 @@ Use a `ProjectReference` to the generator with `OutputItemType="Analyzer"` and `
 
 This path is intended for **advanced setups** that supply a `.cs` file as an **`AdditionalFiles`** item and exclude that file from **`Compile`**.
 
-The generator detects the `AdditionalFiles` entry automatically (no extra MSBuild property required) and emits a rewritten compilation unit that lowers `VerifyExpression` to `VerifyExpression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in **`src/samples/VerifyInterceptorsSample`**.
+The generator detects the `AdditionalFiles` entry automatically (no extra MSBuild property required) and emits a rewritten compilation unit that lowers legacy `VerifyExpression` call sites to `Ensure.Expression(bool, AssertionCapture)` with per-subexpression values in the failure message. It is **not** required for normal NuGet consumption. Wiring details and a sample live in **`src/samples/VerifyInterceptorsSample`**.
