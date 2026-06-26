@@ -158,4 +158,67 @@ public static class T
         var diagnostics = await AnalyzerTestHelper.GetOmniAssertAnalyzerDiagnosticsAsync(source);
         Xunit.Assert.Contains(diagnostics, d => d.Id == OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId);
     }
+
+    [Fact]
+    public async Task CodeFix_OA001_replaces_Assert_with_Ensure()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M() { Assert.VerifyExpression(true); }
+}
+""";
+
+        var fixedSource = await AnalyzerTestHelper.ApplyCodeFixAsync(source, OmniAssertDiagnosticAnalyzer.LegacyAssertId);
+        Xunit.Assert.Contains("Ensure.VerifyExpression", fixedSource);
+        Xunit.Assert.DoesNotContain("Assert.VerifyExpression", fixedSource);
+    }
+
+    [Fact]
+    public async Task CodeFix_OA002_replaces_Verify_with_Must()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x) { x.Verify().ToBeGreaterThan(0); }
+}
+""";
+
+        var fixedSource = await AnalyzerTestHelper.ApplyCodeFixAsync(source, OmniAssertDiagnosticAnalyzer.LegacyVerifyId);
+        Xunit.Assert.Contains("x.Must().ToBeGreaterThan", fixedSource);
+    }
+
+    [Fact]
+    public async Task CodeFix_OA003_replaces_NotToBeNull_with_NotBeNull()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(string? s) { s.Verify().NotToBeNull(); }
+}
+""";
+
+        var fixedSource = await AnalyzerTestHelper.ApplyCodeFixAsync(source, OmniAssertDiagnosticAnalyzer.LegacyFluentGrammarId);
+        Xunit.Assert.Contains("NotBeNull()", fixedSource);
+        Xunit.Assert.DoesNotContain("NotToBeNull()", fixedSource);
+    }
+
+    [Fact]
+    public async Task CodeFix_OA004_replaces_VerifyExpression_with_Expression()
+    {
+        var source = """
+using OmniAssert;
+public static class T
+{
+    public static void M(int x, int y) { Ensure.VerifyExpression(x > y); }
+}
+""";
+
+        var fixedSource = await AnalyzerTestHelper.ApplyCodeFixAsync(source, OmniAssertDiagnosticAnalyzer.LegacyVerifyExpressionId);
+        Xunit.Assert.Contains("Ensure.Expression(x > y)", fixedSource);
+        Xunit.Assert.DoesNotContain("VerifyExpression", fixedSource);
+    }
 }
