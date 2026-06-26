@@ -119,6 +119,23 @@ public readonly ref struct SpanAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the span count is within the inclusive range [<paramref name="minCount"/>, <paramref name="maxCount"/>].</summary>
+    /// <param name="minCount">The minimum inclusive count.</param>
+    /// <param name="maxCount">The maximum inclusive count.</param>
+    /// <param name="minExpression">The expression for the minimum count (automatically captured).</param>
+    /// <param name="maxExpression">The expression for the maximum count (automatically captured).</param>
+    public void HaveCountBetween(int minCount, int maxCount,
+        [CallerArgumentExpression(nameof(minCount))] string? minExpression = null,
+        [CallerArgumentExpression(nameof(maxCount))] string? maxExpression = null)
+    {
+        if (_actual.Length >= minCount && _actual.Length <= maxCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count between {minExpression ?? "minCount"} ({minCount}) and {maxExpression ?? "maxCount"} ({maxCount}), but had {_actual.Length}.",
+            _expression);
+    }
+
     /// <summary>Verifies that the span contains <paramref name="item"/>.</summary>
     /// <param name="item">The element expected to be present.</param>
     /// <param name="itemExpression">The expression for the item (automatically captured).</param>
