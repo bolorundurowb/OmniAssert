@@ -318,6 +318,47 @@ public class WebAssertionTests
     }
 
     [Fact]
+    public void HttpResponseMessage_BeHttpStatusCode_WhenMatching_ShouldSucceed()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.Created);
+        HttpResponseMessageExtensions.Must(response).BeHttpStatusCode(201);
+    }
+
+    [Fact]
+    public void HttpResponseMessage_BeHttpStatusCode_WhenMismatch_ShouldThrow()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.NotFound);
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            HttpResponseMessageExtensions.Must(response).BeHttpStatusCode(200));
+    }
+
+    [Fact]
+    public void HttpResponseMessage_HaveContentType_WhenHeaderMissing_ShouldThrow()
+    {
+        using var response = new HttpResponseMessage(HttpStatusCode.OK);
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            HttpResponseMessageExtensions.Must(response).HaveContentType("application/json"));
+    }
+
+    [Fact]
+    public void BeHtml_TagPairWithoutDocument_ShouldSucceed()
+    {
+        "<div><p>Hello</p></div>".Must().BeHtml();
+    }
+
+    [Fact]
+    public void BeMacAddress_ContiguousHex_ShouldSucceed()
+    {
+        "001A2B3C4D5E".Must().BeMacAddress();
+    }
+
+    [Fact]
+    public void BeRelativeUrl_WithSchemeLikeColon_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() => "/bad://path".Must().BeRelativeUrl());
+    }
+
+    [Fact]
     public void BeReachable_WhenSkipEnvSet_ShouldSucceed()
     {
         Environment.SetEnvironmentVariable("OMNIASSERT_SKIP_NETWORK", "1");

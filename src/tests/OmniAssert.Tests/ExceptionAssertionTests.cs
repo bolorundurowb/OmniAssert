@@ -356,41 +356,4 @@ public class ExceptionAssertionTests
                 throw new Exception("fail");
             })).NotThrowAsync());
     }
-
-    [Fact]
-    public void Expect_Throws_WhenCorrectExceptionType_ShouldSucceed()
-    {
-        var result = Expect.Throws<ArgumentException>(() => throw new ArgumentException("bad"));
-        Xunit.Assert.IsType<ArgumentException>(result.Exception);
-    }
-
-    [Fact]
-    public void Expect_Throws_FuncReturningValue_WhenThrows_ShouldSucceed()
-    {
-        var result = Expect.Throws<ArgumentException>(() => throw new ArgumentException("bad"));
-        Xunit.Assert.IsType<ArgumentException>(result.Exception);
-    }
-
-    [Fact]
-    public void Expect_NotThrow_WhenNoException_ShouldSucceed()
-    {
-        Expect.NotThrow(() => { });
-    }
-
-    [Fact]
-    public async Task Expect_ThrowsAsync_WhenCorrectExceptionType_ShouldSucceed()
-    {
-        var result = await Expect.ThrowsAsync<ArgumentException>(async () =>
-        {
-            await Task.Yield();
-            throw new ArgumentException("bad");
-        });
-        Xunit.Assert.IsType<ArgumentException>(result.Exception);
-    }
-
-    [Fact]
-    public async Task Expect_NotThrowAsync_WhenNoException_ShouldSucceed()
-    {
-        await Expect.NotThrowAsync(async () => await Task.Yield());
-    }
 }

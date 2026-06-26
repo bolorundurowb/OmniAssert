@@ -3,6 +3,7 @@
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <CoverletOutput>$(MSBuildThisFileDirectory)coverage/$(MSBuildProjectName).cobertura.xml</CoverletOutput>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <ExcludeByFile>$(MSBuildThisFileDirectory)**/obj/**/RegexGenerator.g.cs</ExcludeByFile>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">

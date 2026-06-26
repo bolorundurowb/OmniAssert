@@ -3,6 +3,27 @@ namespace OmniAssert.Tests;
 public class GuidAssertionTests
 {
     [Fact]
+    public void Be_WhenMatch_ShouldSucceed()
+    {
+        var id = Guid.NewGuid();
+        id.Must().Be(id);
+    }
+
+    [Fact]
+    public void Be_WhenMismatch_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Guid.NewGuid().Must().Be(Guid.NewGuid()));
+    }
+
+    [Fact]
+    public void ToBeOneOf_WhenExpectedArrayEmpty_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            Guid.NewGuid().Must().BeOneOf());
+    }
+
+    [Fact]
     public void ToBeEmpty_WhenGuidIsEmpty_ShouldSucceed()
     {
         (Guid.Empty).Must().BeEmpty();

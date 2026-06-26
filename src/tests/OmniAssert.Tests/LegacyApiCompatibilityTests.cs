@@ -58,6 +58,24 @@ public class LegacyApiCompatibilityTests
     }
 
     [Fact]
+    public void Legacy_static_VerifyExpression_with_capture_delegates_like_Ensure()
+    {
+#pragma warning disable CS0618
+        var capture = AssertionCapture.WithOperands("x > y", ("x", 2), ("y", 3));
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            OmniAssert.Assert.VerifyExpression(2 > 3, capture));
+#pragma warning restore CS0618
+    }
+
+    [Fact]
+    public void Legacy_Verify_byte_returns_NumericAssertions()
+    {
+#pragma warning disable CS0618
+        ((byte)1).Verify().ToBe((byte)1);
+#pragma warning restore CS0618
+    }
+
+    [Fact]
     public void Expect_throws_delegates_to_Ensure_throws()
     {
         var action = (Action)(() => throw new InvalidOperationException("boom"));
