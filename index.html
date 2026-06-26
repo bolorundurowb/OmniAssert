@@ -375,6 +375,11 @@
     .api-row strong, .migration-row strong { color: var(--brand-dark); }
     .api-row span, .migration-row span { color: var(--muted); }
 
+    .ext-table .api-row {
+      grid-template-columns: minmax(190px, 0.34fr) minmax(0, 0.66fr);
+    }
+    .ext-table .api-row span code { font-size: 0.88em; }
+
     .migration-table .migration-row {
       grid-template-columns: minmax(0, 0.48fr) minmax(0, 0.52fr);
     }
@@ -442,6 +447,7 @@
         <a href="#installation">Install</a>
         <a href="#quick-start">Quick start</a>
         <a href="#api-reference">API</a>
+        <a href="#extensions">Extensions</a>
         <a href="#advanced">Advanced</a>
         <a href="#assertion-style">Style</a>
         <a href="#migration">Migration</a>
@@ -656,6 +662,15 @@
           <pre><code class="language-xml">&lt;PropertyGroup&gt;
   &lt;OmniAssertDisableVerifyInterceptors&gt;true&lt;/OmniAssertDisableVerifyInterceptors&gt;
 &lt;/PropertyGroup&gt;</code></pre>
+        </article>
+
+        <article class="step">
+          <h3>Optionally install Extensions for domain assertions</h3>
+          <p>OmniAssert.Extensions adds web, financial, security, and regional assertions. It requires the core OmniAssert package.</p>
+          <pre><code class="language-bash">dotnet add package OmniAssert.Extensions --version 2.1.0</code></pre>
+          <pre><code class="language-xml">&lt;ItemGroup&gt;
+  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.1.0" /&gt;
+&lt;/ItemGroup&gt;</code></pre>
         </article>
       </div>
     </section>
@@ -893,6 +908,302 @@ Ensure.Fail("Verification failed: custom wording");</code></pre>
           <li><code>Ensure.Fail(message?)</code> — throws <code>OmniAssertionException</code> immediately, unless an enclosing <code>AssertionScope</code> is collecting failures</li>
         </ul>
       </article>
+    </section>
+
+    <section class="section" id="extensions">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">05b. Extensions</p>
+          <h2>Domain-specific assertions</h2>
+        </div>
+        <p class="section-intro">
+          <a href="https://www.nuget.org/packages/OmniAssert.Extensions"><code>OmniAssert.Extensions</code></a> extends
+          the <code>.Must()</code> fluent API with validators for web payloads, financial identifiers, security tokens,
+          and regional business rules. Import only the namespaces you need.
+        </p>
+      </div>
+
+      <div class="callout">
+        <strong>Prerequisite:</strong> Extensions requires the core <code>OmniAssert</code> package at the
+        <strong>same version</strong>. Add both <code>PackageReference</code> entries to your test project.
+      </div>
+
+      <h3>Installation</h3>
+      <pre><code class="language-xml">&lt;ItemGroup&gt;
+  &lt;PackageReference Include="OmniAssert" Version="2.1.0" /&gt;
+  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.1.0" /&gt;
+&lt;/ItemGroup&gt;</code></pre>
+
+      <h3>Namespaces</h3>
+      <div class="api-table ext-table" aria-label="Extensions namespaces">
+        <div class="api-row">
+          <strong><code>OmniAssert.Extensions.Web</code></strong>
+          <span>Email, URL, JSON/XML/HTML, IP, hostname, MAC, HTTP status, content-type, network reachability</span>
+        </div>
+        <div class="api-row">
+          <strong><code>OmniAssert.Extensions.Financials</code></strong>
+          <span>GUID, ULID, CUID, ISBN, IMEI, credit card (Luhn), IBAN (mod-97)</span>
+        </div>
+        <div class="api-row">
+          <strong><code>OmniAssert.Extensions.Security</code></strong>
+          <span>Password strength, hash formats, JWT structure, API keys, OAuth tokens</span>
+        </div>
+        <div class="api-row">
+          <strong><code>OmniAssert.Extensions.Regional</code></strong>
+          <span>Nigerian identifiers (phone, NUBAN, BVN, NIN, postal), global phone/postal/SSN, age and business hours</span>
+        </div>
+      </div>
+
+      <h3>Quick examples</h3>
+      <pre><code class="language-csharp">using OmniAssert;
+using OmniAssert.Extensions.Web;
+using OmniAssert.Extensions.Financials;
+using OmniAssert.Extensions.Security;
+using OmniAssert.Extensions.Regional;
+
+// Web
+"user@acme.com".Must().BeEmailAddress();
+"https://api.example.com/v1".Must().BeUrl();
+"{\"id\":1}".Must().BeJson();
+
+// Financial
+"978-0-306-40615-7".Must().BeIsbn();
+"GB29NWBK60161331926819".Must().BeIban();
+
+// Security
+"MyP@ssw0rd!".Must().BeStrongPassword(minLength: 12);
+token.Must().BeJwt();
+
+// Regional
+"+2348012345678".Must().BeNigerianPhoneNumber();
+"0022728153".Must().BeNigerianBankAccountNumber("058");</code></pre>
+
+      <h3>Web, network &amp; communications</h3>
+      <p>String extensions unless noted. Use core <code>Uri</code> assertions (<code>HaveScheme</code>, <code>HaveHost</code>, …) when you already have a parsed <code>Uri</code> object; use Extensions <code>BeUrl()</code> to validate string format <em>before</em> parsing.</p>
+      <div class="api-table ext-table" aria-label="Web extension assertions">
+        <div class="api-row">
+          <strong><code>BeEmailAddress()</code></strong>
+          <span>Non-empty; <code>MailAddress</code> parseable; local-part and domain present; domain contains <code>.</code>; no spaces; max 254 characters (practical RFC 5322 subset).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeUrl()</code> / <code>BeAbsoluteUrl()</code></strong>
+          <span>Absolute URI with <code>http</code> or <code>https</code> scheme and non-empty host.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeRelativeUrl()</code></strong>
+          <span>Starts with <code>/</code>; not parseable as an absolute URI (no scheme/host).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeSlug()</code></strong>
+          <span>Lowercase alphanumeric segments separated by single hyphens; no leading/trailing hyphen (<code>^[a-z0-9]+(?:-[a-z0-9]+)*$</code>).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeJson()</code></strong>
+          <span>Non-empty; strict <code>JsonDocument.Parse</code> (malformed or trailing junk fails).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeXml()</code></strong>
+          <span>Non-empty; well-formed XML via <code>XDocument.Parse</code>.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeHtml()</code></strong>
+          <span>Document heuristic: <code>&lt;html&gt;…&lt;/html&gt;</code> / <code>&lt;body&gt;…&lt;/body&gt;</code>, or opening tag plus matching closing tag (not a full HTML5 parser).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeIpAddress()</code> / <code>BeValidIpAddress()</code></strong>
+          <span><code>IPAddress.TryParse</code> succeeds (IPv4 or IPv6).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeIpv4()</code> / <code>BeIpv6()</code></strong>
+          <span>Parsed address family is <code>InterNetwork</code> or <code>InterNetworkV6</code> respectively.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeValidHostname()</code></strong>
+          <span>Labels 1–63 chars; total ≤ 253; optional trailing dot stripped; each label matches hostname label rules.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeValidMacAddress()</code> / <code>BeMacAddress()</code></strong>
+          <span><code>AA:BB:CC:DD:EE:FF</code>, hyphen-separated, or 12 contiguous hex digits.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeValidPort()</code></strong>
+          <span>On <code>NumericAssertions&lt;int&gt;</code>: value in <code>0</code>–<code>65535</code>.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeHttpStatusCode(int)</code> / <code>BeSuccessStatusCode()</code></strong>
+          <span>On <code>NumericAssertions&lt;int&gt;</code>: exact match, or any <code>2xx</code> code.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeReachable()</code> / <code>BeReachableAsync()</code></strong>
+          <span>Live HTTP check: prepends <code>https://</code> when no scheme; HEAD then GET fallback; <code>2xx</code>/<code>3xx</code> = reachable; default timeout 5s (optional <code>TimeSpan?</code>). Set <code>OMNIASSERT_SKIP_NETWORK=1</code> in CI to skip without failing.</span>
+        </div>
+      </div>
+
+      <h4>HTTP response assertions</h4>
+      <p>Use <code>HttpResponseMessage.Must()</code> from <code>OmniAssert.Extensions.Web</code>:</p>
+      <pre><code class="language-csharp">using var response = await client.GetAsync("/api/users");
+response.Must().BeSuccessStatusCode();
+response.Must().HaveContentType("application/json");
+
+404.Must().BeHttpStatusCode(404);</code></pre>
+      <div class="api-table ext-table" aria-label="HttpResponseMessage assertions">
+        <div class="api-row">
+          <strong><code>BeSuccessStatusCode()</code></strong>
+          <span>Status code in <code>200</code>–<code>299</code>.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeHttpStatusCode(int)</code></strong>
+          <span>Exact status code match.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>HaveContentType(string)</code></strong>
+          <span><code>Content-Type</code> media type equals expected (case-insensitive; charset/parameters ignored).</span>
+        </div>
+      </div>
+
+      <h3>Financial &amp; industry identifiers</h3>
+      <div class="api-table ext-table" aria-label="Financial extension assertions">
+        <div class="api-row">
+          <strong><code>BeGuid(GuidFormat?)</code></strong>
+          <span><code>Guid.TryParse</code>; optional <code>GuidFormat</code> enum (<code>N</code>, <code>D</code>, <code>B</code>, <code>P</code>, <code>X</code>) requires string to match that layout exactly.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeUlid()</code></strong>
+          <span>26 Crockford base32 characters; rejects <code>I</code>, <code>L</code>, <code>O</code>, <code>U</code>.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeCuid()</code></strong>
+          <span>Starts with <code>c</code>; 24–25 lowercase alphanumeric characters (CUID v1 pattern).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeIsbn()</code></strong>
+          <span>ISBN-10 (mod 11 check digit, <code>X</code> allowed) or ISBN-13 (<code>978</code>/<code>979</code> prefix, mod 10 check digit); hyphens/spaces stripped.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeImei()</code></strong>
+          <span>Exactly 15 digits; Luhn-valid including check digit.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeCreditCard()</code> / <code>BeCreditCardNumber()</code></strong>
+          <span>13–19 digits after stripping separators; Luhn-valid.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeIban()</code></strong>
+          <span>Length 15–34; country code + check digits; mod-97 rearrangement validation (IBAN standard).</span>
+        </div>
+      </div>
+
+      <h3>Security, authentication &amp; cryptography</h3>
+      <div class="api-table ext-table" aria-label="Security extension assertions">
+        <div class="api-row">
+          <strong><code>BeStrongPassword(minLength?)</code></strong>
+          <span>Default <code>minLength</code> 8; requires uppercase, lowercase, digit, and symbol from a documented punctuation set.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeSha256Hash()</code></strong>
+          <span>Exactly 64 hex characters (optional <code>0x</code> prefix stripped).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeMd5Hash()</code></strong>
+          <span>Exactly 32 hex characters.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeHashedWith(HashType)</code></strong>
+          <span><code>HashType</code>: <code>Md5</code> (32 hex), <code>Sha256</code> (64 hex), <code>Sha512</code> (128 hex).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeJwtToken()</code> / <code>BeJwt()</code></strong>
+          <span>Three dot-separated Base64Url segments; decoded header JSON contains <code>alg</code>; payload is a JSON object.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeApiKey()</code></strong>
+          <span>Length 16–128; <code>[A-Za-z0-9_-]</code>; at least one letter and one digit.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeOAuthToken()</code></strong>
+          <span>Optional <code>Bearer </code> prefix stripped; length ≥ 20; RFC 6750-style token character set.</span>
+        </div>
+      </div>
+
+      <h3>Regional, demographic &amp; business rules</h3>
+      <div class="api-table ext-table" aria-label="Regional extension assertions">
+        <div class="api-row">
+          <strong><code>BeNigerianPhoneNumber()</code></strong>
+          <span><code>+234</code> or leading <code>0</code>; normalized to Nigerian mobile prefixes (e.g. 701–709, 802–809, 811, 813–819, 901–909).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeNigerianBankAccountNumber()</code></strong>
+          <span>Format-only: exactly 10 digits.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeNigerianBankAccountNumber(bankCode)</code></strong>
+          <span>Full NUBAN check: 10-digit account + 3-digit bank code; weighted mod-10 check digit verification.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeNigerianBvn()</code> / <code>BeNigerianNin()</code></strong>
+          <span>Exactly 11 digits; rejects all-identical digits.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeNigerianPostalCode()</code></strong>
+          <span>Exactly 6 digits.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BePhoneNumber()</code></strong>
+          <span>E.164-style: optional <code>+</code>; 8–15 total digits.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BePostalCode(CountryCode)</code></strong>
+          <span><code>CountryCode</code>: <code>US</code>, <code>GB</code>, <code>CA</code>, <code>NG</code>, or <code>Generic</code> (default). Each applies country-specific patterns.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeSocialSecurityNumber()</code></strong>
+          <span>US SSN: rejects invalid area (<code>000</code>, <code>666</code>, <code>9xx</code>), group <code>00</code>, serial <code>0000</code>.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeAdult(age?)</code></strong>
+          <span>On <code>DateTime</code> / <code>DateOnly</code>; default <code>age</code> 18; computed against <strong>UTC</strong> calendar date today.</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeBirthday()</code></strong>
+          <span>Month and day match <strong>local</strong> calendar date today (<code>DateTime.Today</code> / <code>DateOnly</code> equivalent).</span>
+        </div>
+        <div class="api-row">
+          <strong><code>BeBusinessHours(timeZone?)</code></strong>
+          <span>Weekday (Mon–Fri); time in <code>[09:00, 17:00)</code> local or converted via optional <code>TimeZoneInfo</code>.</span>
+        </div>
+      </div>
+
+      <h3>Failure messages &amp; soft assertions</h3>
+      <p>
+        Extensions use the same <code>VerificationFlow</code> as core OmniAssert. Failures are prefixed with
+        <code>Verification failed:</code> and include the captured expression (for example <code>email</code>) and the
+        actual value. Inside an <code>AssertionScope</code>, failures are collected and reported together.
+      </p>
+
+      <h3>Extensions FAQ</h3>
+      <div class="faq">
+        <details>
+          <summary>When should I use Extensions vs core string <code>Match(regex)</code>?</summary>
+          <p>
+            Prefer Extensions when you need a named, documented validator (IBAN mod-97, NUBAN, JWT structure) with
+            consistent failure wording. Use core <code>Match</code> for one-off project-specific patterns.
+          </p>
+        </details>
+        <details>
+          <summary>Why does <code>BeReachable()</code> pass in CI without network access?</summary>
+          <p>
+            Set <code>OMNIASSERT_SKIP_NETWORK=1</code>. Reachability assertions become no-ops so pipelines without
+            outbound HTTP stay deterministic.
+          </p>
+        </details>
+        <details>
+          <summary>Do I need both packages at the same version?</summary>
+          <p>
+            Yes. <code>OmniAssert.Extensions</code> declares a NuGet dependency on <code>OmniAssert</code> at the
+            matching version. Mismatched versions can cause missing APIs or assertion struct incompatibilities.
+          </p>
+        </details>
+      </div>
     </section>
 
     <section class="section" id="advanced">
@@ -1361,8 +1672,35 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
           <summary>Can I use OmniAssert with NUnit, xUnit, or MSTest?</summary>
           <p>
             Yes. OmniAssert is a standalone assertion library. Import the namespace and use it from whichever .NET test
-            framework your project already uses. v2’s <code>Ensure</code> entry point avoids clashing with NUnit’s
+            framework your project already uses. v2's <code>Ensure</code> entry point avoids clashing with NUnit's
             <code>Assert</code>.
+          </p>
+        </details>
+
+        <details>
+          <summary>Is OmniAssert.Extensions a required dependency?</summary>
+          <p>
+            No. Extensions is an optional companion package. The core <code>OmniAssert</code> package includes all
+            standard assertions. Install <code>OmniAssert.Extensions</code> only if you need domain-specific validators
+            for web, financial, security, or regional checks.
+          </p>
+        </details>
+
+        <details>
+          <summary>How do I skip network-dependent assertions in CI?</summary>
+          <p>
+            Set the environment variable <code>OMNIASSERT_SKIP_NETWORK=1</code> before running tests. When this variable
+            is set, <code>BeReachable()</code> and <code>BeReachableAsync()</code> pass immediately without making any
+            network calls. This prevents flaky tests in CI environments without network access.
+          </p>
+        </details>
+
+        <details>
+          <summary>Does <code>BeNigerianBankAccountNumber()</code> validate the bank code?</summary>
+          <p>
+            Without a bank code parameter, the assertion checks only that the value is exactly 10 digits (format-only).
+            Use the overload <code>BeNigerianBankAccountNumber(string bankCode)</code> for full NUBAN validation that
+            verifies the check digit against the 3-digit bank code.
           </p>
         </details>
 
