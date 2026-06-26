@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>Assertions for <see cref="DateTime"/> (unspecified, UTC, or local per how the value was constructed).</summary>
-public readonly struct DateTimeAssertions
+public readonly struct DateTimeAssertions : IAssertionContext<DateTime>
 {
     private readonly DateTime _actual;
     private readonly string _expression;
@@ -13,6 +13,9 @@ public readonly struct DateTimeAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    DateTime IAssertionContext<DateTime>.Subject => _actual;
+    string IAssertionContext<DateTime>.Expression => _expression;
 
     /// <summary>Verifies that the date/time is after the <paramref name="expected"/> date/time.</summary>
     /// <param name="expected">The date/time to compare against.</param>
@@ -93,7 +96,7 @@ public readonly struct DateTimeAssertions
 }
 
 /// <summary>Assertions for <see cref="DateTimeOffset"/> subjects (includes offset in comparisons).</summary>
-public readonly struct DateTimeOffsetAssertions
+public readonly struct DateTimeOffsetAssertions : IAssertionContext<DateTimeOffset>
 {
     private readonly DateTimeOffset _actual;
     private readonly string _expression;
@@ -103,6 +106,9 @@ public readonly struct DateTimeOffsetAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    DateTimeOffset IAssertionContext<DateTimeOffset>.Subject => _actual;
+    string IAssertionContext<DateTimeOffset>.Expression => _expression;
 
     /// <summary>Verifies that the date/time offset is after the <paramref name="expected"/> date/time offset.</summary>
     /// <param name="expected">The date/time offset to compare against.</param>

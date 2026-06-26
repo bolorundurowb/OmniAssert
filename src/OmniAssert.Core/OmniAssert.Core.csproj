@@ -15,8 +15,6 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>2.1.0</Version>
-    <PackageVersion>2.1.0</PackageVersion>
     <PackageReleaseNotes>v2.1.0
     - Deprecated extension VerifyExpression() in favor of static Ensure.Expression(...); the extension remains functional with [Obsolete] warnings until v3.0.
     - Updated the compile-time interceptor source generator to emit Ensure.Expression(...) and to intercept static Ensure.Expression call sites in addition to legacy VerifyExpression paths.
@@ -30,6 +28,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>omni-assert-logo.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,6 +39,8 @@
   <ItemGroup>
     <InternalsVisibleTo Include="OmniAssert.Tests" />
     <InternalsVisibleTo Include="OmniAssert.Tests.NoInterceptors" />
+    <InternalsVisibleTo Include="OmniAssert.Extensions" />
+    <InternalsVisibleTo Include="OmniAssert.Extensions.Tests" />
   </ItemGroup>
 
   <ItemGroup>

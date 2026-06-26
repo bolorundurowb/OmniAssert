@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>Assertions for <see cref="Guid"/> subjects from <see cref="Ensure.Must(Guid, string?)"/>.</summary>
-public readonly struct GuidAssertions
+public readonly struct GuidAssertions : IAssertionContext<Guid>
 {
     private readonly Guid _actual;
     private readonly string _expression;
@@ -13,6 +13,9 @@ public readonly struct GuidAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    Guid IAssertionContext<Guid>.Subject => _actual;
+    string IAssertionContext<Guid>.Expression => _expression;
 
     /// <summary>Verifies that the GUID is equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected GUID.</param>

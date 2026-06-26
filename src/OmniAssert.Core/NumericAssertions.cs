@@ -6,7 +6,7 @@ namespace OmniAssert;
 
 /// <summary>Assertions for numeric types that implement <see cref="INumber{T}"/> (including <see cref="System.Numerics.BigInteger"/>).</summary>
 /// <typeparam name="T">Numeric type under test.</typeparam>
-public readonly struct NumericAssertions<T> where T : INumber<T>
+public readonly struct NumericAssertions<T> : IAssertionContext<T> where T : INumber<T>
 {
     private readonly T _actual;
     private readonly string _expression;
@@ -16,6 +16,9 @@ public readonly struct NumericAssertions<T> where T : INumber<T>
         _actual = actual;
         _expression = expression;
     }
+
+    T IAssertionContext<T>.Subject => _actual;
+    string IAssertionContext<T>.Expression => _expression;
 
     /// <summary>Verifies that the numeric value is equal to the <paramref name="expected"/> value.</summary>
     /// <param name="expected">The expected value.</param>
