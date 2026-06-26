@@ -1,4 +1,5 @@
 using OmniAssert.Extensions.Financials;
+using OmniAssert.Extensions.Financials.Validators;
 
 namespace OmniAssert.Extensions.Tests;
 
@@ -160,5 +161,34 @@ public class FinancialAssertionTests
     public void BeIban_AnotherValidIban_ShouldSucceed()
     {
         "DE89370400440532013000".Must().BeIban();
+    }
+
+    [Theory]
+    [InlineData("01ARZ3NDEKTSV4RRFFQ69G5FAV")]
+    public void UlidValidator_ValidUlid_ShouldPass(string ulid)
+    {
+        Xunit.Assert.True(UlidValidator.IsValid(ulid));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("01ARZ3NDEKTSV4RRFFQ69G5FAI")]
+    public void UlidValidator_InvalidUlid_ShouldFail(string ulid)
+    {
+        Xunit.Assert.False(UlidValidator.IsValid(ulid));
+    }
+
+    [Theory]
+    [InlineData("cjld2cjxh0000qzrmn831i7rn")]
+    public void CuidValidator_ValidCuid_ShouldPass(string cuid)
+    {
+        Xunit.Assert.True(CuidValidator.IsValid(cuid));
+    }
+
+    [Theory]
+    [InlineData("xjld2cjxh0000qzrmn831i7rn")]
+    public void CuidValidator_InvalidCuid_ShouldFail(string cuid)
+    {
+        Xunit.Assert.False(CuidValidator.IsValid(cuid));
     }
 }

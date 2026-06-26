@@ -1,4 +1,5 @@
 using OmniAssert.Extensions.Security;
+using OmniAssert.Extensions.Security.Validators;
 
 namespace OmniAssert.Extensions.Tests;
 
@@ -97,8 +98,8 @@ public class SecurityAssertionTests
     [Fact]
     public void BeJwtToken_ValidJwt_ShouldSucceed()
     {
-        var header = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("""{"alg":"HS256","typ":"JWT"}""")).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-        var payload = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("""{"sub":"1234567890","name":"John"}""")).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var header = Convert.ToBase64String("""{"alg":"HS256","typ":"JWT"}"""u8.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var payload = Convert.ToBase64String("""{"sub":"1234567890","name":"John"}"""u8.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var signature = "signature";
         var jwt = $"{header}.{payload}.{signature}";
 
@@ -120,8 +121,8 @@ public class SecurityAssertionTests
     [Fact]
     public void BeJwt_Alias_ShouldSucceed()
     {
-        var header = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("""{"alg":"HS256","typ":"JWT"}""")).TrimEnd('=').Replace('+', '-').Replace('/', '_');
-        var payload = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("""{"sub":"1234567890"}""")).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var header = Convert.ToBase64String("""{"alg":"HS256","typ":"JWT"}"""u8.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var payload = Convert.ToBase64String("""{"sub":"1234567890"}"""u8.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var jwt = $"{header}.{payload}.sig";
 
         jwt.Must().BeJwt();
@@ -161,5 +162,34 @@ public class SecurityAssertionTests
     public void BeOAuthToken_TooShort_ShouldThrow()
     {
         Xunit.Assert.Throws<OmniAssertionException>(() => "short".Must().BeOAuthToken());
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("part1.part2")]
+    [InlineData("a..c")]
+    public void JwtValidator_InvalidTokens_ShouldFail(string token)
+    {
+        Xunit.Assert.False(JwtValidator.IsValid(token));
+    }
+
+    [Fact]
+    public void JwtValidator_HeaderWithoutAlg_ShouldFail()
+    {
+        var header = Convert.ToBase64String("""{"typ":"JWT"}"""u8.ToArray())
+            .TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var payload = Convert.ToBase64String("""{"sub":"1"}"""u8.ToArray())
+            .TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        Xunit.Assert.False(JwtValidator.IsValid($"{header}.{payload}.sig"));
+    }
+
+    [Fact]
+    public void JwtValidator_PayloadNotJsonObject_ShouldFail()
+    {
+        var header = Convert.ToBase64String("""{"alg":"HS256"}"""u8.ToArray())
+            .TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var payload = Convert.ToBase64String("\"not-an-object\""u8.ToArray())
+            .TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        Xunit.Assert.False(JwtValidator.IsValid($"{header}.{payload}.sig"));
     }
 }
