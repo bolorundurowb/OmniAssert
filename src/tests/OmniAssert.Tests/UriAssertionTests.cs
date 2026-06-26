@@ -3,6 +3,20 @@ namespace OmniAssert.Tests;
 public class UriAssertionTests
 {
     [Fact]
+    public void Be_WhenUrisMatch_ShouldSucceed()
+    {
+        var uri = new Uri("https://example.com/path");
+        uri.Must().Be(uri);
+    }
+
+    [Fact]
+    public void Be_WhenUrisDiffer_ShouldThrow()
+    {
+        Xunit.Assert.Throws<OmniAssertionException>(() =>
+            (new Uri("https://example.com/a")).Must().Be(new Uri("https://example.com/b")));
+    }
+
+    [Fact]
     public void HaveScheme_WhenMatching_ShouldSucceed()
     {
         (new Uri("https://api.example.com/v1/users?id=123")).Must().HaveScheme("https");

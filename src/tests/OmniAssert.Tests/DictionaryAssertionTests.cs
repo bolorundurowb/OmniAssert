@@ -210,4 +210,12 @@ public class DictionaryAssertionTests
         Xunit.Assert.Throws<OmniAssertionException>(() =>
             ((IReadOnlyDictionary<string, int>?)null).Must().HaveCount(0));
     }
+
+    [Fact]
+    public void Must_OnMutableDictionary_UsesReadOnlyWrapper()
+    {
+        IDictionary<string, int> dict = new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 };
+        dict.Must().ContainKey("a");
+        dict.Must().HaveCount(2);
+    }
 }

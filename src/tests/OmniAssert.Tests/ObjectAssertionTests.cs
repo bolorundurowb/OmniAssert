@@ -6,6 +6,20 @@ public class ObjectAssertionTests
     private class Dog : Animal { }
 
     [Fact]
+    public void Be_WhenObjectsEqual_ShouldSucceed()
+    {
+        object obj = "hello";
+        obj.Must().Be("hello");
+    }
+
+    [Fact]
+    public void Be_WhenObjectsDiffer_ShouldThrow()
+    {
+        object obj = "hello";
+        Xunit.Assert.Throws<OmniAssertionException>(() => obj.Must().Be("world"));
+    }
+
+    [Fact]
     public void ToBeNull_WhenObjectIsNull_ShouldSucceed()
     {
         ((object?)null).Must().BeNull();
