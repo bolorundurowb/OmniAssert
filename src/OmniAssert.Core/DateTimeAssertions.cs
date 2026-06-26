@@ -73,12 +73,66 @@ public readonly struct DateTimeAssertions : IAssertionContext<DateTime>
         VerificationFlow.Fail(FormatFailure("not to be", unexpected, unexpectedExpression ?? "unexpected", _actual, _expression), _expression);
     }
 
+    /// <summary>
+    /// Verifies that the date/time is in the past relative to <see cref="DateTime.UtcNow"/>.
+    /// </summary>
+    /// <remarks>
+    /// The comparison is made against <see cref="DateTime.UtcNow"/>, so the subject should be a UTC value.
+    /// Comparing a <see cref="DateTimeKind.Local"/> or <see cref="DateTimeKind.Unspecified"/> value may give
+    /// surprising results near "now"; convert to UTC first when in doubt.
+    /// </remarks>
+    public void BeInPast()
+    {
+        if (_actual < DateTime.UtcNow)
+            return;
+
+        VerificationFlow.Fail(FormatSingle("to be in the past (UTC)", _actual, _expression), _expression);
+    }
+
+    /// <summary>
+    /// Verifies that the date/time is in the future relative to <see cref="DateTime.UtcNow"/>.
+    /// </summary>
+    /// <remarks>
+    /// The comparison is made against <see cref="DateTime.UtcNow"/>, so the subject should be a UTC value.
+    /// Comparing a <see cref="DateTimeKind.Local"/> or <see cref="DateTimeKind.Unspecified"/> value may give
+    /// surprising results near "now"; convert to UTC first when in doubt.
+    /// </remarks>
+    public void BeInFuture()
+    {
+        if (_actual > DateTime.UtcNow)
+            return;
+
+        VerificationFlow.Fail(FormatSingle("to be in the future (UTC)", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date/time falls on the same calendar day as <paramref name="expected"/> (time-of-day ignored).</summary>
+    /// <param name="expected">The date/time whose calendar day must match.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void BeSameDayAs(DateTime expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual.Date == expected.Date)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("to be on the same day as", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
     private static string FormatFailure(string relation, DateTime expected, string expectedLabel, DateTime actual, string actualLabel)
     {
         var sb = new System.Text.StringBuilder();
         sb.AppendLine("Verification failed.");
         sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
         sb.AppendLine(AnsiColour.Expected(expected.ToString("O")));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(actual.ToString("O")));
+        return sb.ToString();
+    }
+
+    private static string FormatSingle(string expectedDesc, DateTime actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {expectedDesc}."));
+        sb.AppendLine();
         sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
         sb.Append(AnsiColour.Actual(actual.ToString("O")));
         return sb.ToString();
@@ -166,12 +220,54 @@ public readonly struct DateTimeOffsetAssertions : IAssertionContext<DateTimeOffs
         VerificationFlow.Fail(FormatFailure("not to be", unexpected, unexpectedExpression ?? "unexpected", _actual, _expression), _expression);
     }
 
+    /// <summary>Verifies that the instant is in the past relative to <see cref="DateTimeOffset.UtcNow"/> (offset-aware).</summary>
+    /// <remarks>Compares against <see cref="DateTimeOffset.UtcNow"/>; prefer UTC-normalized instants when testing wall-clock boundaries.</remarks>
+    public void BeInPast()
+    {
+        if (_actual < DateTimeOffset.UtcNow)
+            return;
+
+        VerificationFlow.Fail(FormatSingle("to be in the past (UTC)", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the instant is in the future relative to <see cref="DateTimeOffset.UtcNow"/> (offset-aware).</summary>
+    /// <remarks>Compares against <see cref="DateTimeOffset.UtcNow"/>; prefer UTC-normalized instants when testing wall-clock boundaries.</remarks>
+    public void BeInFuture()
+    {
+        if (_actual > DateTimeOffset.UtcNow)
+            return;
+
+        VerificationFlow.Fail(FormatSingle("to be in the future (UTC)", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the instant falls on the same calendar day as <paramref name="expected"/>, comparing UTC dates.</summary>
+    /// <param name="expected">The instant whose UTC calendar day must match.</param>
+    /// <param name="expectedExpression">The expression for the expected value (automatically captured).</param>
+    public void BeSameDayAs(DateTimeOffset expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        if (_actual.UtcDateTime.Date == expected.UtcDateTime.Date)
+            return;
+
+        VerificationFlow.Fail(FormatFailure("to be on the same day as", expected, expectedExpression ?? "expected", _actual, _expression), _expression);
+    }
+
     private static string FormatFailure(string relation, DateTimeOffset expected, string expectedLabel, DateTimeOffset actual, string actualLabel)
     {
         var sb = new System.Text.StringBuilder();
         sb.AppendLine("Verification failed.");
         sb.Append(AnsiColour.Expected($"Expected {actualLabel} {relation} {expectedLabel}: "));
         sb.AppendLine(AnsiColour.Expected(expected.ToString("O")));
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(actual.ToString("O")));
+        return sb.ToString();
+    }
+
+    private static string FormatSingle(string expectedDesc, DateTimeOffset actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {expectedDesc}."));
+        sb.AppendLine();
         sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
         sb.Append(AnsiColour.Actual(actual.ToString("O")));
         return sb.ToString();

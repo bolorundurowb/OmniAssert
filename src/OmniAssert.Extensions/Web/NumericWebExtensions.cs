@@ -2,7 +2,7 @@ using OmniAssert.Extensions.Internal;
 
 namespace OmniAssert.Extensions.Web;
 
-/// <summary>Web and HTTP-related assertions for <see cref="NumericAssertions{int}"/> subjects.</summary>
+/// <summary>Web and HTTP-related assertions for integer numeric subjects from <see cref="Ensure.Must(int, string?)"/>.</summary>
 public static class NumericWebExtensions
 {
     /// <summary>Verifies that the port number is within the valid range <c>0</c>–<c>65535</c>.</summary>

@@ -16,15 +16,19 @@ internal static class ObjectDiffWalker
     /// <param name="actual">Candidate object graph (actual side).</param>
     /// <param name="rootLabel">Path label for the root (often the caller expression).</param>
     /// <returns><c>null</c> when equivalent; otherwise a result you can format for <see cref="ObjectAssertions.ToBeEquivalentTo"/> failures.</returns>
-    public static ObjectDiffResult? Diff(object? expected, object? actual, string rootLabel)
+    public static ObjectDiffResult? Diff(object? expected, object? actual, string rootLabel) =>
+        Diff(expected, actual, rootLabel, EquivalenceOptions.Default);
+
+    /// <summary>Compares two graphs using the supplied <paramref name="options"/> to relax case and sequence ordering.</summary>
+    public static ObjectDiffResult? Diff(object? expected, object? actual, string rootLabel, EquivalenceOptions options)
     {
         var visitedPairs = new HashSet<(object, object)>(ReferencePairComparer.Instance);
         var mismatches = new List<Mismatch>();
-        Walk(expected, actual, rootLabel, visitedPairs, mismatches);
+        Walk(expected, actual, rootLabel, visitedPairs, mismatches, options);
         return mismatches.Count == 0 ? null : new ObjectDiffResult(mismatches);
     }
 
-    private static void Walk(object? expected, object? actual, string path, HashSet<(object, object)> visited, List<Mismatch> mismatches)
+    private static void Walk(object? expected, object? actual, string path, HashSet<(object, object)> visited, List<Mismatch> mismatches, EquivalenceOptions options)
     {
         if (ReferenceEquals(expected, actual))
             return;
@@ -45,6 +49,13 @@ internal static class ObjectDiffWalker
 
         if (IsLeaf(expType))
         {
+            if (options.IgnoreCase && expected is string es && actual is string @as)
+            {
+                if (!string.Equals(es, @as, StringComparison.OrdinalIgnoreCase))
+                    mismatches.Add(new Mismatch(path, expected, actual));
+                return;
+            }
+
             if (!Equals(expected, actual))
                 mismatches.Add(new Mismatch(path, expected, actual));
             return;
@@ -58,7 +69,10 @@ internal static class ObjectDiffWalker
                 return;
             }
 
-            CompareEnumerables(expEnum, actEnum, path, visited, mismatches);
+            if (options.IgnoreCollectionOrder)
+                CompareEnumerablesUnordered(expEnum, actEnum, path, mismatches, options);
+            else
+                CompareEnumerables(expEnum, actEnum, path, visited, mismatches, options);
             return;
         }
 
@@ -81,11 +95,11 @@ internal static class ObjectDiffWalker
                 continue;
             }
 
-            Walk(ev, av, path + "." + prop.Name, visited, mismatches);
+            Walk(ev, av, path + "." + prop.Name, visited, mismatches, options);
         }
     }
 
-    private static void CompareEnumerables(IEnumerable expected, IEnumerable actual, string path, HashSet<(object, object)> visited, List<Mismatch> mismatches)
+    private static void CompareEnumerables(IEnumerable expected, IEnumerable actual, string path, HashSet<(object, object)> visited, List<Mismatch> mismatches, EquivalenceOptions options)
     {
         var ee = expected.GetEnumerator();
         var ae = actual.GetEnumerator();
@@ -102,8 +116,46 @@ internal static class ObjectDiffWalker
                 return;
             }
 
-            Walk(ee.Current, ae.Current, path + $"[{index}]", visited, mismatches);
+            Walk(ee.Current, ae.Current, path + $"[{index}]", visited, mismatches, options);
             index++;
+        }
+    }
+
+    private static void CompareEnumerablesUnordered(IEnumerable expected, IEnumerable actual, string path, List<Mismatch> mismatches, EquivalenceOptions options)
+    {
+        var expectedItems = new List<object?>();
+        foreach (var e in expected) expectedItems.Add(e);
+        var actualItems = new List<object?>();
+        foreach (var a in actual) actualItems.Add(a);
+
+        if (expectedItems.Count != actualItems.Count)
+        {
+            mismatches.Add(new Mismatch(path, expectedItems.Count, actualItems.Count));
+            return;
+        }
+
+        var matched = new bool[actualItems.Count];
+        foreach (var expectedItem in expectedItems)
+        {
+            var found = false;
+            for (var i = 0; i < actualItems.Count; i++)
+            {
+                if (matched[i])
+                    continue;
+
+                if (Diff(expectedItem, actualItems[i], "", options) is null)
+                {
+                    matched[i] = true;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                mismatches.Add(new Mismatch(path, expectedItem, null));
+                return;
+            }
         }
     }
 

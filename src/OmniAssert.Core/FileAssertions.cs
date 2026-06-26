@@ -55,4 +55,39 @@ public readonly struct FileAssertions
             $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) to be empty, but had {info.Length} bytes.",
             _expression);
     }
+
+    /// <summary>Verifies that the file has content (non-zero byte length).</summary>
+    public void NotBeEmpty()
+    {
+        if (!File.Exists(_path))
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) to exist, but it does not.",
+                _expression);
+            return;
+        }
+
+        var info = new FileInfo(_path);
+        if (info.Length > 0)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) not to be empty, but had 0 bytes.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the file path ends with <paramref name="extension"/> (case-insensitive; a leading dot is optional).</summary>
+    /// <param name="extension">The expected extension, with or without a leading dot (for example <c>".json"</c> or <c>"json"</c>).</param>
+    /// <param name="extensionExpression">The expression for the extension (automatically captured).</param>
+    public void HaveExtension(string extension, [CallerArgumentExpression(nameof(extension))] string? extensionExpression = null)
+    {
+        var normalized = extension.StartsWith('.') ? extension : "." + extension;
+        var actualExtension = Path.GetExtension(_path);
+        if (string.Equals(actualExtension, normalized, StringComparison.OrdinalIgnoreCase))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected file {_expression} ({StringFormatter.Quote(_path)}) to have extension {extensionExpression ?? "extension"} ({StringFormatter.Quote(normalized)}), but had {StringFormatter.Quote(actualExtension)}.",
+            _expression);
+    }
 }

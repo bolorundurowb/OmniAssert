@@ -14,6 +14,9 @@ public readonly struct TimeSpanAssertions
         _expression = expression;
     }
 
+    /// <summary>Verifies that the timespan is exactly equal to the <paramref name="expected"/> value.</summary>
+    /// <param name="expected">The expected duration.</param>
+    /// <param name="expectedExpression">The expression for the expected timespan (automatically captured).</param>
     public void Be(TimeSpan expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
     {
         if (_actual == expected)

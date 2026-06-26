@@ -11,7 +11,7 @@ namespace OmniAssert;
 /// <remarks>
 /// This is a <c>ref struct</c> so it can hold a <see cref="ReadOnlySpan{T}"/> directly without allocation.
 /// All four memory-slice types share this single assertion type via their respective
-/// <c>Verify()</c> extension-method overloads.
+/// <c>Must()</c> extension-method overloads.
 /// </remarks>
 /// <typeparam name="T">Element type.</typeparam>
 public readonly ref struct SpanAssertions<T>
@@ -116,6 +116,23 @@ public readonly ref struct SpanAssertions<T>
 
         VerificationFlow.Fail(
             $"Verification failed: expected {_expression} to have count less than {maximumCount} ({countExpression ?? "maximumCount"}), but had {_actual.Length}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the span count is within the inclusive range [<paramref name="minCount"/>, <paramref name="maxCount"/>].</summary>
+    /// <param name="minCount">The minimum inclusive count.</param>
+    /// <param name="maxCount">The maximum inclusive count.</param>
+    /// <param name="minExpression">The expression for the minimum count (automatically captured).</param>
+    /// <param name="maxExpression">The expression for the maximum count (automatically captured).</param>
+    public void HaveCountBetween(int minCount, int maxCount,
+        [CallerArgumentExpression(nameof(minCount))] string? minExpression = null,
+        [CallerArgumentExpression(nameof(maxCount))] string? maxExpression = null)
+    {
+        if (_actual.Length >= minCount && _actual.Length <= maxCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count between {minExpression ?? "minCount"} ({minCount}) and {maxExpression ?? "maxCount"} ({maxCount}), but had {_actual.Length}.",
             _expression);
     }
 

@@ -324,6 +324,170 @@ public readonly struct StringAssertions : IAssertionContext<string?>
             _expression);
     }
 
+    /// <summary>Verifies that the string has no leading or trailing whitespace (internal whitespace is allowed).</summary>
+    public void BeTrimmed()
+    {
+        if (_actual is not null && StringFormatValidators.IsTrimmed(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be trimmed (no leading or trailing whitespace), but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string length is within the inclusive range [<paramref name="minLength"/>, <paramref name="maxLength"/>].</summary>
+    /// <param name="minLength">The minimum inclusive length.</param>
+    /// <param name="maxLength">The maximum inclusive length.</param>
+    /// <param name="minExpression">The expression for the minimum length (automatically captured).</param>
+    /// <param name="maxExpression">The expression for the maximum length (automatically captured).</param>
+    public void HaveLengthBetween(int minLength, int maxLength,
+        [CallerArgumentExpression(nameof(minLength))] string? minExpression = null,
+        [CallerArgumentExpression(nameof(maxLength))] string? maxExpression = null)
+    {
+        if (_actual is not null && _actual.Length >= minLength && _actual.Length <= maxLength)
+            return;
+
+        var actualLengthText = _actual is null ? "null" : _actual.Length.ToString();
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have length between {minExpression ?? "minLength"} ({minLength}) and {maxExpression ?? "maxLength"} ({maxLength}), but had length {actualLengthText}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is non-empty and consists only of letters and digits.</summary>
+    public void BeAlphanumeric()
+    {
+        if (_actual is not null && StringFormatValidators.IsAlphanumeric(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be alphanumeric (letters and digits only), but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string contains no upper-case letters (ordinal). Digits and punctuation are permitted.</summary>
+    public void BeLowerCase()
+    {
+        if (_actual is not null && StringFormatValidators.IsLowerCase(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be lower case, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string contains no lower-case letters (ordinal). Digits and punctuation are permitted.</summary>
+    public void BeUpperCase()
+    {
+        if (_actual is not null && StringFormatValidators.IsUpperCase(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be upper case, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is non-empty and consists only of decimal digits (leading zeros are preserved).</summary>
+    public void BeNumeric()
+    {
+        if (_actual is not null && StringFormatValidators.IsAllDigits(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be numeric (digits only), but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is valid Base64 text (canonical alphabet, length a multiple of four, optional padding).</summary>
+    public void BeBase64()
+    {
+        if (_actual is not null && StringFormatValidators.IsBase64(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be a Base64 string, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is non-empty and consists solely of hexadecimal digits (<c>0-9</c>, <c>a-f</c>, <c>A-F</c>).</summary>
+    public void BeHexString()
+    {
+        if (_actual is not null && StringFormatValidators.IsHexString(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be a hexadecimal string, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is a CSS-style hex colour: <c>#RGB</c>, <c>#RGBA</c>, <c>#RRGGBB</c>, or <c>#RRGGBBAA</c>.</summary>
+    public void BeHexColor()
+    {
+        if (_actual is not null && StringFormatValidators.IsHexColor(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be a hex colour (e.g. #RGB, #RRGGBB, or #RRGGBBAA), but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>
+    /// Verifies that the string is a valid ISO 8601 date/time. Parsing uses <see cref="System.Globalization.CultureInfo.InvariantCulture"/>
+    /// with round-trip semantics, so the result is culture-independent.
+    /// </summary>
+    public void BeIso8601()
+    {
+        if (_actual is not null &&
+            DateTime.TryParse(_actual, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.RoundtripKind, out _))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be an ISO 8601 date/time string, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>
+    /// Verifies that the string matches the exact date/time <paramref name="format"/>. Parsing is performed with
+    /// <see cref="System.Globalization.CultureInfo.InvariantCulture"/> and exact matching, so results are culture-independent.
+    /// </summary>
+    /// <param name="format">The exact .NET date/time format string (for example <c>yyyy-MM-dd</c>).</param>
+    /// <param name="formatExpression">The expression for the format (automatically captured).</param>
+    public void BeDateString(string format, [CallerArgumentExpression(nameof(format))] string? formatExpression = null)
+    {
+        if (_actual is not null &&
+            DateTime.TryParseExact(_actual, format, System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out _))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be a date string matching format {formatExpression ?? "format"} ({Quote(format)}), but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is a rooted (absolute) path via <see cref="System.IO.Path.IsPathRooted(string)"/>.</summary>
+    /// <remarks>Path rooting rules are OS-specific; this is a syntactic check only and does not touch the file system.</remarks>
+    public void BeAbsolutePath()
+    {
+        if (_actual is not null && System.IO.Path.IsPathRooted(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be an absolute (rooted) path, but was {Quote(_actual)}.",
+            _expression);
+    }
+
+    /// <summary>Verifies that the string is a relative (non-rooted) path via <see cref="System.IO.Path.IsPathRooted(string)"/>.</summary>
+    /// <remarks>Path rooting rules are OS-specific; this is a syntactic check only and does not touch the file system.</remarks>
+    public void BeRelativePath()
+    {
+        if (_actual is not null && !System.IO.Path.IsPathRooted(_actual))
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to be a relative path, but was {Quote(_actual)}.",
+            _expression);
+    }
+
     private static string FormatStrings(string relation, string? expected, string expectedLabel, string? actual, string actualLabel)
     {
         if (relation == "not to be")

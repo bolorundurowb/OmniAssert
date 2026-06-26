@@ -150,6 +150,131 @@ public readonly struct NumericAssertions<T> : IAssertionContext<T> where T : INu
         VerificationFlow.Fail(msg, _expression);
     }
 
+    /// <summary>Verifies that the numeric value is strictly greater than zero.</summary>
+    public void BePositive()
+    {
+        if (_actual > T.Zero)
+            return;
+
+        var msg = FormatFailure("to be positive", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the numeric value is strictly less than zero.</summary>
+    public void BeNegative()
+    {
+        if (_actual < T.Zero)
+            return;
+
+        var msg = FormatFailure("to be negative", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the value is an even integer. Fails for non-integral or fractional values.</summary>
+    public void BeEven()
+    {
+        if (T.IsEvenInteger(_actual))
+            return;
+
+        var msg = FormatFailure("to be even", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the value is an odd integer. Fails for non-integral or fractional values.</summary>
+    public void BeOdd()
+    {
+        if (T.IsOddInteger(_actual))
+            return;
+
+        var msg = FormatFailure("to be odd", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the value is an exact integer multiple of <paramref name="factor"/>.</summary>
+    /// <param name="factor">The non-zero factor the value must be divisible by.</param>
+    /// <param name="factorExpression">The expression for the factor (automatically captured).</param>
+    public void BeMultipleOf(T factor, [CallerArgumentExpression(nameof(factor))] string? factorExpression = null)
+    {
+        if (factor == T.Zero)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected factor to be non-zero, but was {FormatValue(factor)}.",
+                _expression);
+            return;
+        }
+
+        if (_actual % factor == T.Zero)
+            return;
+
+        var msg = FormatFailure($"to be a multiple of {factorExpression ?? "factor"} ({FormatValue(factor)})", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the value is a finite number (not NaN or infinity). Always passes for integral types.</summary>
+    public void BeFinite()
+    {
+        if (T.IsFinite(_actual))
+            return;
+
+        var msg = FormatFailure("to be finite", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>Verifies that the value is positive or negative infinity. Always fails for integral types.</summary>
+    public void BeInfinite()
+    {
+        if (T.IsInfinity(_actual))
+            return;
+
+        var msg = FormatFailure("to be infinite", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    /// <summary>
+    /// Verifies that the value has exactly <paramref name="expectedPlaces"/> fractional digits (trailing zeros ignored).
+    /// The subject is converted to <see cref="decimal"/> before counting; floating-point subjects therefore reflect the
+    /// nearest representable decimal, so prefer this for <see cref="decimal"/> values and document tolerance for <see cref="double"/>/<see cref="float"/>.
+    /// </summary>
+    /// <param name="expectedPlaces">The expected number of fractional digits (non-negative).</param>
+    /// <param name="placesExpression">The expression for the expected places (automatically captured).</param>
+    public void HaveDecimalPlaces(int expectedPlaces, [CallerArgumentExpression(nameof(expectedPlaces))] string? placesExpression = null)
+    {
+        if (expectedPlaces < 0)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected decimal places to be non-negative, but was {expectedPlaces}.",
+                _expression);
+            return;
+        }
+
+        if (!T.IsFinite(_actual))
+        {
+            VerificationFlow.Fail(
+                FormatFailure($"to have {expectedPlaces} ({placesExpression ?? "expectedPlaces"}) decimal places", _actual, _expression),
+                _expression);
+            return;
+        }
+
+        var actualPlaces = CountDecimalPlaces(decimal.CreateChecked(_actual));
+        if (actualPlaces == expectedPlaces)
+            return;
+
+        var msg = FormatFailure($"to have {expectedPlaces} ({placesExpression ?? "expectedPlaces"}) decimal places, but had {actualPlaces}", _actual, _expression);
+        VerificationFlow.Fail(msg, _expression);
+    }
+
+    private static int CountDecimalPlaces(decimal value)
+    {
+        value = Math.Abs(value);
+        var scale = (decimal.GetBits(value)[3] >> 16) & 0xFF;
+
+        // Strip trailing zeros: if rounding to one fewer place leaves the value unchanged, that place was a zero.
+        while (scale > 0 && value == Math.Round(value, scale - 1))
+            scale--;
+
+        return scale;
+    }
+
     private static string FormatPair(string relation, T expected, string expectedLabel, T actual, string actualLabel)
     {
         var sb = new StringBuilder();

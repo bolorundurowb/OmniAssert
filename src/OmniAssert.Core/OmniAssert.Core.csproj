@@ -15,12 +15,11 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>v2.2.0
-    - Added OmniAssert.Extensions companion package: web, financial, security, and regional fluent validators (email, URL, IBAN, JWT, Nigerian phone/BVN/NUBAN, and more).
-    - Expanded automated test coverage across Core, Extensions, Analyzers, and Generator (80%+ line coverage on production assemblies).
-    - Broadened SpanAssertions test coverage and consolidated legacy span wrapper tests.
-    - Added analyzer code-fix tests for OA001–OA004 migration paths.
-    - Updated documentation site and package examples for v2.2.0.</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.3.0
+    - Added convenience assertions for strings, numbers, dates, collections, and files (format validators, sign/parity checks, set operations, EquivalenceOptions).
+    - Added EquivalenceOptions for tuning BeEquivalentTo (IgnoreCase, IgnoreCollectionOrder).
+    - Expanded XML documentation on public assertion APIs.
+    - Updated documentation site and package examples for v2.3.0.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>

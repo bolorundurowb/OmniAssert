@@ -88,9 +88,17 @@ public readonly struct ObjectAssertions
     /// Deep structural comparison: walks public instance properties and sequences, then reports a coloured diff on mismatch.
     /// </summary>
     /// <param name="expected">Expected graph (order of enumerable elements must match).</param>
-    public void BeEquivalentTo(object? expected)
+    public void BeEquivalentTo(object? expected) => BeEquivalentTo(expected, EquivalenceOptions.Default);
+
+    /// <summary>
+    /// Deep structural comparison with relaxed matching controlled by <paramref name="options"/>
+    /// (case-insensitive strings and/or order-insensitive nested sequences).
+    /// </summary>
+    /// <param name="expected">Expected graph.</param>
+    /// <param name="options">Equivalence relaxations to apply.</param>
+    public void BeEquivalentTo(object? expected, EquivalenceOptions options)
     {
-        var diff = ObjectDiffWalker.Diff(expected, _actual, _expression);
+        var diff = ObjectDiffWalker.Diff(expected, _actual, _expression, options);
         if (diff is null)
             return;
 

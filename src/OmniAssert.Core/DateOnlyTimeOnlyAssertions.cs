@@ -89,7 +89,102 @@ public readonly struct DateOnlyAssertions : IAssertionContext<DateOnly>
             _expression);
     }
 
+    /// <summary>Verifies that the date is today's date according to the local system clock (<see cref="DateTime.Today"/>).</summary>
+    /// <remarks>Uses the local clock, so results can shift across midnight or time-zone boundaries.</remarks>
+    public void BeToday()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        if (_actual == today)
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to be today ({FormatDate(today)})", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date is yesterday's date according to the local system clock.</summary>
+    /// <remarks>Uses the local clock, so results can shift across midnight or time-zone boundaries.</remarks>
+    public void BeYesterday()
+    {
+        var yesterday = DateOnly.FromDateTime(DateTime.Today).AddDays(-1);
+        if (_actual == yesterday)
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to be yesterday ({FormatDate(yesterday)})", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date is tomorrow's date according to the local system clock.</summary>
+    /// <remarks>Uses the local clock, so results can shift across midnight or time-zone boundaries.</remarks>
+    public void BeTomorrow()
+    {
+        var tomorrow = DateOnly.FromDateTime(DateTime.Today).AddDays(1);
+        if (_actual == tomorrow)
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to be tomorrow ({FormatDate(tomorrow)})", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date falls on a weekday (Monday through Friday).</summary>
+    public void BeWeekday()
+    {
+        var day = _actual.DayOfWeek;
+        if (day != DayOfWeek.Saturday && day != DayOfWeek.Sunday)
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to be a weekday, but was {day}", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date falls on a weekend (Saturday or Sunday).</summary>
+    public void BeWeekend()
+    {
+        var day = _actual.DayOfWeek;
+        if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to be a weekend, but was {day}", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date's year is a leap year.</summary>
+    public void BeLeapYear()
+    {
+        if (DateTime.IsLeapYear(_actual.Year))
+            return;
+
+        VerificationFlow.Fail(FormatSingle($"to fall in a leap year, but {_actual.Year} is not", _actual, _expression), _expression);
+    }
+
+    /// <summary>Verifies that the date is within <paramref name="days"/> days (inclusive) of <paramref name="anchor"/>.</summary>
+    /// <param name="days">The maximum allowed difference in days (non-negative).</param>
+    /// <param name="anchor">The reference date.</param>
+    /// <param name="anchorExpression">The expression for the anchor (automatically captured).</param>
+    public void BeWithinDays(int days, DateOnly anchor, [CallerArgumentExpression(nameof(anchor))] string? anchorExpression = null)
+    {
+        if (days < 0)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected days to be non-negative, but was {days}.",
+                _expression);
+            return;
+        }
+
+        if (Math.Abs(_actual.DayNumber - anchor.DayNumber) <= days)
+            return;
+
+        VerificationFlow.Fail(
+            FormatSingle($"to be within {days} day(s) of {anchorExpression ?? "anchor"} ({FormatDate(anchor)})", _actual, _expression),
+            _expression);
+    }
+
     private static string FormatDate(DateOnly value) => value.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static string FormatSingle(string expectedDesc, DateOnly actual, string actualLabel)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Verification failed.");
+        sb.Append(AnsiColour.Expected($"Expected {actualLabel} {expectedDesc}."));
+        sb.AppendLine();
+        sb.Append(AnsiColour.Actual($"Got {actualLabel}: "));
+        sb.Append(AnsiColour.Actual(FormatDate(actual)));
+        return sb.ToString();
+    }
 
     private static string FormatFailure(string relation, DateOnly expected, string expectedLabel, DateOnly actual, string actualLabel)
     {
