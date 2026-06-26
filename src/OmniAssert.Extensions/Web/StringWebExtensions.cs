@@ -244,10 +244,23 @@ public static partial class StringWebExtensions
         if (string.IsNullOrEmpty(value) || !value.StartsWith('/'))
             return false;
 
-        if (Uri.TryCreate(value, UriKind.Absolute, out _))
+        if (value.Contains("://") || RightOfColonIsScheme(value.AsSpan()))
             return false;
 
         return true;
+    }
+
+    private static bool RightOfColonIsScheme(ReadOnlySpan<char> value)
+    {
+        for (var i = 0; i < value.Length - 1; i++)
+        {
+            if (value[i] == ':')
+            {
+                var rest = value[(i + 1)..];
+                return rest.StartsWith("//");
+            }
+        }
+        return false;
     }
 
     private static bool IsValidJson(string? value)
