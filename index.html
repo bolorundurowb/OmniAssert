@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="OmniAssert 2.2 — fluent assertions for .NET 10 and C# 14. Ensure.Must() API, Ensure.Expression() boolean diagnostics, soft assertions, object diffing, Roslyn migration analyzers OA001–OA007, OmniAssert.Extensions validators, and compile-time interceptors.">
+  <meta name="description" content="OmniAssert 2.3 — fluent assertions for .NET 10 and C# 14. Ensure.Must() API, Ensure.Expression() boolean diagnostics, soft assertions, object diffing, Roslyn migration analyzers OA001–OA007, OmniAssert.Extensions validators, and compile-time interceptors.">
   <title>OmniAssert Documentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -478,12 +478,12 @@
           <div class="logo-wrap">
             <img src="assets/omni-assert-logo.svg" alt="OmniAssert shield logo">
           </div>
-          <h2>OmniAssert 2.2.0</h2>
+          <h2>OmniAssert 2.3.0</h2>
           <p>
             A GPL-3.0-only package for test projects targeting .NET 10. The runtime assembly is
             <code>OmniAssert.Core</code>. Roslyn generators and analyzers ship in the same NuGet package.
           </p>
-          <div class="command">dotnet add package OmniAssert --version 2.2.0</div>
+          <div class="command">dotnet add package OmniAssert --version 2.3.0</div>
           <div class="stats" aria-label="Key capabilities">
             <div class="stat">
               <strong>.NET 10</strong>
@@ -573,9 +573,15 @@
       </div>
 
       <div class="callout">
+        <strong>What's new in 2.3:</strong> convenience assertions for strings, numbers, dates, collections, and files;
+        <code>EquivalenceOptions</code> for <code>BeEquivalentTo</code>; expanded XML docs on public APIs; documentation
+        site API reference updated for v2.3.0.
+      </div>
+
+      <div class="callout">
         <strong>What's new in 2.2:</strong> <code>OmniAssert.Extensions</code> companion package for web, financial,
         security, and regional validators; expanded span assertion coverage; improved automated test coverage across Core,
-        Extensions, Analyzers, and Generator; documentation and package examples updated for v2.2.0.
+        Extensions, Analyzers, and Generator.
       </div>
 
       <div class="callout">
@@ -641,13 +647,13 @@
       <div class="steps">
         <article class="step">
           <h3>Add the NuGet package</h3>
-          <pre><code class="language-bash">dotnet add package OmniAssert --version 2.2.0</code></pre>
+          <pre><code class="language-bash">dotnet add package OmniAssert --version 2.3.0</code></pre>
         </article>
 
         <article class="step">
           <h3>Or add the package reference manually</h3>
           <pre><code class="language-xml">&lt;ItemGroup&gt;
-  &lt;PackageReference Include="OmniAssert" Version="2.2.0" /&gt;
+  &lt;PackageReference Include="OmniAssert" Version="2.3.0" /&gt;
 &lt;/ItemGroup&gt;</code></pre>
         </article>
 
@@ -673,9 +679,9 @@
         <article class="step">
           <h3>Optionally install Extensions for domain assertions</h3>
           <p>OmniAssert.Extensions adds web, financial, security, and regional assertions. It requires the core OmniAssert package.</p>
-          <pre><code class="language-bash">dotnet add package OmniAssert.Extensions --version 2.2.0</code></pre>
+          <pre><code class="language-bash">dotnet add package OmniAssert.Extensions --version 2.3.0</code></pre>
           <pre><code class="language-xml">&lt;ItemGroup&gt;
-  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.2.0" /&gt;
+  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.3.0" /&gt;
 &lt;/ItemGroup&gt;</code></pre>
         </article>
       </div>
@@ -757,10 +763,12 @@ public class OrderServiceTests
 
       <article class="card">
         <h4>Basic values and numeric</h4>
-        <p>Assertions for standard numeric types including <code>BigInteger</code>.</p>
+        <p>Assertions for standard numeric types including <code>BigInteger</code> (via <code>INumber&lt;T&gt;</code>).</p>
         <pre><code class="language-csharp">answer.Must().Be(42);
 count.Must().BeGreaterThan(0);
-price.Must().BeApproximately(9.99, 0.01);
+order.Total.Must().BePositive();
+price.Must().BeApproximately(9.99m, 0.01m);
+rate.Must().HaveDecimalPlaces(2);
 score.Must().BeOneOf(10, 20, 30);</code></pre>
         <ul class="method-list">
           <li><code>Be(expected)</code> / <code>NotBe(unexpected)</code></li>
@@ -769,17 +777,23 @@ score.Must().BeOneOf(10, 20, 30);</code></pre>
           <li><code>BeInRange(min, max)</code></li>
           <li><code>BeApproximately(expected, precision)</code></li>
           <li><code>BeOneOf(values...)</code></li>
+          <li><code>BePositive()</code> / <code>BeNegative()</code> — strictly greater/less than zero</li>
+          <li><code>BeEven()</code> / <code>BeOdd()</code> — integral values only</li>
+          <li><code>BeMultipleOf(factor)</code> — exact integer multiple; <code>factor</code> must be non-zero</li>
+          <li><code>BeFinite()</code> / <code>BeInfinite()</code> — floating-point semantics; integral types always pass <code>BeFinite</code></li>
+          <li><code>HaveDecimalPlaces(n)</code> — counts fractional digits after converting to <code>decimal</code> (trailing zeros ignored)</li>
         </ul>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
         <h4>Strings</h4>
         <pre><code class="language-csharp">name.Must().StartWith("John");
-email.Must().Match(@"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-path.Must().NotContain("/");
-bio.Must().HaveLengthGreaterThan(10);</code></pre>
+sku.Must().BeAlphanumeric();
+createdAt.Must().BeIso8601();
+token.Must().BeBase64();
+configPath.Must().BeAbsolutePath();</code></pre>
         <ul class="method-list">
-          <li><code>Contain(substring)</code> / <code>NotContain(substring)</code> — ordinal by default; <code>NotContain(substring, StringComparison)</code> overload available</li>
+          <li><code>Contain(substring)</code> / <code>NotContain(substring)</code> — ordinal by default; overloads with <code>StringComparison</code></li>
           <li><code>StartWith(prefix)</code> / <code>EndWith(suffix)</code> / <code>NotEndWith(suffix)</code></li>
           <li><code>Match(regex)</code></li>
           <li><code>BeIgnoringCase(expected)</code> / <code>BeOneOf(values...)</code></li>
@@ -788,27 +802,35 @@ bio.Must().HaveLengthGreaterThan(10);</code></pre>
           <li><code>BeNullOrEmpty()</code> / <code>NotBeNullOrEmpty()</code></li>
           <li><code>BeNullOrWhiteSpace()</code> / <code>NotBeNullOrWhiteSpace()</code></li>
           <li><code>BeWhiteSpace()</code> / <code>NotBeWhiteSpace()</code></li>
-          <li><code>HaveLength(n)</code> / <code>HaveLengthGreaterThan(n)</code> / <code>HaveLengthLessThan(n)</code></li>
+          <li><code>HaveLength(n)</code> / <code>HaveLengthGreaterThan(n)</code> / <code>HaveLengthLessThan(n)</code> / <code>HaveLengthBetween(min, max)</code></li>
+          <li><code>BeTrimmed()</code> — no leading or trailing whitespace</li>
+          <li><code>BeAlphanumeric()</code> / <code>BeLowerCase()</code> / <code>BeUpperCase()</code> / <code>BeNumeric()</code></li>
+          <li><code>BeBase64()</code> / <code>BeHexString()</code> / <code>BeHexColor()</code> — format validators</li>
+          <li><code>BeIso8601()</code> / <code>BeDateString(format)</code> — parsed with <code>InvariantCulture</code></li>
+          <li><code>BeAbsolutePath()</code> / <code>BeRelativePath()</code> — syntactic check via <code>Path.IsPathRooted</code> (OS-specific)</li>
         </ul>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
         <h4>Collections and dictionaries</h4>
-        <pre><code class="language-csharp">users.Must().HaveCount(3);
-items.Must().Contain(targetItem);
-items.Must().NotBe(otherItems);
+        <pre><code class="language-csharp">users.Must().HaveCountBetween(1, 10);
+roles.Must().BeSubsetOf(allRoles);
+items.Must().ContainOnly(allowedStatuses);
 results.Must().BeEmpty();
 settings.Must().ContainKey("Theme");</code></pre>
         <ul class="method-list">
           <li><code>Be(expected)</code> / <code>NotBe(expected)</code> — reference equality on the collection instance</li>
-          <li><code>HaveCount(n)</code>, <code>HaveCountGreaterThan(n)</code>, <code>HaveCountLessThan(n)</code></li>
+          <li><code>HaveCount(n)</code>, <code>HaveCountGreaterThan(n)</code>, <code>HaveCountLessThan(n)</code>, <code>HaveCountBetween(min, max)</code></li>
           <li><code>HaveCountMatching(n, predicate)</code></li>
           <li><code>BeEmpty()</code> / <code>NotBeEmpty()</code></li>
           <li><code>Contain(item)</code> / <code>NotContain(item)</code></li>
           <li><code>Contain(predicate)</code>, <code>AllSatisfy(predicate)</code>, <code>AnySatisfy(predicate)</code>, <code>NoneSatisfy(predicate)</code></li>
+          <li><code>ContainOnly(allowed)</code> / <code>ContainOnly(predicate)</code> — every element must be permitted or match</li>
+          <li><code>BeSubsetOf(expected)</code> / <code>BeSupersetOf(expected)</code> — set semantics with default equality</li>
           <li><code>BeUnique()</code> / <code>HaveUniqueCount(n)</code></li>
-          <li><code>BeInAscendingOrder()</code> / <code>BeInDescendingOrder()</code></li>
+          <li><code>BeInAscendingOrder()</code> / <code>BeInDescendingOrder()</code> — optional key-selector overloads</li>
           <li><code>BeEquivalentTo(other)</code> — multiset equivalence, order ignored</li>
+          <li><code>BeEquivalentTo(other, EquivalenceOptions)</code> — relaxed string case and/or nested sequence order</li>
           <li><code>BeSequenceEqual(other)</code> — exact sequence, same order</li>
           <li><code>ContainInOrder(items...)</code> — items appear in order, not necessarily consecutively</li>
           <li><code>BeNull()</code> / <code>NotBeNull()</code></li>
@@ -819,13 +841,21 @@ settings.Must().ContainKey("Theme");</code></pre>
       <article class="card" style="margin-top: 1rem;">
         <h4>Objects and equivalence</h4>
         <pre><code class="language-csharp">instance.Must().BeOfType&lt;MyClass&gt;();
-actualDto.Must().BeEquivalentTo(expectedDto);</code></pre>
+actualDto.Must().BeEquivalentTo(expectedDto);
+actual.Must().BeEquivalentTo(expected, new EquivalenceOptions
+{
+    IgnoreCase = true,
+    IgnoreCollectionOrder = true
+});</code></pre>
         <ul class="method-list">
           <li><code>Be(expected)</code> — reference equality</li>
           <li><code>BeNull()</code> / <code>NotBeNull()</code></li>
           <li><code>BeOfType&lt;T&gt;()</code> / <code>NotBeOfType&lt;T&gt;()</code></li>
           <li><code>BeAssignableTo&lt;T&gt;()</code> / <code>NotBeAssignableTo&lt;T&gt;()</code></li>
-          <li><code>BeEquivalentTo(expected)</code> — recursive property comparison with diff</li>
+          <li><code>BeEquivalentTo(expected)</code> — recursive property comparison with coloured diff</li>
+          <li><code>BeEquivalentTo(expected, EquivalenceOptions)</code> — tune case and nested collection order</li>
+          <li><code>EquivalenceOptions.IgnoreCase</code> — ordinal case-insensitive strings in the graph</li>
+          <li><code>EquivalenceOptions.IgnoreCollectionOrder</code> — multiset comparison for nested sequences</li>
         </ul>
       </article>
 
@@ -850,28 +880,84 @@ await TimeSpan.FromSeconds(2).CompleteWithin(() =&gt; longRunningTask);</code></
 
       <article class="card" style="margin-top: 1rem;">
         <h4>Dates, times, and other types</h4>
-        <pre><code class="language-csharp">dateTime.Must().BeAfter(yesterday);
+        <pre><code class="language-csharp">createdAt.Must().BeInPast();
+dueDate.Must().BeSameDayAs(expected);
+birthday.Must().BeToday();
 timeSpan.Must().BePositive();
-guid.Must().NotBeEmpty();
-uri.Must().HaveHost("github.com");</code></pre>
+guid.Must().NotBeEmpty();</code></pre>
         <ul class="method-list">
-          <li><code>DateTime</code> / <code>DateTimeOffset</code>: <code>BeBefore</code>, <code>BeAfter</code>, <code>BeWithin</code></li>
-          <li><code>DateOnly</code> / <code>TimeOnly</code>: <code>BeBefore</code>, <code>BeAfter</code></li>
-          <li><code>TimeSpan</code>: <code>BePositive</code>, <code>BeNegative</code></li>
-          <li><code>Guid</code>: <code>BeEmpty</code>, <code>NotBeEmpty</code></li>
-          <li><code>Enum</code>: <code>Be</code>, <code>BeOneOf</code></li>
-          <li><code>Uri</code>: <code>HaveScheme</code>, <code>HaveHost</code>, <code>HavePath</code>, <code>HaveQuery</code></li>
+          <li><code>DateTime</code> / <code>DateTimeOffset</code>: <code>Be</code>, <code>NotBe</code>, <code>BeBefore</code>, <code>BeAfter</code>, <code>BeWithin</code>, <code>BeInPast</code>, <code>BeInFuture</code>, <code>BeSameDayAs</code></li>
+          <li><code>BeInPast</code> / <code>BeInFuture</code> compare against <code>UtcNow</code> — use UTC subjects</li>
+          <li><code>DateOnly</code>: <code>Be</code>, <code>BeBefore</code>, <code>BeAfter</code>, <code>HaveYear</code>, <code>HaveMonth</code>, <code>HaveDay</code>, <code>BeToday</code>, <code>BeYesterday</code>, <code>BeTomorrow</code>, <code>BeWeekday</code>, <code>BeWeekend</code>, <code>BeLeapYear</code>, <code>BeWithinDays(n, anchor)</code></li>
+          <li><code>DateOnly</code> “today” helpers use the local clock (<code>DateTime.Today</code>)</li>
+          <li><code>TimeOnly</code>: <code>Be</code>, <code>BeBefore</code>, <code>BeAfter</code></li>
+          <li><code>TimeSpan</code>: <code>Be</code>, <code>NotBe</code>, <code>BePositive</code>, <code>BeNegative</code>, range and ordering helpers</li>
+          <li><code>Guid</code>: <code>Be</code>, <code>BeEmpty</code>, <code>NotBeEmpty</code>, <code>BeOneOf</code></li>
+          <li><code>Enum</code>: <code>Be</code>, <code>NotBe</code>, <code>BeOneOf</code></li>
+          <li><code>Uri</code>: <code>Be</code>, <code>HaveScheme</code>, <code>HaveHost</code>, <code>HavePath</code>, <code>HaveQuery</code></li>
+        </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Spans and memory slices</h4>
+        <p>Zero-allocation assertions for <code>ReadOnlySpan&lt;T&gt;</code>, <code>Span&lt;T&gt;</code>, <code>ReadOnlyMemory&lt;T&gt;</code>, and <code>Memory&lt;T&gt;</code> via <code>.Must()</code>.</p>
+        <pre><code class="language-csharp">ReadOnlySpan&lt;byte&gt; header = buffer.AsSpan(0, 4);
+header.Must().StartWith(magicBytes);
+header.Must().HaveCountBetween(1, 64);</code></pre>
+        <ul class="method-list">
+          <li><code>Equal</code> / <code>NotEqual</code>, <code>BeEmpty</code> / <code>NotBeEmpty</code></li>
+          <li><code>HaveLength</code> / <code>HaveCount</code>, count bounds including <code>HaveCountBetween</code></li>
+          <li><code>Contain</code>, <code>NotContain</code>, <code>StartWith</code>, <code>EndWith</code></li>
+          <li><code>BeUnique</code>, ordering, predicate helpers — same vocabulary as collections</li>
+          <li><code>BeEquivalentTo</code>, <code>BeSequenceEqual</code>, <code>ContainInOrder</code></li>
         </ul>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
         <h4>File system</h4>
         <pre><code class="language-csharp">"config.json".FileExists().HaveContent(expectedJson);
+"log.txt".FileExists().NotBeEmpty().HaveExtension(".txt");
 "temp".DirectoryExists().BeEmpty();</code></pre>
         <ul class="method-list">
-          <li><code>FileExists()</code> → <code>HaveContent(text)</code>, <code>BeEmpty()</code></li>
+          <li><code>FileExists()</code> → <code>HaveContent(text)</code>, <code>BeEmpty()</code>, <code>NotBeEmpty()</code>, <code>HaveExtension(ext)</code></li>
+          <li><code>HaveExtension</code> — leading dot optional, comparison is case-insensitive</li>
           <li><code>DirectoryExists()</code> → <code>BeEmpty()</code></li>
         </ul>
+      </article>
+
+      <article class="card" style="margin-top: 1rem;">
+        <h4>Names from other libraries</h4>
+        <p>Common assertion names elsewhere and their OmniAssert spelling:</p>
+        <div class="api-table" aria-label="Suggested assertion name mappings">
+          <div class="api-row">
+            <strong><code>BeDistinct</code> / <code>HaveUniqueItems</code></strong>
+            <span><code>BeUnique()</code></span>
+          </div>
+          <div class="api-row">
+            <strong><code>BeSorted</code> / <code>BeInAscendingOrder</code></strong>
+            <span><code>BeInAscendingOrder()</code></span>
+          </div>
+          <div class="api-row">
+            <strong><code>MatchRegex</code> / <code>BeRegex</code></strong>
+            <span><code>Match(pattern)</code></span>
+          </div>
+          <div class="api-row">
+            <strong><code>BeNumericString</code></strong>
+            <span><code>BeNumeric()</code></span>
+          </div>
+          <div class="api-row">
+            <strong><code>BeExistingFile</code></strong>
+            <span><code>path.FileExists()</code></span>
+          </div>
+          <div class="api-row">
+            <strong><code>HaveSameElementsAs</code></strong>
+            <span><code>BeEquivalentTo()</code> (unordered) / <code>BeSequenceEqual()</code> (ordered)</span>
+          </div>
+          <div class="api-row">
+            <strong><code>BeQuasiEquivalentTo</code></strong>
+            <span><code>BeEquivalentTo(expected, new EquivalenceOptions { IgnoreCase = true, IgnoreCollectionOrder = true })</code></span>
+          </div>
+        </div>
       </article>
 
       <article class="card" style="margin-top: 1rem;">
@@ -936,8 +1022,8 @@ Ensure.Fail("Verification failed: custom wording");</code></pre>
 
       <h3>Installation</h3>
       <pre><code class="language-xml">&lt;ItemGroup&gt;
-  &lt;PackageReference Include="OmniAssert" Version="2.2.0" /&gt;
-  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.2.0" /&gt;
+  &lt;PackageReference Include="OmniAssert" Version="2.3.0" /&gt;
+  &lt;PackageReference Include="OmniAssert.Extensions" Version="2.3.0" /&gt;
 &lt;/ItemGroup&gt;</code></pre>
 
       <h3>Namespaces</h3>
@@ -1271,7 +1357,8 @@ public void Should_reject_unsupported_platform()
       <p>
         <code>BeEquivalentTo</code> compares object graphs recursively and reports the path where values diverge. On
         collections it treats sequences as multisets — same elements in any order. Use <code>BeSequenceEqual</code> when
-        order matters.
+        order matters. Pass <code>EquivalenceOptions</code> to relax string case and nested collection order instead of
+        inventing a separate “quasi-equivalent” API.
       </p>
       <pre><code class="language-csharp">var expected = new InvoiceDto
 {
@@ -1284,7 +1371,20 @@ public void Should_reject_unsupported_platform()
 };
 
 var actual = await client.GetInvoiceAsync("INV-2026-001");
-actual.Must().BeEquivalentTo(expected);</code></pre>
+actual.Must().BeEquivalentTo(expected);
+
+// Case-insensitive strings + order-insensitive nested sequences
+actual.Must().BeEquivalentTo(expected, new EquivalenceOptions
+{
+    IgnoreCase = true,
+    IgnoreCollectionOrder = true
+});</code></pre>
+
+      <h3>Collection sets and bounds</h3>
+      <pre><code class="language-csharp">roles.Must().BeSubsetOf(allRoles);
+permissions.Must().BeSupersetOf(requiredPermissions);
+tags.Must().ContainOnly(allowedTags);
+batch.Must().HaveCountBetween(1, 100);</code></pre>
 
       <h3>Collections, predicates, and ordering</h3>
       <pre><code class="language-csharp">results.Must().HaveCount(documents.Count);
@@ -1598,7 +1698,7 @@ Ensure.Throws&lt;ArgumentException&gt;(() =&gt; act());
 
       <h3>Recommended migration steps</h3>
       <ol class="feature-list">
-        <li>Upgrade the <code>OmniAssert</code> package to v2.x (latest: 2.2.0).</li>
+        <li>Upgrade the <code>OmniAssert</code> package to v2.x (latest: 2.3.0).</li>
         <li>Build and review OA001–OA004 warnings.</li>
         <li>Run code fixes (per file or fix all in solution).</li>
         <li>Search for remaining <code>.Verify()</code>, <code>.ToBe</code>, <code>VerifyExpression</code>, or <code>OmniAssert.Assert</code> usages.</li>
@@ -1771,7 +1871,7 @@ dotnet test src/OmniAssert.slnx /p:CollectCoverage=true</code></pre>
 
   <footer class="footer">
     <div class="footer-inner">
-      <span>OmniAssert documentation · v2.2.0</span>
+      <span>OmniAssert documentation · v2.3.0</span>
       <span>
         <a href="https://github.com/bolorundurowb/OmniAssert">GitHub</a>
         ·
