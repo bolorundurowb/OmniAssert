@@ -7,6 +7,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OmniAssert.Analyzers.Tests/OmniAssert.Analyzers.Tests.csproj" />
+    <Project Path="tests/OmniAssert.Extensions.Tests/OmniAssert.Extensions.Tests.csproj" />
     <Project Path="tests/OmniAssert.Tests/OmniAssert.Tests.csproj" />
     <Project Path="tests/OmniAssert.Generator.Tests/OmniAssert.Generator.Tests.csproj" />
   </Folder>
