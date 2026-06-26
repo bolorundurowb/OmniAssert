@@ -442,6 +442,54 @@ public readonly struct CollectionAssertions<T>
     }
 
     /// <summary>
+    /// Multiset equivalence with relaxed matching controlled by <paramref name="options"/>
+    /// (case-insensitive string elements and/or order-insensitive nested sequences).
+    /// </summary>
+    /// <param name="expected">Expected multiset of elements.</param>
+    /// <param name="options">Equivalence relaxations to apply.</param>
+    /// <param name="expectedExpression">The expression for the expected collection (automatically captured).</param>
+    public void BeEquivalentTo(IEnumerable<T> expected, EquivalenceOptions options, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualList = _actual.ToList();
+        var expectedList = expected.ToList();
+
+        if (actualList.Count != expectedList.Count)
+        {
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"} (count {expectedList.Count}), but had count {actualList.Count}.",
+                _expression);
+            return;
+        }
+
+        var matched = new bool[actualList.Count];
+        foreach (var expectedItem in expectedList)
+        {
+            var found = false;
+            for (var i = 0; i < actualList.Count; i++)
+            {
+                if (matched[i])
+                    continue;
+
+                if (AreEquivalent(actualList[i], expectedItem, options))
+                {
+                    matched[i] = true;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found)
+                continue;
+
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be equivalent to {expectedExpression ?? "expected"}, but no unmatched element equivalent to {FormatItem(expectedItem)} was found.",
+                _expression);
+            return;
+        }
+    }
+
+    /// <summary>
     /// Sequence equivalence: same elements in the same order. Uses default equality for <typeparamref name="T"/>.
     /// </summary>
     /// <param name="expected">Expected sequence of elements.</param>
@@ -504,6 +552,111 @@ public readonly struct CollectionAssertions<T>
             _expression);
     }
 
+    /// <summary>Verifies that the collection count is within the inclusive range [<paramref name="minCount"/>, <paramref name="maxCount"/>].</summary>
+    /// <param name="minCount">The minimum inclusive count.</param>
+    /// <param name="maxCount">The maximum inclusive count.</param>
+    /// <param name="minExpression">The expression for the minimum count (automatically captured).</param>
+    /// <param name="maxExpression">The expression for the maximum count (automatically captured).</param>
+    public void HaveCountBetween(int minCount, int maxCount,
+        [CallerArgumentExpression(nameof(minCount))] string? minExpression = null,
+        [CallerArgumentExpression(nameof(maxCount))] string? maxExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualCount = GetActualCount();
+        if (actualCount >= minCount && actualCount <= maxCount)
+            return;
+
+        VerificationFlow.Fail(
+            $"Verification failed: expected {_expression} to have count between {minExpression ?? "minCount"} ({minCount}) and {maxExpression ?? "maxCount"} ({maxCount}), but had {actualCount}.",
+            _expression);
+    }
+
+    /// <summary>
+    /// Verifies that every element of the collection is a member of <paramref name="allowed"/> (set semantics, default equality).
+    /// An empty collection trivially satisfies this.
+    /// </summary>
+    /// <param name="allowed">The set of permitted values.</param>
+    /// <param name="allowedExpression">The expression for the allowed set (automatically captured).</param>
+    public void ContainOnly(IEnumerable<T> allowed, [CallerArgumentExpression(nameof(allowed))] string? allowedExpression = null)
+    {
+        EnsureActualNotNull();
+        var allowedSet = new HashSet<T>(allowed);
+        var index = 0;
+        foreach (var item in _actual)
+        {
+            if (!allowedSet.Contains(item))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to contain only elements from {allowedExpression ?? "allowed"}, but element at index {index} ({FormatItem(item)}) was not allowed.",
+                    _expression);
+                return;
+            }
+            index++;
+        }
+    }
+
+    /// <summary>Verifies that every element of the collection satisfies <paramref name="predicate"/> (alias of all-elements semantics).</summary>
+    /// <param name="predicate">The condition every element must meet.</param>
+    /// <param name="predicateExpression">The expression for the predicate (automatically captured).</param>
+    public void ContainOnly(Func<T, bool> predicate, [CallerArgumentExpression(nameof(predicate))] string? predicateExpression = null)
+    {
+        EnsureActualNotNull();
+        var index = 0;
+        foreach (var item in _actual)
+        {
+            if (!predicate(item))
+            {
+                VerificationFlow.Fail(
+                    $"Verification failed: expected {_expression} to contain only elements matching {predicateExpression ?? "predicate"}, but element at index {index} ({FormatItem(item)}) did not.",
+                    _expression);
+                return;
+            }
+            index++;
+        }
+    }
+
+    /// <summary>
+    /// Verifies that every distinct element of the collection is also present in <paramref name="expected"/> (set semantics, default equality).
+    /// </summary>
+    /// <param name="expected">The candidate superset.</param>
+    /// <param name="expectedExpression">The expression for the expected superset (automatically captured).</param>
+    public void BeSubsetOf(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        EnsureActualNotNull();
+        var superset = new HashSet<T>(expected);
+        foreach (var item in _actual)
+        {
+            if (superset.Contains(item))
+                continue;
+
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be a subset of {expectedExpression ?? "expected"}, but element {FormatItem(item)} was not present in the superset.",
+                _expression);
+            return;
+        }
+    }
+
+    /// <summary>
+    /// Verifies that every distinct element of <paramref name="expected"/> is also present in the collection (set semantics, default equality).
+    /// </summary>
+    /// <param name="expected">The candidate subset.</param>
+    /// <param name="expectedExpression">The expression for the expected subset (automatically captured).</param>
+    public void BeSupersetOf(IEnumerable<T> expected, [CallerArgumentExpression(nameof(expected))] string? expectedExpression = null)
+    {
+        EnsureActualNotNull();
+        var actualSet = new HashSet<T>(_actual);
+        foreach (var item in expected)
+        {
+            if (actualSet.Contains(item))
+                continue;
+
+            VerificationFlow.Fail(
+                $"Verification failed: expected {_expression} to be a superset of {expectedExpression ?? "expected"}, but required element {FormatItem(item)} was missing.",
+                _expression);
+            return;
+        }
+    }
+
     private static bool AreEquivalent(T a, T b)
     {
         if (EqualityComparer<T>.Default.Equals(a, b))
@@ -513,6 +666,20 @@ public readonly struct CollectionAssertions<T>
             return false;
 
         return ObjectDiffWalker.Diff(a, b, "") == null;
+    }
+
+    private static bool AreEquivalent(T a, T b, EquivalenceOptions options)
+    {
+        if (options.IgnoreCase && a is string sa && b is string sb)
+            return string.Equals(sa, sb, StringComparison.OrdinalIgnoreCase);
+
+        if (EqualityComparer<T>.Default.Equals(a, b))
+            return true;
+
+        if (a is null || b is null)
+            return false;
+
+        return ObjectDiffWalker.Diff(a, b, "", options) == null;
     }
 
     private static List<(T Item, int Count)> GetElementCounts(IEnumerable<T> source)
