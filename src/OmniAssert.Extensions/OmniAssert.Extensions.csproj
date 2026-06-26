@@ -17,6 +17,10 @@
     <PackageTags>assertion;fluent;testing;validation;web;security;iban;jwt;nigeria</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>v2.2.0
+    - Initial public release of OmniAssert.Extensions alongside OmniAssert 2.2.0.
+    - Web, financial, security, and regional assertion extensions with companion validators.
+    - Requires OmniAssert package at the same version.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/#extensions</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>

@@ -15,13 +15,12 @@
     <PackageTags>assertion;fluent;testing;csharp;dotnet;soft-assertions;test-framework;validation;roslyn;code-generation</PackageTags>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>v2.1.0
-    - Deprecated extension VerifyExpression() in favor of static Ensure.Expression(...); the extension remains functional with [Obsolete] warnings until v3.0.
-    - Updated the compile-time interceptor source generator to emit Ensure.Expression(...) and to intercept static Ensure.Expression call sites in addition to legacy VerifyExpression paths.
-    - Added OA005–OA007 analyzers: OA005 rewrites comparison-in-bool patterns such as (a &lt; b).Must().BeTrue() to subject-first a.Must().BeLessThan(b); OA006 suggests BeEmpty() instead of HaveCount(0); OA007 flags redundant NotBeNull() after new expressions.
-    - Added BeNull(), NotBeNull(), and NotBe(expected) to CollectionAssertions for null and reference-inequality checks.
-    - Added NotContain(substring) to StringAssertions with ordinal and StringComparison overloads.
-    - Updated PackageProjectUrl to https://bolorundurowb.github.io/OmniAssert/.</PackageReleaseNotes>
+    <PackageReleaseNotes>v2.2.0
+    - Added OmniAssert.Extensions companion package: web, financial, security, and regional fluent validators (email, URL, IBAN, JWT, Nigerian phone/BVN/NUBAN, and more).
+    - Expanded automated test coverage across Core, Extensions, Analyzers, and Generator (80%+ line coverage on production assemblies).
+    - Broadened SpanAssertions test coverage and consolidated legacy span wrapper tests.
+    - Added analyzer code-fix tests for OA001–OA004 migration paths.
+    - Updated documentation site and package examples for v2.2.0.</PackageReleaseNotes>
     <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
     <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
