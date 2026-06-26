@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <InternalsVisibleTo Include="OmniAssert.Extensions.Tests" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>OmniAssert.Extensions</RootNamespace>
+    <AssemblyName>OmniAssert.Extensions</AssemblyName>
+    <LangVersion>14</LangVersion>
+    <PackageId>OmniAssert.Extensions</PackageId>
+    <Title>OmniAssert Extensions</Title>
+    <Authors>Winner-Timothy Bolorunduro</Authors>
+    <Description>Domain-specific fluent assertions for web, financial, security, and regional validation — companion to OmniAssert.</Description>
+    <PackageTags>assertion;fluent;testing;validation;web;security;iban;jwt;nigeria</PackageTags>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Copyright>©2026-2026, Bolorunduro Winner-Timothy. All Rights reserved.</Copyright>
+    <PackageProjectUrl>https://bolorundurowb.github.io/OmniAssert/#extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bolorundurowb/OmniAssert</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>omni-assert-logo.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OmniAssert.Core\OmniAssert.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\omni-assert-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

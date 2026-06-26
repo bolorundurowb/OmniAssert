@@ -88,15 +88,21 @@ jobs:
           OUT="${RUNNER_TEMP}/nupkg"
           mkdir -p "$OUT"
           dotnet restore OmniAssert.slnx
+          dotnet test OmniAssert.slnx --configuration Release --no-restore
           dotnet pack OmniAssert.Core/OmniAssert.Core.csproj \
+            --configuration Release \
+            --no-restore \
+            --output "$OUT" \
+            -p:ContinuousIntegrationBuild=true
+          dotnet pack OmniAssert.Extensions/OmniAssert.Extensions.csproj \
             --configuration Release \
             --no-restore \
             --output "$OUT" \
             -p:ContinuousIntegrationBuild=true
 
           mapfile -t pkgs < <(find "$OUT" -maxdepth 1 -name '*.nupkg' -type f | sort)
-          if [[ ${#pkgs[@]} -eq 0 ]]; then
-            echo "::error::Pack produced no .nupkg under $OUT"
+          if [[ ${#pkgs[@]} -lt 2 ]]; then
+            echo "::error::Pack produced fewer than 2 .nupkg files under $OUT (expected OmniAssert + OmniAssert.Extensions)"
             ls -la "$OUT" || true
             exit 1
           fi

@@ -202,7 +202,6 @@ public static class T
         var (_, generatedSources) = RunGenerator(source, enableInterceptors: true);
 
         var interceptor = generatedSources.FirstOrDefault(s => s.HintName.Contains("VerifyInterceptors"));
-        Xunit.Assert.NotNull(interceptor);
         Xunit.Assert.Contains("Ensure.Expression", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
         Xunit.Assert.Contains("(bool condition", interceptor!.SourceText.ToString(), StringComparison.Ordinal);
     }

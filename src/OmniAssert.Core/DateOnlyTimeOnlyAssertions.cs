@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace OmniAssert;
 
 /// <summary>Assertions for <see cref="DateOnly"/> subjects from <see cref="Ensure.Must(DateOnly, string?)"/>.</summary>
-public readonly struct DateOnlyAssertions
+public readonly struct DateOnlyAssertions : IAssertionContext<DateOnly>
 {
     private readonly DateOnly _actual;
     private readonly string _expression;
@@ -13,6 +13,9 @@ public readonly struct DateOnlyAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    DateOnly IAssertionContext<DateOnly>.Subject => _actual;
+    string IAssertionContext<DateOnly>.Expression => _expression;
 
     /// <summary>Verifies that the date is equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected date value.</param>
@@ -113,7 +116,7 @@ public readonly struct DateOnlyAssertions
 }
 
 /// <summary>Assertions for <see cref="TimeOnly"/> subjects from <see cref="Ensure.Must(TimeOnly, string?)"/>.</summary>
-public readonly struct TimeOnlyAssertions
+public readonly struct TimeOnlyAssertions : IAssertionContext<TimeOnly>
 {
     private readonly TimeOnly _actual;
     private readonly string _expression;
@@ -123,6 +126,9 @@ public readonly struct TimeOnlyAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    TimeOnly IAssertionContext<TimeOnly>.Subject => _actual;
+    string IAssertionContext<TimeOnly>.Expression => _expression;
 
     /// <summary>Verifies that the time is equal to <paramref name="expected"/>.</summary>
     /// <param name="expected">The expected time value.</param>

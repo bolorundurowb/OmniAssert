@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace OmniAssert;
 
 /// <summary>Assertions for <see cref="string"/> (or null) subjects from <see cref="Ensure.Must(string?, string?)"/>.</summary>
-public readonly struct StringAssertions
+public readonly struct StringAssertions : IAssertionContext<string?>
 {
     private readonly string? _actual;
     private readonly string _expression;
@@ -15,6 +15,9 @@ public readonly struct StringAssertions
         _actual = actual;
         _expression = expression;
     }
+
+    string? IAssertionContext<string?>.Subject => _actual;
+    string IAssertionContext<string?>.Expression => _expression;
 
     /// <summary>Verifies that the string is equal to the <paramref name="expected"/> string using ordinal comparison.</summary>
     /// <param name="expected">The expected string.</param>

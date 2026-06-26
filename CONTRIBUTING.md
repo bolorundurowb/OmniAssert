@@ -16,11 +16,26 @@ The codebase was bootstrapped with **significant AI assistance**; treat contribu
 | Path | Role |
 |------|------|
 | `src/OmniAssert.Core` | Runtime: `Assert`, fluent assertion structs, `AssertionScope`, `OmniAssertionException`, `AssertionCapture`, plus internal diff and colour helpers. |
+| `src/OmniAssert.Extensions` | Domain-specific fluent assertions for web, financial, security, and regional validation — companion package (`OmniAssert.Extensions` on NuGet). |
 | `src/OmniAssert.Generator` | Roslyn incremental generator: `Ensure.Expression(bool, string?)` and legacy `VerifyExpression` interceptors (on by default, opt out with `OmniAssertDisableVerifyInterceptors`); optional operand-capture rewrite via `AdditionalFiles`. |
 | `src/OmniAssert.Generator/Rewrite` | `VerifyExpansionEngine`: lowers boolean trees to `Expression(bool, AssertionCapture)` for tests and tooling. |
 | `src/tests/OmniAssert.Tests` | Main tests (interceptors enabled). |
+| `src/tests/OmniAssert.Extensions.Tests` | Tests for the Extensions package. |
 | `src/tests/OmniAssert.Generator.Tests` | Generator and lowering compile tests. |
 | `src/samples/VerifyInterceptorsSample` | Minimal project showing interceptor and rewrite MSBuild wiring. |
+
+## Documentation site (gh-pages)
+
+The public docs at [bolorundurowb.github.io/OmniAssert](https://bolorundurowb.github.io/OmniAssert/) are served from the **`gh-pages`** branch. Many contributors keep a separate local checkout (for example `OmniAssert-gh-pages` beside this repo) and push `index.html` updates there:
+
+```powershell
+cd path\to\OmniAssert-gh-pages
+git add index.html
+git commit -m "Document API changes"
+git push origin gh-pages
+```
+
+Site files: `index.html`, `assets/omni-assert-logo.svg`, `assets/omni-assert-logo.png`.
 
 ## Build, test, and coverage
 
