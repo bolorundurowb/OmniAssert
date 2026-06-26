@@ -11,7 +11,7 @@ namespace OmniAssert;
 /// <remarks>
 /// This is a <c>ref struct</c> so it can hold a <see cref="ReadOnlySpan{T}"/> directly without allocation.
 /// All four memory-slice types share this single assertion type via their respective
-/// <c>Verify()</c> extension-method overloads.
+/// <c>Must()</c> extension-method overloads.
 /// </remarks>
 /// <typeparam name="T">Element type.</typeparam>
 public readonly ref struct SpanAssertions<T>

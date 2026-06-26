@@ -36,9 +36,9 @@
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="OmniAssert" Version="2.2.0" />
+  <PackageReference Include="OmniAssert" Version="2.3.0" />
   <!-- Optional: domain validators (web, financial, security, regional) -->
-  <PackageReference Include="OmniAssert.Extensions" Version="2.2.0" />
+  <PackageReference Include="OmniAssert.Extensions" Version="2.3.0" />
 </ItemGroup>
 ```
 

@@ -221,6 +221,7 @@ public readonly struct DateTimeOffsetAssertions : IAssertionContext<DateTimeOffs
     }
 
     /// <summary>Verifies that the instant is in the past relative to <see cref="DateTimeOffset.UtcNow"/> (offset-aware).</summary>
+    /// <remarks>Compares against <see cref="DateTimeOffset.UtcNow"/>; prefer UTC-normalized instants when testing wall-clock boundaries.</remarks>
     public void BeInPast()
     {
         if (_actual < DateTimeOffset.UtcNow)
@@ -230,6 +231,7 @@ public readonly struct DateTimeOffsetAssertions : IAssertionContext<DateTimeOffs
     }
 
     /// <summary>Verifies that the instant is in the future relative to <see cref="DateTimeOffset.UtcNow"/> (offset-aware).</summary>
+    /// <remarks>Compares against <see cref="DateTimeOffset.UtcNow"/>; prefer UTC-normalized instants when testing wall-clock boundaries.</remarks>
     public void BeInFuture()
     {
         if (_actual > DateTimeOffset.UtcNow)

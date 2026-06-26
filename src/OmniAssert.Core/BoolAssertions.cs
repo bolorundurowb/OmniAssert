@@ -3,7 +3,7 @@ using System.Text;
 
 namespace OmniAssert;
 
-/// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Ensure.Must(bool)"/>.</summary>
+/// <summary>Fluent assertions for a <see cref="bool"/> returned from <see cref="Ensure.Must(bool, string?)"/>.</summary>
 /// <remarks>Failures respect an enclosing <see cref="AssertionScope"/> when present; otherwise they throw <see cref="OmniAssertionException"/>.</remarks>
 public readonly struct BoolAssertions
 {
